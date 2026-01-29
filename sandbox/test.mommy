@@ -1,0 +1,4 @@
+mayihave 10 in x as int
+add x with 5
+say x
+leave
