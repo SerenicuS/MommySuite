@@ -1,0 +1,7 @@
+[package]
+name = "mommy_lang"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+hive_std = { path = "../hive_std" }
