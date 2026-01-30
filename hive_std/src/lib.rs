@@ -10,6 +10,7 @@ pub fn insert_token(input: &str) -> Vec<String>{
         match c{
             '"' =>{
                 inside_quote = !inside_quote;
+                current_token.push(c);
             }
 
             ' ' | '\t' | '\r' | '\n' if !inside_quote => {

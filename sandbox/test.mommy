@@ -1,4 +1,12 @@
 mayihave 10 in x as int
 add x with 5
+ask if x > 5
+say "The number x is greater than 5"
+done
+or
+say "Then number x is less than 5"
+done
+punishme x
 say x
+done
 leave

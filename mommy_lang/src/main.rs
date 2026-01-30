@@ -28,13 +28,22 @@ fn parse_line(tokens: Vec<String>) -> String{
 
             let message = &tokens[1];
             if message.starts_with("\""){
-                format!("printf(\"{}\\n\");", message)
+                format!("printf(\"%s\\n\", {});", message) // string
             }
 
             else{
                 format!("printf(\"%d\\n\", {});", message) // without quotation print messages
             }
 
+        }
+
+        // Syntax: punishme (variable)
+        //   printf
+        // done
+        "punishme" =>{
+            let repeat_count = &tokens[1];
+
+            format!("for (int i = 0; i < {}; i++) {{", repeat_count)
         }
 
         // Syntax: add variable with 5
@@ -44,6 +53,23 @@ fn parse_line(tokens: Vec<String>) -> String{
             let add_to_value = &tokens[3];
 
             format!("{} = {} + {};", value, value, add_to_value)
+        }
+
+        //Syntax: ask if (variable) (operator) (variable)
+
+        "ask" =>{
+            let condition = &tokens[2..].join(" ");
+            format!("if ({}) {{", condition)
+        }
+
+        // Syntax: else
+        "or" => {
+            format!("else {{")
+        }
+
+        // For brackets
+        "done" =>{
+            format!("}}")
         }
 
         "leave" => {
