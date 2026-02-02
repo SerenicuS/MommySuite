@@ -45,6 +45,8 @@ fn parse_line(
 }
 
 
+
+// This is too big, i will deal with this later
 fn main(){
     let content = fs::read_to_string("sandbox/test.mommy").expect("Could not read the file Does test Mommy exist?");
     let mut symbol_table: HashMap<String, String> = HashMap::new();
@@ -67,7 +69,6 @@ fn main(){
                 writeln!(output_file, "    {}", c_code).unwrap();
             }
             Err(e) => {
-                // Sad Path: Print your toxic error message and STOP compiling
                 eprintln!("COMPILATION ABORTED:\nLine: \"{}\"\nMommy says: {}", trimmed_line, e);
                 return; // Exit the program immediately
             }
