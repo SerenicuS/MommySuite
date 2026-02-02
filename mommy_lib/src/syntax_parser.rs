@@ -1,6 +1,4 @@
 // Insert Token
-
-
 pub fn insert_token(input: &str) -> Vec<String>{
     let mut tokens = Vec::new();
     let mut current_token = String::new();

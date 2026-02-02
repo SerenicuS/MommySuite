@@ -1,12 +1,25 @@
-mayihave 10 in x as int
-add x with 5
-ask if x > 5
-say "The number x is greater than 5"
+mayihave 85.5 in math as float
+mayihave 90.0 in science as float
+mayihave 2.0 in count as float
+mayihave 0.0 in total as float
+
+add total with math
+add total with science
+divide total with count
+
+say "--- REPORT CARD ---"
+say "Math Grade:"
+say math
+say "Science Grade:"
+say science
+say "Average:"
+say total
+
+ask if total > 85.0
+    say "Mommy is proud of you."
 done
 or
-say "Then number x is less than 5"
+    say "You are grounded."
 done
-punishme x
-say x
-done
+
 leave

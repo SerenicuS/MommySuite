@@ -1,93 +1,53 @@
-use hive_std::insert_token;
+use mommy_lib::syntax_parser;
+use mommy_lib::alu;
+use mommy_lib::io;
+use mommy_lib::loops;
+use mommy_lib::conditions;
+use mommy_lib::declaration;
+use mommy_lib::errors::MommyErrorResponse;
 use std::fs;
 use std::io::Write;
 use std::process::Command;
+use std::collections::HashMap;
 
-fn parse_line(tokens: Vec<String>) -> String{
-    if tokens.is_empty(){
-        return String::new();
+
+
+fn parse_line(
+    tokens: Vec<String>,
+    symbols: &mut HashMap<String, String>
+) -> Result<String, MommyErrorResponse> {
+
+    if tokens.is_empty() {
+        return Ok(String::new());
     }
 
-    match tokens[0].as_str(){
-        // Syntax: mayihave [VALUE] in [NAME] as [TYPE]
-        // Tokens: [0]        [1]   [2]  [3] [4]  [5]
+    match tokens[0].as_str() {
 
-        "mayihave" =>{
-            let value = &tokens[1];
-            let name = &tokens[3];
-            let variable_type = &tokens[5];
+        "mayihave" => declaration::may_i_have(&tokens, symbols),
 
-            // Return int x = 5
-            format!("{} {} = {};", variable_type, name, value)
-        }
+        "add" => alu::calculate_two(&tokens[1], "+", &tokens[3], symbols),
+        "divide" => alu::calculate_two(&tokens[1], "/", &tokens[3], symbols),
+        "subtract" => alu::calculate_two(&tokens[1], "-", &tokens[3], symbols),
+        "multiply" => alu::calculate_two(&tokens[1], "*", &tokens[3], symbols),
 
-        // Syntax say [Message]
-        // Tokens [0]   [1]
+        "say" => io::say(&tokens, symbols),
 
-        "say" => {
+        "punishme" => Ok(loops::punish_me(&tokens)),
+        "done" => Ok(loops::done()),
 
-            let message = &tokens[1];
-            if message.starts_with("\""){
-                format!("printf(\"%s\\n\", {});", message) // string
-            }
+        "ask" => Ok(conditions::ask(&tokens)),
+        "or" => Ok(conditions::or()),
 
-            else{
-                format!("printf(\"%d\\n\", {});", message) // without quotation print messages
-            }
+        "leave" => Ok("return 0;".to_string()),
 
-        }
-
-        // Syntax: punishme (variable)
-        //   printf
-        // done
-        "punishme" =>{
-            let repeat_count = &tokens[1];
-
-            format!("for (int i = 0; i < {}; i++) {{", repeat_count)
-        }
-
-        // Syntax: add variable with 5
-        "add" => {
-            let value = &tokens[1];
-
-            let add_to_value = &tokens[3];
-
-            format!("{} = {} + {};", value, value, add_to_value)
-        }
-
-        //Syntax: ask if (variable) (operator) (variable)
-
-        "ask" =>{
-            let condition = &tokens[2..].join(" ");
-            format!("if ({}) {{", condition)
-        }
-
-        // Syntax: else
-        "or" => {
-            format!("else {{")
-        }
-
-        // For brackets
-        "done" =>{
-            format!("}}")
-        }
-
-        "leave" => {
-            "return 0;".to_string()
-        }
-
-        _ => {
-            format!("//Unknown command {}", tokens[0])
-        }
+        _ => Ok(format!("// Unknown command {}", tokens[0])),
     }
 }
 
 
-
-
-
 fn main(){
     let content = fs::read_to_string("sandbox/test.mommy").expect("Could not read the file Does test Mommy exist?");
+    let mut symbol_table: HashMap<String, String> = HashMap::new();
 
     let mut output_file = fs::File::create("sandbox/test.c").expect("Could not create file");
 
@@ -99,11 +59,19 @@ fn main(){
         if trimmed_line.is_empty() {
             continue;
         }
-        let tokens = insert_token(trimmed_line);
-        let c_code = parse_line(tokens);
-
-        writeln!(output_file, "    {}", c_code).unwrap();
-
+        let tokens = syntax_parser::insert_token(trimmed_line);
+        let result = parse_line(tokens, &mut symbol_table);
+        match result {
+            Ok(c_code) => {
+                // Happy Path: Write the C code to the file
+                writeln!(output_file, "    {}", c_code).unwrap();
+            }
+            Err(e) => {
+                // Sad Path: Print your toxic error message and STOP compiling
+                eprintln!("COMPILATION ABORTED:\nLine: \"{}\"\nMommy says: {}", trimmed_line, e);
+                return; // Exit the program immediately
+            }
+        }
 
     }
 

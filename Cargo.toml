@@ -2,7 +2,7 @@
 members = [
     "mommy_lang",     # Your Compiler
     "mommy_shell",    # Your Terminal
-    "hive_std",       # Your Shared Library
+    "mommy_lib",       # Your Shared Library
 ]
 resolver = "2"
 
