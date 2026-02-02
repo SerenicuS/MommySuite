@@ -6,11 +6,9 @@ use mommy_lib::conditions;
 use mommy_lib::declaration;
 use mommy_lib::errors::MommyErrorResponse;
 use std::fs;
-use std::io::Write;
-use std::process::Command;
 use std::collections::HashMap;
-
-
+use std::env;
+use std::process::Command;
 
 fn parse_line(
     tokens: Vec<String>,
@@ -47,46 +45,73 @@ fn parse_line(
 
 
 // This is too big, i will deal with this later
-fn main(){
-    let content = fs::read_to_string("sandbox/test.mommy").expect("Could not read the file Does test Mommy exist?");
+fn main() {
+    // 1. GET ARGUMENTS & SETUP FILENAMES
+    let args: Vec<String> = env::args().collect();
+
+    let input_filename = if args.len() > 1 {
+        &args[1]
+    } else {
+        "sandbox/template.mommy"
+    };
+
+    // Prepare the output names *before* we start writing
+    // e.g., "sandbox/story.mommy" -> "sandbox/story.c" and "sandbox/story.exe"
+    let c_filename = input_filename.replace(".mommy", ".c");
+    let exe_filename = input_filename.replace(".mommy", ".exe");
+
+    println!("Mommy is reading: {}", input_filename);
+
+    // 2. READ THE FILE
+    let content = fs::read_to_string(input_filename)
+        .expect(&format!("Could not read file: {}", input_filename));
+
+    // 3. CREATE THE C FILE (Use the dynamic name!)
+    let mut output_file = fs::File::create(&c_filename)
+        .expect("Could not create C file");
+
     let mut symbol_table: HashMap<String, String> = HashMap::new();
 
-    let mut output_file = fs::File::create("sandbox/test.c").expect("Could not create file");
-
+    // 4. WRITE THE C CODE
+    // We write into 'output_file' which points to your dynamic .c file
+    use std::io::Write; // Make sure we can use writeln!
     writeln!(output_file, "#include <stdio.h>").unwrap();
     writeln!(output_file, "int main(){{").unwrap();
 
-    for line in content.lines(){
+    for line in content.lines() {
         let trimmed_line = line.trim();
         if trimmed_line.is_empty() {
             continue;
         }
+
+        // Assuming these functions come from your mommy_lib
         let tokens = syntax_parser::insert_token(trimmed_line);
         let result = parse_line(tokens, &mut symbol_table);
+
         match result {
             Ok(c_code) => {
-                // Happy Path: Write the C code to the file
                 writeln!(output_file, "    {}", c_code).unwrap();
             }
             Err(e) => {
                 eprintln!("COMPILATION ABORTED:\nLine: \"{}\"\nMommy says: {}", trimmed_line, e);
-                return; // Exit the program immediately
+                // We stop here so we don't try to run broken code
+                return;
             }
         }
-
     }
 
     writeln!(output_file, "}}").unwrap();
+
+    // Crucial: Save the file before GCC tries to read it
     drop(output_file);
-    println!("Transpilation successful. Now summoning GCC...");
 
-
-    println!("Compiling...");
+    // 5. RUN GCC DYNAMICALLY
+    println!("Compiling {}...", c_filename);
 
     let output = Command::new("gcc")
-        .arg("sandbox/test.c")
+        .arg(&c_filename)   // Compile the dynamic .c file
         .arg("-o")
-        .arg("sandbox/test.exe")
+        .arg(&exe_filename) // Output the dynamic .exe
         .output()
         .expect("Failed to execute GCC");
 
@@ -94,10 +119,18 @@ fn main(){
         eprintln!("Error: {}", String::from_utf8_lossy(&output.stderr));
         return;
     }
-    println!("GCC finished. Running the program...\n");
+
+    // 6. RUN THE PROGRAM
+    println!("Running {}...\n", exe_filename);
     println!("--- MOMMY OUTPUT BEGINS ---");
 
-    let _ = Command::new("./sandbox/test.exe")
+    let run_path = if exe_filename.contains('/') || exe_filename.contains('\\') {
+        exe_filename // It already has a path (e.g., "sandbox/test.exe")
+    } else {
+        format!("./{}", exe_filename) // It needs a path (e.g., "./test.exe")
+    };
+
+    let _ = Command::new(&run_path)
         .status()
         .expect("Failed to run the executable.");
 
