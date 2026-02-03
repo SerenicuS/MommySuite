@@ -232,6 +232,10 @@ fn shell_start_coding() {
         else if input.trim() == "EXIT"{
             return;
         }
+        else if input.trim() == "CLEAR"{
+            lite_ide.clear();
+            line_count = 0;
+        }
         lite_ide.push_str(&input);
 
         line_count += 1;
@@ -248,7 +252,7 @@ fn shell_save_coding(lite_ide: &str){
     let clean_name =  input_name.trim();
 
     let final_filename = {
-        validate_file(&clean_name)   // if the user added .mommy in the filename, if yes do not try to add another one
+        validate_file(&clean_name)   // the user might add .mommy in the filename, if yes do not try to add another one
     };
 
 
@@ -350,11 +354,11 @@ TODO LIST (For Tomorrow)
 
 1. Refactor Mommy Lang [AI(code temporary) -> Clean Arch]
 
-    [ ] Create a Config struct to handle path generation (input, .c, .exe) in one place.
+    [/] Create a Config struct to handle path generation (input, .c, .exe) in one place.
 
-    [?] Split main.rs into clear pipeline steps: transpile(), compile_gcc(), run_exe().
+    [/] Split main.rs into clear pipeline steps: transpile(), compile_gcc(), run_exe().
 
-    [?] Add better exit codes (don't try to run GCC if transpilation failed).
+    [/] Add better exit codes (don't try to run GCC if transpilation failed).
 
 2. Refactor Mommy Shell [AI(code temporary) -> Clean Arch]
 

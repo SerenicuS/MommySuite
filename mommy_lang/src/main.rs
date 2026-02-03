@@ -115,7 +115,7 @@ fn main() {
     let args: Vec<String> = env::args().collect();
 
 
-    let config = match Config::new(&args){
+    let config = match Config::new(&args){ // Prepare the file
         Ok(cfg) => cfg,
         Err(e) => {
             eprintln!("{}", e);
@@ -126,13 +126,13 @@ fn main() {
     println!("{}", mommy_response::MommyLangGeneralResponse::ReadingFile);
 
 
-    if let Err(e) = transpile_code_to_c(&config){
+    if let Err(e) = transpile_code_to_c(&config){ //Convert mommylang to C
         eprintln!("{}", mommy_response::MommyLangErrorResponse::ConvertLangFailed);
         eprintln!("{}", e);
         std::process::exit(1);
     }
 
-    if let Err(e) = compile_to_gcc(&config){
+    if let Err(e) = compile_to_gcc(&config){ //use GCC to create exe file for the converted C
         eprintln!("{}", mommy_response::MommyLangErrorResponse::TranspilingError);
         eprintln!("{}", e);
         std::process::exit(1);
@@ -140,7 +140,7 @@ fn main() {
 
     println!("--- MOMMY OUTPUT BEGINS ---");
 
-    if let Err(e) = run_mommy_file(&config){
+    if let Err(e) = run_mommy_file(&config){ // Run the exe file
         eprintln!("{}", mommy_response::MommyLangErrorResponse::RuntimeError);
         eprintln!("{}", e);
         std::process::exit(1);
