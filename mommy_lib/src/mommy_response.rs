@@ -8,7 +8,12 @@ pub enum MommyLangErrorResponse { //mommy_lang
     TypeMismatch,
     SyntaxError,
     UnclosedBlock,
-    
+    StatusNoFile,
+    WrongFileType,
+    ConfigCreationOfConfig,
+    ConvertLangFailed,
+    TranspilingError,
+    RuntimeError,
 
     //ALU
     MathOnString,
@@ -22,6 +27,9 @@ pub enum MommyLangGeneralResponse{
     StatusResultOk,
     StatusResultOkGeneral,
     StatusResultError,
+    ReadingFile,
+
+
 }
 
 
@@ -99,6 +107,13 @@ impl fmt::Display for MommyLangErrorResponse {
             Self::MathOnString => write!(f, "You cannot do math on words. This isn't Algebra class."),
             Self::DivideByZero => write!(f, "Zero? You want to divide by ZERO? Get out."),
 
+
+            Self::StatusNoFile => write!(f, "{}", "Mommy says there is no file to read."),
+            Self::WrongFileType => write!(f, "{}", "This is not what mommy wants sweetie."),
+            Self::ConfigCreationOfConfig => write!(f, "{}", "There is an error in handling the file sweetie"),
+            Self::ConvertLangFailed => write!(f, "{}", "Failed to convert the file sweetie."),
+            Self::TranspilingError => write!(f, "{}", "Failed to transpile the file sweetie"),
+            Self::RuntimeError => write!(f, "{}", "Failed to run sweetie"),
         }
     }
 }
@@ -112,6 +127,7 @@ impl fmt::Display for MommyLangGeneralResponse {
             Self::StatusResultOk => write!(f, "{}", "Mommy understood everything you told me sweetie."),
             Self::StatusResultOkGeneral => write!(f, "{}", "Mommy read everything but I am confused sweetie."),
             Self::StatusResultError => write!(f, "{}", "Mommy does not understand everything."),
+            Self::ReadingFile => write!(f, "{}", "Mommy is reading the file sweetie..."),
         }
     }
 }

@@ -1,19 +1,19 @@
+use std::io::Write;
 use mommy_lib::syntax_parser;
 use mommy_lib::alu;
 use mommy_lib::io;
 use mommy_lib::loops;
 use mommy_lib::conditions;
 use mommy_lib::declaration;
-use mommy_lib::mommy_response::MommyLangErrorResponse;
-use std::fs;
 use std::collections::HashMap;
-use std::env;
+use std::{env, fs};
 use std::process::Command;
+use mommy_lib::mommy_response;
 
 fn parse_line(
     tokens: Vec<String>,
     symbols: &mut HashMap<String, String>
-) -> Result<String, MommyLangErrorResponse> {
+) -> Result<String, mommy_response::MommyLangErrorResponse> {
 
     if tokens.is_empty() {
         return Ok(String::new());
@@ -43,48 +43,54 @@ fn parse_line(
 }
 
 
+struct Config{
+    input_path: String,
+    c_path: String,
+    exe_path: String,
+}
 
-// This is too big, i will deal with this later
-fn main() {
-    // 1. GET ARGUMENTS & SETUP FILENAMES
-    let args: Vec<String> = env::args().collect();
+impl Config{
+    fn new(args: &[String]) -> Result<Config, String>{
+        if args.len() < 2{
+            return Err(mommy_response::MommyLangErrorResponse::StatusNoFile.to_string())
+        }
 
-    let input_filename = if args.len() > 1 {
-        &args[1]
-    } else {
-        "sandbox/template.mommy"
-    };
+        let input_path = args[1].clone();
 
-    // Prepare the output names *before* we start writing
-    // e.g., "sandbox/story.mommy" -> "sandbox/story.c" and "sandbox/story.exe"
-    let c_filename = input_filename.replace(".mommy", ".c");
-    let exe_filename = input_filename.replace(".mommy", ".exe");
+        if !input_path.ends_with(".mommy"){
+            return Err(mommy_response::MommyLangErrorResponse::WrongFileType.to_string())
+        }
 
-    println!("Mommy is reading: {}", input_filename);
+        let c_path = input_path.replace(".mommy", ".c");
+        let exe_path = input_path.replace(".mommy", ".exe");
 
-    // 2. READ THE FILE
-    let content = fs::read_to_string(input_filename)
-        .expect(&format!("Could not read file: {}", input_filename));
+        Ok(Config{
+            input_path,
+            c_path,
+            exe_path,
+        })
+    }
+}
 
-    // 3. CREATE THE C FILE (Use the dynamic name!)
-    let mut output_file = fs::File::create(&c_filename)
-        .expect("Could not create C file");
+fn transpile_code_to_c(config: &Config) -> Result<(), String> {
+
+    let content = fs::read_to_string(&config.input_path)
+        .map_err(|_| format!("Could not read file: {}", config.input_path))?;
+
+    let mut output_file = fs::File::create(&config.c_path)
+        .map_err(|_| "Could not create C file")?;
 
     let mut symbol_table: HashMap<String, String> = HashMap::new();
 
-    // 4. WRITE THE C CODE
-    // We write into 'output_file' which points to your dynamic .c file
-    use std::io::Write; // Make sure we can use writeln!
     writeln!(output_file, "#include <stdio.h>").unwrap();
     writeln!(output_file, "int main(){{").unwrap();
 
-    for line in content.lines() {
+    for (i, line) in content.lines().enumerate() {
         let trimmed_line = line.trim();
         if trimmed_line.is_empty() {
             continue;
         }
 
-        // Assuming these functions come from your mommy_lib
         let tokens = syntax_parser::insert_token(trimmed_line);
         let result = parse_line(tokens, &mut symbol_table);
 
@@ -93,46 +99,82 @@ fn main() {
                 writeln!(output_file, "    {}", c_code).unwrap();
             }
             Err(e) => {
-                eprintln!("COMPILATION ABORTED:\nLine: \"{}\"\nMommy says: {}", trimmed_line, e);
-                // We stop here so we don't try to run broken code
-                return;
+                // Return the error so main stops!
+                return Err(format!("Line {}: {}", i + 1, e));
             }
         }
     }
 
     writeln!(output_file, "}}").unwrap();
 
-    // Crucial: Save the file before GCC tries to read it
-    drop(output_file);
+    Ok(())
+}
 
-    // 5. RUN GCC DYNAMICALLY
-    println!("Compiling {}...", c_filename);
 
-    let output = Command::new("gcc")
-        .arg(&c_filename)   // Compile the dynamic .c file
-        .arg("-o")
-        .arg(&exe_filename) // Output the dynamic .exe
-        .output()
-        .expect("Failed to execute GCC");
+fn main() {
+    let args: Vec<String> = env::args().collect();
 
-    if !output.status.success() {
-        eprintln!("Error: {}", String::from_utf8_lossy(&output.stderr));
-        return;
-    }
 
-    // 6. RUN THE PROGRAM
-    println!("Running {}...\n", exe_filename);
-    println!("--- MOMMY OUTPUT BEGINS ---");
-
-    let run_path = if exe_filename.contains('/') || exe_filename.contains('\\') {
-        exe_filename // It already has a path (e.g., "sandbox/test.exe")
-    } else {
-        format!("./{}", exe_filename) // It needs a path (e.g., "./test.exe")
+    let config = match Config::new(&args){
+        Ok(cfg) => cfg,
+        Err(e) => {
+            eprintln!("{}", e);
+            std::process::exit(1);
+        }
     };
 
-    let _ = Command::new(&run_path)
-        .status()
-        .expect("Failed to run the executable.");
+    println!("{}", mommy_response::MommyLangGeneralResponse::ReadingFile);
 
+
+    if let Err(e) = transpile_code_to_c(&config){
+        eprintln!("{}", mommy_response::MommyLangErrorResponse::ConvertLangFailed);
+        eprintln!("{}", e);
+        std::process::exit(1);
+    }
+
+    if let Err(e) = compile_to_gcc(&config){
+        eprintln!("{}", mommy_response::MommyLangErrorResponse::TranspilingError);
+        eprintln!("{}", e);
+        std::process::exit(1);
+    }
+
+    println!("--- MOMMY OUTPUT BEGINS ---");
+
+    if let Err(e) = run_mommy_file(&config){
+        eprintln!("{}", mommy_response::MommyLangErrorResponse::RuntimeError);
+        eprintln!("{}", e);
+        std::process::exit(1);
+    }
     println!("\n--- MOMMY OUTPUT ENDS ---");
+}
+
+fn run_mommy_file(config: &Config) -> Result<(), String> {
+    let output = if config.exe_path.contains('/') || config.exe_path.contains('\\'){
+        config.exe_path.clone()
+    }
+    else{
+        format!("./{}", config.exe_path)
+    };
+
+    let _ = Command::new(output).status().map_err(|_| "Could not start the executable. Permission denied?".to_string())?;
+
+    Ok(())
+}
+
+fn compile_to_gcc(config: &Config) -> Result<(), String>{
+
+    let output = Command::new("gcc")
+        .arg(&config.c_path)
+        .arg("-o")
+        .arg(&config.exe_path)
+        .output()
+        .map_err(|_| "GCC not found. Is MinGW installed?")?;
+
+    if output.status.success() {
+        Ok(())
+    } else {
+        let error_msg = String::from_utf8_lossy(&output.stderr).to_string();
+        Err(error_msg)
+    }
+
 }
