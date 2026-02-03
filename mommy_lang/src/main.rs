@@ -4,7 +4,7 @@ use mommy_lib::io;
 use mommy_lib::loops;
 use mommy_lib::conditions;
 use mommy_lib::declaration;
-use mommy_lib::errors::MommyErrorResponse;
+use mommy_lib::mommy_response::MommyLangErrorResponse;
 use std::fs;
 use std::collections::HashMap;
 use std::env;
@@ -13,7 +13,7 @@ use std::process::Command;
 fn parse_line(
     tokens: Vec<String>,
     symbols: &mut HashMap<String, String>
-) -> Result<String, MommyErrorResponse> {
+) -> Result<String, MommyLangErrorResponse> {
 
     if tokens.is_empty() {
         return Ok(String::new());

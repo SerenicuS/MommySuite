@@ -1,18 +1,18 @@
 use std::collections::HashMap;
-use crate::errors::MommyErrorResponse;
+use crate::mommy_response::MommyLangErrorResponse;
 
 pub fn may_i_have(
     tokens: &Vec<String>,
     symbols: &mut HashMap<String, String>
-) -> Result<String, MommyErrorResponse> {
+) -> Result<String, MommyLangErrorResponse> {
 
 
     if tokens.len() < 6 {
-        return Err(MommyErrorResponse::MissingArguments);
+        return Err(MommyLangErrorResponse::MissingArguments);
     }
 
     let in_index = tokens.iter().position(|r| r == "in")
-        .ok_or(MommyErrorResponse::SyntaxError)?;
+        .ok_or(MommyLangErrorResponse::SyntaxError)?;
 
     let raw_type = tokens.last().unwrap();
     let c_type = if raw_type == "String" { "char*" } else { raw_type };
@@ -21,7 +21,7 @@ pub fn may_i_have(
     let name = &tokens[name_index];
 
     if name == "int" || name == "return" {
-        return Err(MommyErrorResponse::InvalidVariableName);
+        return Err(MommyLangErrorResponse::InvalidVariableName);
     }
 
     symbols.insert(name.to_string(), raw_type.to_string()); // Save the variable name
