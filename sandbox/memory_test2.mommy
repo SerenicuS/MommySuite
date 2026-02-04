@@ -1,0 +1,6 @@
+mayihave 10 in x is int
+mayihave null in p is box
+replace p with x address
+replace p with 999 inside
+say x
+leave
