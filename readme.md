@@ -17,6 +17,7 @@
 | **Print Variable** | `say [NAME]` | `printf("...", name);` | Prints a variable. Auto-detects type (`%d`, `%f`, `%s`). |
 | **If Condition** | `ask [CONDITION]` | `if (cond) {` | Starts a logic check (supports `>`, `<`, `==`, `!=`). |
 | **Else** | `or` | `} else {` | The alternative path. |
+| **Break** | `satisfied` | ` break; ` | Stops the loop. |
 | **Loop** | `punishme [AMOUNT]` | `for(int i=0; i<amt; i++){` | Repeats the block `amount` times. |
 | **End Block** | `done` | `}` | Closes an `ask`, `or`, or `punishme`. |
 | **Exit** | `leave` | `return 0;` | Ends the program. |
