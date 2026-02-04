@@ -13,7 +13,7 @@ use mommy_lib::mommy_response;
 fn parse_line(
     tokens: Vec<String>,
     symbols: &mut HashMap<String, String>
-) -> Result<String, mommy_response::MommyLangErrorResponse> {
+) -> Result<String, mommy_response::MommyLangError> {
 
     if tokens.is_empty() {
         return Ok(String::new());
@@ -21,7 +21,8 @@ fn parse_line(
 
     match tokens[0].as_str() {
 
-        "mayihave" => declaration::may_i_have(&tokens, symbols),
+        "mayihave" => declaration::create_variable(&tokens, symbols),
+        "replace" => declaration::replace_variable(&tokens, symbols),
 
         "add" => alu::calculate_two(&tokens[1], "+", &tokens[3], symbols),
         "divide" => alu::calculate_two(&tokens[1], "/", &tokens[3], symbols),
@@ -52,13 +53,13 @@ struct Config{
 impl Config{
     fn new(args: &[String]) -> Result<Config, String>{
         if args.len() < 2{
-            return Err(mommy_response::MommyLangErrorResponse::StatusNoFile.to_string())
+            return Err(mommy_response::MommyLangError::StatusNoFile.to_string())
         }
 
         let input_path = args[1].clone();
 
         if !input_path.ends_with(".mommy"){
-            return Err(mommy_response::MommyLangErrorResponse::WrongFileType.to_string())
+            return Err(mommy_response::MommyLangError::WrongFileType.to_string())
         }
 
         let c_path = input_path.replace(".mommy", ".c");
@@ -123,17 +124,17 @@ fn main() {
         }
     };
 
-    println!("{}", mommy_response::MommyLangGeneralResponse::ReadingFile);
+    println!("{}", mommy_response::MommyShellOk::FileRead);
 
 
     if let Err(e) = transpile_code_to_c(&config){ //Convert mommylang to C
-        eprintln!("{}", mommy_response::MommyLangErrorResponse::ConvertLangFailed);
+        eprintln!("{}", mommy_response::MommyLangError::ConvertLangFailed);
         eprintln!("{}", e);
         std::process::exit(1);
     }
 
     if let Err(e) = compile_to_gcc(&config){ //use GCC to create exe file for the converted C
-        eprintln!("{}", mommy_response::MommyLangErrorResponse::TranspilingError);
+        eprintln!("{}", mommy_response::MommyLangError::TranspilingError);
         eprintln!("{}", e);
         std::process::exit(1);
     }
@@ -141,7 +142,7 @@ fn main() {
     println!("--- MOMMY OUTPUT BEGINS ---");
 
     if let Err(e) = run_mommy_file(&config){ // Run the exe file
-        eprintln!("{}", mommy_response::MommyLangErrorResponse::RuntimeError);
+        eprintln!("{}", mommy_response::MommyLangError::RuntimeError);
         eprintln!("{}", e);
         std::process::exit(1);
     }

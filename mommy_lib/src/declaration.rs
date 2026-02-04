@@ -1,33 +1,90 @@
 use std::collections::HashMap;
-use crate::mommy_response::MommyLangErrorResponse;
+use crate::mommy_response::MommyLangError;
 
-pub fn may_i_have(
+pub fn create_variable(
     tokens: &Vec<String>,
     symbols: &mut HashMap<String, String>
-) -> Result<String, MommyLangErrorResponse> {
+) -> Result<String, MommyLangError> {
 
+    // Syntax: mayihave <VAR> is <VALUE/box>
 
     if tokens.len() < 6 {
-        return Err(MommyLangErrorResponse::MissingArguments);
+        return Err(MommyLangError::MissingArguments);
     }
 
     let in_index = tokens.iter().position(|r| r == "in")
-        .ok_or(MommyLangErrorResponse::SyntaxError)?;
+        .ok_or(MommyLangError::SyntaxError)?;
 
     let raw_type = tokens.last().unwrap();
-    let c_type = if raw_type == "String" { "char*" } else { raw_type };
+
+    let c_type = match raw_type.as_str(){
+        "String" => "char*",
+        "box" => "int*",
+        _ => raw_type,
+    };
 
     let name_index = tokens.len() - 3;
     let name = &tokens[name_index];
 
-    if name == "int" || name == "return" {
-        return Err(MommyLangErrorResponse::InvalidVariableName);
+    if name == "int" || name == "return" || name == "void" {
+        return Err(MommyLangError::InvalidVariableName);
     }
 
-    symbols.insert(name.to_string(), raw_type.to_string()); // Save the variable name
+    if raw_type == "box"{
+        symbols.insert(name.to_string(), "pointer".to_string());
+    }
+    else{
+        symbols.insert(name.to_string(), raw_type.to_string());
+    }
 
     let value_tokens = &tokens[1..in_index];
-    let value = &value_tokens.join(" ");
+    let mut value = value_tokens.join(" ");
+
+    if value == "null"{
+        value = "NULL".to_string();
+    }
 
     Ok(format!("{} {} = {};", c_type, name, value))
+}
+
+pub fn replace_variable (
+    tokens: &Vec<String>,
+    symbols: &mut HashMap<String, String>
+) -> Result<String, MommyLangError> {
+
+    if tokens.len() < 4{
+    return Err(MommyLangError::MissingArguments);
+    }
+
+    let var_name = &tokens[1];
+    let keyword_with = &tokens[2];
+    let value = &tokens[3];
+
+    if keyword_with != "with" {
+        return Err(MommyLangError::SyntaxError)
+    }
+
+    if !symbols.contains_key(var_name) {
+        return Err(MommyLangError::UndeclaredVariable)
+    }
+
+    let var_type = symbols.get(var_name).unwrap();
+
+    if tokens.len() == 5 && tokens[4] == "address" {
+        if !symbols.contains_key(value) {
+            return Err(MommyLangError::UndeclaredVariable);
+        }
+        return Ok(format!("{} = &{};", var_name, value));
+    }
+
+    if tokens.len() == 5 && tokens[4] == "inside" {
+       if var_type != "pointer"{
+           return Err(MommyLangError::TypeMismatch)
+       }
+        return Ok(format!("*{} = {};", var_name, value));
+    }
+
+    Ok(format!("{} = {};", var_name, value))
+
+
 }

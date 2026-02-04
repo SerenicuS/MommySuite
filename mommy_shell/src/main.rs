@@ -7,7 +7,7 @@ use std::process::Command;
 use mommy_lib::mommy_response;
 
 
-const HELP_MENU: &str = r#"
+const SHELL_BASIC_COMMANDS: &str = r#"
     You are too greedy.
     ---------------
      1. tellme                      ->    List Commands
@@ -29,18 +29,26 @@ const HELP_MENU: &str = r#"
     "#;
 
 
+const SHELL_ADVANCED_COMMANDS: &str = r#"
+    You are too greedy.
+    ---------------
+     1. startcoding                 ->    Enter lite_IDE
+    ---------------
+    "#;
+
+
 
 
 fn main() {
-    println!("{}", mommy_response::GeneralFlavorResponse::FlavorMenu1);
-    println!("{}", mommy_response::GeneralFlavorResponse::FlavorMenu2);
-    println!("{}", mommy_response::GeneralFlavorResponse::FlavorMenu3);
+    println!("{}", mommy_response::MommyUI::WelcomeTitle);
+    println!("{}", mommy_response::MommyUI::WelcomeSubtitle);
+    println!("{}", mommy_response::MommyUI::WelcomePrompt);
 
     loop{
 
         let mut input = String::new();// lineBuffer
         println!();
-        io::stdin().read_line(&mut input).expect(&mommy_response::GeneralFlavorResponse::FlavorExit.to_string());
+        io::stdin().read_line(&mut input).expect(&mommy_response::MommyUI::ExitMessage.to_string());
 
         match input.trim(){
             "Y" => shell_start_default(input),
@@ -51,13 +59,13 @@ fn main() {
 }
 
 fn shell_start_default(mut input: String){
-    println!("{}", mommy_response::GeneralFlavorResponse::FlavorStart1);
+    println!("{}", mommy_response::MommyUI::GenericObedience);
 
     loop{
         input.clear();
         print!(">");
         io::stdout().flush().unwrap(); // This exists because without this, the ">" will not show up and get stuck.
-        io::stdin().read_line(&mut input).expect(&mommy_response::ShellErrorResponse::ErrorGeneral.to_string());
+        io::stdin().read_line(&mut input).expect(&mommy_response::MommyShellError::GeneralInvalid.to_string());
 
         shell_attempt_command(&input)
 
@@ -66,15 +74,15 @@ fn shell_start_default(mut input: String){
 
 fn shell_open_file(file_name: &str){
     match Command::new("cmd").args(&["/C", "start", file_name]).output(){
-        Ok(_) => println!("{}", mommy_response::ShellOkResponse::OkOpenedFile),
-        Err(_) => println!("{}", mommy_response::ShellErrorResponse::ErrorFileDoesNotExist),
+        Ok(_) => println!("{}", mommy_response::MommyShellOk::FileOpened),
+        Err(_) => println!("{}", mommy_response::MommyShellError::FileNotFound),
     }
 }
 
 fn shell_return_to_prev_directory(){
     match set_current_dir(".."){
-        Ok(_) => println!("{}", mommy_response:: ShellOkResponse::OkReturnDirectory),
-        Err(_) => println!("{}", mommy_response::ShellErrorResponse::ErrorRootDirectory),
+        Ok(_) => println!("{}", mommy_response:: MommyShellOk::DirectoryChanged),
+        Err(_) => println!("{}", mommy_response::MommyShellError::DirectoryNotFound),
     }
 }
 
@@ -84,48 +92,53 @@ fn check_args_len(args: &Vec<&str>) -> bool{
 }
 
 
+
 fn shell_create_file(file_name: &str){
     match fs::File::create(file_name){
-        Ok(_) => println!("{}", mommy_response::ShellOkResponse::OkCreateFile),
-        Err(_) => println!("{}", mommy_response::ShellErrorResponse::ErrorPermissionDenied)
+        Ok(_) => println!("{}", mommy_response::MommyShellOk::FileCreated),
+        Err(_) => println!("{}", mommy_response::MommyShellError::CannotCreateFile)
     }
 }
 
 fn shell_delete_file(file_name: &str){
     match fs::remove_file(file_name){
-        Ok(_) => println!("{}", mommy_response::ShellOkResponse::OkDeleteFile),
-        Err(_) => println!("{}", mommy_response::ShellErrorResponse::ErrorFileDoesNotExist)
+        Ok(_) => println!("{}", mommy_response::MommyShellOk::FileDeleted),
+        Err(_) => println!("{}", mommy_response::MommyShellError::CannotDeleteFile),
     }
 }
 fn shell_list_files_in_directory(){
-    let files = fs::read_dir(".").expect(&mommy_response::ShellErrorResponse::ErrorListedFilesDoesNotExist.to_string());
+    let files = fs::read_dir(".").expect(&mommy_response::MommyShellError::CannotListFiles.to_string());
 
     for entry in files{
-        let entry = entry.expect(&mommy_response::ShellErrorResponse::ErrorPermissionDenied.to_string());
+        let entry = entry.expect(&mommy_response::MommyShellError::CannotListFiles.to_string());
         println!("{}", entry.path().display());
     }
 }
 fn shell_get_directory(){
-    let dir = std::env::current_dir().expect(&mommy_response::ShellErrorResponse::ErrorRootDirectory.to_string());
+    let dir = std::env::current_dir().expect(&mommy_response::MommyShellError::DirectoryNotFound.to_string());
     println!("{}", dir.display());
 
 }
 
 
 fn shell_get_directory_return() -> String{
-    let dir = std::env::current_dir().expect(&mommy_response::ShellErrorResponse::ErrorRootDirectory.to_string());
+    let dir = std::env::current_dir().expect(&mommy_response::MommyShellError::DirectoryNotFound.to_string());
 
     dir.display().to_string()
 
 }
-fn shell_help(){
-    println!("{}", HELP_MENU);
+fn shell_print_basic_help(){
+    println!("{}", SHELL_BASIC_COMMANDS);
+}
+
+fn shell_print_advance_help(){
+    println!("{}", SHELL_ADVANCED_COMMANDS);
 }
 
 fn shell_move_directory(path: &str){
     match set_current_dir(path){
         Ok(_) => println!("Moved Inside: {}", shell_get_directory_return()),
-        Err(_) => println!("{}", mommy_response::ShellErrorResponse::ErrorSystem),
+        Err(_) => println!("{}", mommy_response::MommyShellError::DirectoryNotFound),
     }
 }
 
@@ -134,20 +147,23 @@ fn shell_attempt_command(input: &str){
     let args: Vec<&str> = clean_input.split_whitespace().collect();
 
     if args.is_empty(){
-        println!("{}", mommy_response::ShellErrorResponse::ErrorBadArgs);
+        println!("{}", mommy_response::MommyShellError::IncompleteArgs);
         return;
     }
 
     match args[0]{
         //1 Args
-        "tellme" => shell_help(),
+        "tellme" => shell_print_basic_help(),
+        "tellmesecret" => shell_print_advance_help(),
         "mayileave" => std::process::exit(0),
         "iamhere" => shell_get_directory(),
         "mommy?" => shell_list_files_in_directory(),
         "doxxme" => shell_windows_call("ipconfig"),
         "goback" => shell_return_to_prev_directory(),
-        "startcoding" => shell_prepare_coding(),
 
+
+        //Advanced
+        "startcoding" => shell_prepare_coding(),
 
         // 2 Args
         "walkwithme" if check_args_len(&args) => shell_move_directory(args[1]),
@@ -155,7 +171,10 @@ fn shell_attempt_command(input: &str){
         "takethe" if check_args_len(&args) => shell_delete_file(args[1]),
         "openthis" if check_args_len(&args) => shell_open_file(args[1]),
         "runthis" if check_args_len(&args) => shell_run_file(args[1]),
-        _ => println!("{}", mommy_response::ShellErrorResponse::ErrorGeneral),
+        _ => println!("{}", mommy_response::MommyShellError::GeneralInvalid),
+
+
+
     }
 
 }
@@ -177,7 +196,7 @@ fn shell_run_file(filename: &str) {
             simple_exec("python", filename);
         },
         _ => {
-            println!("{}", mommy_response::ShellErrorResponse::ErrorCannotOpenFile)
+            println!("{}", mommy_response::MommyShellError::CannotOpenFile)
         }
     }
 }
@@ -193,17 +212,17 @@ fn simple_exec(tool: &str, filename: &str) {
 
 fn shell_prepare_coding(){
     let mut input = String::new();
-    println!("{}", mommy_response::GeneralFlavorResponse::FlavorPrepareCoding);
-    println!("{}", mommy_response::GeneralFlavorResponse::FlavorMenu3);
+    println!("{}", mommy_response::MommyUI::PrepareCoding);
+    println!("{}", mommy_response::MommyUI::WelcomePrompt);
     input.clear();
     io::stdout().flush().unwrap();
-    io::stdin().read_line(&mut input).expect(&mommy_response::GeneralFlavorResponse::FlavorExit.to_string());
+    io::stdin().read_line(&mut input).expect(&mommy_response::MommyUI::ExitMessage.to_string());
 
 
     match input.trim(){
         "Y" => shell_start_coding(),
         _ =>{
-            println!("{}", mommy_response::GeneralFlavorResponse::FlavorRefuseCoding);
+            println!("{}", mommy_response::MommyUI::RefuseCoding);
             return;
         },
     }
@@ -212,7 +231,7 @@ fn shell_prepare_coding(){
 
 
 fn shell_start_coding() {
-    println!("{}", mommy_response::GeneralFlavorResponse::FlavorStartCoding);
+    println!("{}", mommy_response::MommyUI::StartCoding);
 
     let mut lite_ide = String::new();
     let mut line_count = 1;
@@ -224,7 +243,7 @@ fn shell_start_coding() {
 
         let mut input = String::new();
 
-        io::stdin().read_line(&mut input).expect("Failed to read");
+        io::stdin().read_line(&mut input).expect(&mommy_response::MommyShellError::CannotCreateFile.to_string());
 
         if input.trim() == "SAVE" {
             break;
@@ -246,9 +265,9 @@ fn shell_start_coding() {
 }
 
 fn shell_save_coding(lite_ide: &str){
-    println!("{}", mommy_response::MommyLangGeneralResponse::RenameFile);
+    println!("{}", mommy_response::MommyLangStatus::RenameFile);
     let mut input_name = String::new();
-    io::stdin().read_line(&mut input_name).expect(&mommy_response::ShellErrorResponse::ErrorCreateFile.to_string());
+    io::stdin().read_line(&mut input_name).expect(&mommy_response::MommyShellError::CannotCreateFile.to_string());
     let clean_name =  input_name.trim();
 
     let final_filename = {
@@ -260,7 +279,7 @@ fn shell_save_coding(lite_ide: &str){
 
     match fs::write(&full_path, lite_ide) {
         Ok(_) => {
-            println!("{}", mommy_response::ShellOkResponse::OkCreateFile);
+            println!("{}", mommy_response::MommyShellOk::FileCreated);
             shell_instant_run_mommy_file(&full_path)
 
         },
@@ -270,14 +289,14 @@ fn shell_save_coding(lite_ide: &str){
 
 
 fn shell_instant_run_mommy_file(full_path: &str){
-    println!("{}", mommy_response::MommyLangGeneralResponse::PrepareRun);
+    println!("{}", mommy_response::MommyLangStatus::PrepareRun);
     let mut ans = String::new();
     io::stdin().read_line(&mut ans).unwrap();
     if ans.trim().eq_ignore_ascii_case("Y") { // Run it immediately
         run_mommy_lang(&full_path);
     }
     else{
-        println!("{}", mommy_response::MommyLangGeneralResponse::SaveOnly);
+        println!("{}", mommy_response::MommyLangStatus::SaveOnly);
         return
     }
 }
@@ -313,9 +332,9 @@ fn run_mommy_lang(filename: &str) {
     };
 
     match status_result {
-        Ok(status) if status.success() => println!("{}", mommy_response::MommyLangGeneralResponse::StatusResultOk),
-        Ok(_) => println!("{}", mommy_response::MommyLangGeneralResponse::StatusResultOk),
-        Err(_) => println!("{}", mommy_response::MommyLangGeneralResponse::StatusResultError),
+        Ok(status) if status.success() => println!("{}", mommy_response::MommyLangStatus::ResultOk),
+        Ok(_) => println!("{}", mommy_response::MommyLangStatus::ResultOk),
+        Err(_) => println!("{}", mommy_response::MommyLangStatus::ResultError),
     }
 }
 
@@ -332,7 +351,7 @@ fn run_mommy_lang(filename: &str) {
 fn shell_windows_call(windows_command: &str){
     match windows_command{
         "ipconfig" => windows_command_console_output(windows_command),
-        _ => println!("{}", mommy_response::BadFlavorResponse::FlavorWindowsCallFail),
+        _ => println!("{}", mommy_response::MommyShellError::ExternalIPConfigCallFail),
     }
 }
 
@@ -342,7 +361,7 @@ fn windows_command_console_output(var: &str) {
             let console_output = String::from_utf8_lossy(&output.stdout);
             println!("{}", console_output);
         }
-        Err(_) => println!("{}", mommy_response::BadFlavorResponse::FlavorWindowsCommandFail),
+        Err(_) => println!("{}", mommy_response::MommyShellError::ExternalCommandFailed),
     }
 }
 
@@ -384,6 +403,8 @@ TODO LIST (For Tomorrow)
 
     [ ] Cannot do nested loops yet
     [ ] If conditions cannot house complex syntax
-    [ ] Missing Assignment Operator
+    [/] Missing Assignment Operator(with referencing and dereferencing?)
  */
+
+
 
