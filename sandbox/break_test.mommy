@@ -1,0 +1,10 @@
+mayihave 0 in x is int
+punishme 10
+add x with 1
+say x
+ask if x == 5
+say "I am satisfied."
+satisfied
+done
+done
+leave

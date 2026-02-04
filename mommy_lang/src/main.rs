@@ -31,11 +31,13 @@ fn parse_line(
 
         "say" => io::say(&tokens, symbols),
 
-        "punishme" => Ok(loops::punish_me(&tokens)),
+        "punishme" => Ok(loops::for_loop(&tokens)),
         "done" => Ok(loops::done()),
+        "satisfied" => Ok(loops::satisfied()),
 
-        "ask" => Ok(conditions::ask(&tokens)),
-        "or" => Ok(conditions::or()),
+        "ask" => conditions::ask(&tokens),
+        "or" => conditions::or(),
+
 
         "leave" => Ok("return 0;".to_string()),
 
