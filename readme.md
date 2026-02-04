@@ -4,8 +4,8 @@
 
 | Feature | MommyLang Syntax | C Equivalent | Description |
 | :--- | :--- | :--- | :--- |
-| **Declare Integer** | `mayihave [VAL] in [NAME] is int` | `int name = val;` | Declares an integer variable. |
-| **Declare Pointer** | `mayihave null in [NAME] is box` | `int *name = NULL;` | Declares a pointer (Box). |
+| **Declare Integer** | `mayihave [VAL] in [NAME] as int` | `int name = val;` | Declares an integer variable. |
+| **Declare Pointer** | `mayihave null in [NAME] as box` | `int *name = NULL;` | Declares a pointer (Box). |
 | **Assignment** | `replace [NAME] with [VAL]` | `name = val;` | Updates a variable's value. |
 | **Reference (&)** | `replace [PTR] with [NAME] address` | `ptr = &name;` | Stores the address of a variable in a pointer. |
 | **Dereference (*)** | `replace [PTR] with [VAL] inside` | `*ptr = val;` | Changes the value *inside* the address the pointer holds. |
