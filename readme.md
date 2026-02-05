@@ -21,6 +21,3 @@
 | **Loop** | `punishme [AMOUNT]` | `for(int i=0; i<amt; i++){` | Repeats the block `amount` times. |
 | **End Block** | `done` | `}` | Closes an `ask`, `or`, or `punishme`. |
 | **Exit** | `leave` | `return 0;` | Ends the program. |
-
-## 🛠 Usage
-Write your code in `sandbox/test.mommy`.
