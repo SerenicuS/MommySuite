@@ -13,6 +13,7 @@ pub enum MommyLangError {
     TypeMismatch,
     SyntaxError,
     UnclosedBlock,
+    UnexpectedDone,
 
     // File / System (Specific to the Compiler)
     StatusNoFile,       // Can't find the .mommy file
@@ -25,6 +26,10 @@ pub enum MommyLangError {
     // Math (ALU)
     MathOnString,
     DivideByZero,
+
+    //UI
+    ErrorBegins,
+    ErrorEnds,
 }
 
 pub enum MommyLangStatus {
@@ -117,6 +122,9 @@ pub enum MommyUI {
     ChaosDidNotHear,
     ChaosWrongCommand,
     GenericObedience, // "Good boy, always listen..."
+
+    //Misc
+    NewLine,
     
     
 }
@@ -135,6 +143,7 @@ impl fmt::Display for MommyLangError {
             Self::TypeMismatch => write!(f, "Matching types should be easy for you, yet you act as if it is calculus."),
             Self::SyntaxError => write!(f, "You deal with this problem, I taught you enough like an adult."),
             Self::UnclosedBlock => write!(f, "Do you know how to use punctuation?"),
+            Self::UnexpectedDone => write!(f, "Periods without a sentence is wrong sweetie."),
 
             Self::MathOnString => write!(f, "You cannot do math on words. This isn't Algebra class."),
             Self::DivideByZero => write!(f, "Zero? You want to divide by ZERO? Get out."),
@@ -145,6 +154,9 @@ impl fmt::Display for MommyLangError {
             Self::ConvertLangFailed => write!(f, "Failed to convert the file sweetie."),
             Self::TranspilingError => write!(f, "Failed to transpile the file sweetie."),
             Self::RuntimeError => write!(f, "Failed to run sweetie."),
+
+            Self::ErrorBegins => write!(f, "--- MOMMY ERROR BEGINS ---"),
+            Self::ErrorEnds => write!(f, "--- MOMMY ERROR ENDS ---"),
         }
     }
 }
@@ -236,6 +248,9 @@ impl fmt::Display for MommyUI {
             Self::PrepareEnv => write!(f, "Wait sweetie, let me prepare the environment first."),
             Self::StartCoding => write!(f, "Alright sweetie, start typing. Type 'SAVE' when you are done."),
             Self::RestartCLI => write!(f, "Okay sweetie, let us try again."),
+
+
+            Self::NewLine => write!(f, "\n\n\n\n\n"),
         }
     }
 }

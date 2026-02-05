@@ -6,6 +6,7 @@ use std::path::Path;
 use std::process::Command;
 use mommy_lib::mommy_response;
 
+const SEPARATOR: &str = "----------------------------------------------------------------";
 
 const SHELL_BASIC_COMMANDS: &str = r#"
     You are too greedy.
@@ -66,9 +67,8 @@ fn shell_start_default(mut input: String){
         print!(">");
         io::stdout().flush().unwrap(); // This exists because without this, the ">" will not show up and get stuck.
         io::stdin().read_line(&mut input).expect(&mommy_response::MommyShellError::GeneralInvalid.to_string());
-
-        shell_attempt_command(&input)
-
+        println!("{}", SEPARATOR);
+        shell_attempt_command(&input);
     }
 }
 
@@ -212,6 +212,7 @@ fn simple_exec(tool: &str, filename: &str) {
 
 fn shell_prepare_coding(){
     let mut input = String::new();
+    println!("{}", SEPARATOR);
     println!("{}", mommy_response::MommyUI::PrepareCoding);
     println!("{}", mommy_response::MommyUI::WelcomePrompt);
     input.clear();
@@ -231,7 +232,9 @@ fn shell_prepare_coding(){
 
 
 fn shell_start_coding() {
+    println!("{}", SEPARATOR);
     println!("{}", mommy_response::MommyUI::StartCoding);
+    println!("{}", SEPARATOR);
 
     let mut lite_ide = String::new();
     let mut line_count = 1;
@@ -267,6 +270,7 @@ fn shell_start_coding() {
 }
 
 fn shell_save_coding(lite_ide: &str){
+    println!("{}", SEPARATOR);
     println!("{}", mommy_response::MommyLangStatus::RenameFile);
     let mut input_name = String::new();
     io::stdin().read_line(&mut input_name).expect(&mommy_response::MommyShellError::CannotCreateFile.to_string());
@@ -285,15 +289,18 @@ fn shell_save_coding(lite_ide: &str){
             shell_instant_run_mommy_file(&full_path)
 
         },
-        Err(e) => println!("Mommy failed to save file: {}", e),
+        Err(_) => println!("{}", mommy_response::MommyShellError::CannotCreateFile),
     }
 }
 
 
 fn shell_instant_run_mommy_file(full_path: &str){
+    println!("{}", SEPARATOR);
     println!("{}", mommy_response::MommyLangStatus::PrepareRun);
     let mut ans = String::new();
     io::stdin().read_line(&mut ans).unwrap();
+
+
     if ans.trim().eq_ignore_ascii_case("Y") { // Run it immediately
         run_mommy_lang(&full_path);
     }
@@ -317,15 +324,15 @@ fn validate_file(clean_name: &str) -> String{
 
 
 fn run_mommy_lang(filename: &str) {
-    let status_result = if cfg!(debug_assertions) { // Dev mode
-        // 🛠️ DEV MODE (Automatic Rebuilds)
-        // It ensures mommy_lang is recompiled before running!
+
+    println!("{}", SEPARATOR);
+
+    let status_result = if cfg!(debug_assertions) {
         println!("[DEBUG] Running via Cargo...");
         Command::new("cargo")
             .args(["run", "-p", "mommy_lang", "--", filename])
             .status()
     } else {
-        // 🚀 RELEASE MODE (Manual .exe)
         let exe_name = if cfg!(target_os = "windows") { "mommy_lang.exe" } else { "mommy_lang" };
         println!("[RELEASE] Running {}...", exe_name);
         Command::new(format!("./{}", exe_name))
@@ -333,10 +340,12 @@ fn run_mommy_lang(filename: &str) {
             .status()
     };
 
+    println!("{}", SEPARATOR);
+
     match status_result {
         Ok(status) if status.success() => println!("{}", mommy_response::MommyLangStatus::ResultOk),
-        Ok(_) => println!("{}", mommy_response::MommyLangStatus::ResultOk),
         Err(_) => println!("{}", mommy_response::MommyLangStatus::ResultError),
+        _ => println!("{}", mommy_response::MommyLangStatus::ResultError),
     }
 }
 

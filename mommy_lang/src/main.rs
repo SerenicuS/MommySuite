@@ -12,7 +12,8 @@ use mommy_lib::mommy_response;
 
 fn parse_line(
     tokens: Vec<String>,
-    symbols: &mut HashMap<String, String>
+    symbols: &mut HashMap<String, String>,
+    scope_depth: &mut i32
 ) -> Result<String, mommy_response::MommyLangError> {
 
     if tokens.is_empty() {
@@ -24,25 +25,47 @@ fn parse_line(
         "mayihave" => declaration::create_variable(&tokens, symbols),
         "replace" => declaration::replace_variable(&tokens, symbols),
 
-        "add" => alu::calculate_two(&tokens[1], "+", &tokens[3], symbols),
-        "divide" => alu::calculate_two(&tokens[1], "/", &tokens[3], symbols),
-        "subtract" => alu::calculate_two(&tokens[1], "-", &tokens[3], symbols),
-        "multiply" => alu::calculate_two(&tokens[1], "*", &tokens[3], symbols),
+        "add" | "divide" | "subtract" | "multiply" => {
+            if tokens.len() < 4 { return Err(mommy_response::MommyLangError::MissingArguments); }
+            let op = match tokens[0].as_str() {
+                "add" => "+", "divide" => "/", "subtract" => "-", "multiply" => "*", _ => ""
+            };
+            alu::calculate_two(&tokens[1], op, &tokens[3], symbols)
+        },
 
         "say" => io::say(&tokens, symbols),
 
-        "punishme" => Ok(loops::for_loop(&tokens)),
-        "done" => Ok(loops::done()),
+        "punishme" => {
+            *scope_depth += 1;
+            Ok(loops::for_loop(&tokens))
+        },
+
+        "done" => {
+            if *scope_depth == 0 {
+                return Err(mommy_response::MommyLangError::UnexpectedDone);
+            }
+            *scope_depth -= 1;
+            Ok(loops::done())
+        },
         "satisfied" => Ok(loops::satisfied()),
 
-        "ask" => conditions::ask(&tokens),
-        "or" => conditions::or(),
+        "ask" => {
+            *scope_depth += 1;
+            conditions::ask(&tokens)
+        },
+
+        "or" => {
+            if *scope_depth == 0 { return Err(mommy_response::MommyLangError::SyntaxError); }
+            conditions::or()
+        },
 
 
         "leave" => Ok("return 0;".to_string()),
 
         _ => Ok(format!("// Unknown command {}", tokens[0])),
     }
+
+
 }
 
 
@@ -77,6 +100,8 @@ impl Config{
 
 fn transpile_code_to_c(config: &Config) -> Result<(), String> {
 
+    let mut scope_depth = 0;
+
     let content = fs::read_to_string(&config.input_path)
         .map_err(|_| format!("Could not read file: {}", config.input_path))?;
 
@@ -95,7 +120,7 @@ fn transpile_code_to_c(config: &Config) -> Result<(), String> {
         }
 
         let tokens = syntax_parser::insert_token(trimmed_line);
-        let result = parse_line(tokens, &mut symbol_table);
+        let result = parse_line(tokens, &mut symbol_table, &mut scope_depth);
 
         match result {
             Ok(c_code) => {
@@ -106,6 +131,10 @@ fn transpile_code_to_c(config: &Config) -> Result<(), String> {
                 return Err(format!("Line {}: {}", i + 1, e));
             }
         }
+    }
+
+    if scope_depth > 0 {
+        return Err(mommy_response::MommyLangError::UnclosedBlock.to_string());
     }
 
     writeln!(output_file, "}}").unwrap();
@@ -126,26 +155,30 @@ fn main() {
         }
     };
 
-    println!("{}", mommy_response::MommyShellOk::FileRead);
-
 
     if let Err(e) = transpile_code_to_c(&config){ //Convert mommylang to C
+        println!("{}", mommy_response::MommyLangError::ErrorBegins);
         eprintln!("{}", mommy_response::MommyLangError::ConvertLangFailed);
         eprintln!("{}", e);
+        println!("{}", mommy_response::MommyLangError::ErrorEnds);
         std::process::exit(1);
     }
 
+
     if let Err(e) = compile_to_gcc(&config){ //use GCC to create exe file for the converted C
+        println!("{}", mommy_response::MommyLangError::ErrorBegins);
         eprintln!("{}", mommy_response::MommyLangError::TranspilingError);
         eprintln!("{}", e);
+        println!("{}", mommy_response::MommyLangError::ErrorEnds);
         std::process::exit(1);
     }
 
     println!("--- MOMMY OUTPUT BEGINS ---");
-
     if let Err(e) = run_mommy_file(&config){ // Run the exe file
+        println!("{}", mommy_response::MommyLangError::ErrorBegins);
         eprintln!("{}", mommy_response::MommyLangError::RuntimeError);
         eprintln!("{}", e);
+        println!("{}", mommy_response::MommyLangError::ErrorEnds);
         std::process::exit(1);
     }
     println!("\n--- MOMMY OUTPUT ENDS ---");
