@@ -29,7 +29,7 @@ const SHELL_BASIC_COMMANDS: &str = r#"
     "#;
 
 
-const SHELL_ADVANCED_COMMANDS: &str = r#"
+const SHELL_ADVANCE_COMMANDS: &str = r#"
     You are too greedy.
     ---------------
      1. startcoding                 ->    Enter lite_IDE
@@ -132,7 +132,7 @@ fn shell_print_basic_help(){
 }
 
 fn shell_print_advance_help(){
-    println!("{}", SHELL_ADVANCED_COMMANDS);
+    println!("{}", SHELL_ADVANCE_COMMANDS);
 }
 
 fn shell_move_directory(path: &str){
@@ -253,7 +253,9 @@ fn shell_start_coding() {
         }
         else if input.trim() == "CLEAR"{
             lite_ide.clear();
-            line_count = 0;
+            line_count = 1;
+            println!("{}", mommy_response::MommyUI::RestartCLI);
+            continue
         }
         lite_ide.push_str(&input);
 
@@ -401,7 +403,7 @@ TODO LIST (For Tomorrow)
 
 5. MommyLang issues
 
-    [ ] Cannot do nested loops yet
+    [/] Cannot do condition loops yet
     [ ] If conditions cannot house complex syntax
     [/] Missing Assignment Operator(with referencing and dereferencing?)
  */

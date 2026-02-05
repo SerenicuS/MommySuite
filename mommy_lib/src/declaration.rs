@@ -6,14 +6,21 @@ pub fn create_variable(
     symbols: &mut HashMap<String, String>
 ) -> Result<String, MommyLangError> {
 
-    // Syntax: mayihave <VAR> is <VALUE/box>
+    // Syntax: mayihave <VAR> in <VALUE/box> as int
 
     if tokens.len() < 6 {
         return Err(MommyLangError::MissingArguments);
     }
 
+
+    if &tokens[4].to_string() != "as"{
+        return Err(MommyLangError::SyntaxError)
+    }
+
+
     let in_index = tokens.iter().position(|r| r == "in")
         .ok_or(MommyLangError::SyntaxError)?;
+
 
     let raw_type = tokens.last().unwrap();
 

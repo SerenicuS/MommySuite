@@ -111,11 +111,14 @@ pub enum MommyUI {
     StartCoding,       // "Alright sweetie, start typing..."
     RefuseCoding,      // "Why did you tell me to prepare?..."
     PrepareEnv,        // "Wait let me prepare..."
+    RestartCLI,
 
     // Chaos / Errors
     ChaosDidNotHear,
     ChaosWrongCommand,
     GenericObedience, // "Good boy, always listen..."
+    
+    
 }
 
 
@@ -232,6 +235,7 @@ impl fmt::Display for MommyUI {
             Self::RefuseCoding => write!(f, "Why did you tell me to prepare it sweetie? You are wasting my time."),
             Self::PrepareEnv => write!(f, "Wait sweetie, let me prepare the environment first."),
             Self::StartCoding => write!(f, "Alright sweetie, start typing. Type 'SAVE' when you are done."),
+            Self::RestartCLI => write!(f, "Okay sweetie, let us try again."),
         }
     }
 }
