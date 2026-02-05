@@ -1,4 +1,4 @@
-mayihave 0 in x is int
+mayihave 0 in x as int
 punishme 10
 add x with 1
 say x

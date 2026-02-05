@@ -344,10 +344,13 @@ fn run_mommy_lang(filename: &str) {
 
     match status_result {
         Ok(status) if status.success() => println!("{}", mommy_response::MommyLangStatus::ResultOk),
-        Err(_) => println!("{}", mommy_response::MommyLangStatus::ResultError),
+        Err(_) => {
+            println!("{}", mommy_response::MommyLangStatus::ResultError)
+        },
         _ => println!("{}", mommy_response::MommyLangStatus::ResultError),
     }
 }
+
 
 
 

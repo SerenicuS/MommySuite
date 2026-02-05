@@ -14,6 +14,7 @@ pub enum MommyLangError {
     SyntaxError,
     UnclosedBlock,
     UnexpectedDone,
+    
 
     // File / System (Specific to the Compiler)
     StatusNoFile,       // Can't find the .mommy file
@@ -22,6 +23,7 @@ pub enum MommyLangError {
     ConvertLangFailed,
     TranspilingError,
     RuntimeError,
+    GCCError,
 
     // Math (ALU)
     MathOnString,
@@ -154,6 +156,7 @@ impl fmt::Display for MommyLangError {
             Self::ConvertLangFailed => write!(f, "Failed to convert the file sweetie."),
             Self::TranspilingError => write!(f, "Failed to transpile the file sweetie."),
             Self::RuntimeError => write!(f, "Failed to run sweetie."),
+            Self::GCCError => write!(f, "Our Friend GCC failed sweeite."),
 
             Self::ErrorBegins => write!(f, "--- MOMMY ERROR BEGINS ---"),
             Self::ErrorEnds => write!(f, "--- MOMMY ERROR ENDS ---"),

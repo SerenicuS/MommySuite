@@ -75,6 +75,7 @@ pub fn replace_variable (
         return Err(MommyLangError::UndeclaredVariable)
     }
 
+
     let var_type = symbols.get(var_name).unwrap();
 
     if tokens.len() == 5 && tokens[4] == "address" {
@@ -88,10 +89,18 @@ pub fn replace_variable (
        if var_type != "pointer"{
            return Err(MommyLangError::TypeMismatch)
        }
-        return Ok(format!("*{} = {};", var_name, value));
+        return Ok(format!(
+            "if ({0} == NULL) {{ \
+                printf(\"Mommy Error: You tried to put value inside '{0}', but it is NULL!\\n\"); \
+                return 1; \
+             }} \
+             *{0} = {1};",
+            var_name, value
+        )); // Anti segment fault
     }
 
     Ok(format!("{} = {};", var_name, value))
 
 
 }
+

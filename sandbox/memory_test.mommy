@@ -1,5 +1,5 @@
-mayihave 69 in number is int
-mayihave null in container is box
+mayihave 69 in number as int
+mayihave null in container as box
 replace container with number address
 say number
 leave

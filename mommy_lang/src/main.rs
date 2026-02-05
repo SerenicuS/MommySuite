@@ -28,7 +28,11 @@ fn parse_line(
         "add" | "divide" | "subtract" | "multiply" => {
             if tokens.len() < 4 { return Err(mommy_response::MommyLangError::MissingArguments); }
             let op = match tokens[0].as_str() {
-                "add" => "+", "divide" => "/", "subtract" => "-", "multiply" => "*", _ => ""
+                "add" => "+",
+                "divide" => "/",
+                "subtract" => "-",
+                "multiply" => "*",
+                _ => ""
             };
             alu::calculate_two(&tokens[1], op, &tokens[3], symbols)
         },
@@ -55,7 +59,7 @@ fn parse_line(
         },
 
         "or" => {
-            if *scope_depth == 0 { return Err(mommy_response::MommyLangError::SyntaxError); }
+            *scope_depth += 1;
             conditions::or()
         },
 
@@ -158,6 +162,9 @@ fn main() {
 
     if let Err(e) = transpile_code_to_c(&config){ //Convert mommylang to C
         println!("{}", mommy_response::MommyLangError::ErrorBegins);
+        if fs::remove_file(config.c_path).is_err(){ // temporary deletion if converting mommylang to c fails
+            println!("{}", mommy_response::MommyLangError::TranspilingError);
+        }
         eprintln!("{}", mommy_response::MommyLangError::ConvertLangFailed);
         eprintln!("{}", e);
         println!("{}", mommy_response::MommyLangError::ErrorEnds);
@@ -167,7 +174,7 @@ fn main() {
 
     if let Err(e) = compile_to_gcc(&config){ //use GCC to create exe file for the converted C
         println!("{}", mommy_response::MommyLangError::ErrorBegins);
-        eprintln!("{}", mommy_response::MommyLangError::TranspilingError);
+        eprintln!("{}", mommy_response::MommyLangError::GCCError);
         eprintln!("{}", e);
         println!("{}", mommy_response::MommyLangError::ErrorEnds);
         std::process::exit(1);
@@ -187,16 +194,20 @@ fn main() {
 fn run_mommy_file(config: &Config) -> Result<(), String> {
     let output = if config.exe_path.contains('/') || config.exe_path.contains('\\'){
         config.exe_path.clone()
-    }
-    else{
+    } else {
         format!("./{}", config.exe_path)
     };
 
-    let _ = Command::new(output).status().map_err(|_| "Could not start the executable. Permission denied?".to_string())?;
+    let status = Command::new(output)
+        .status()
+        .map_err(|_| "Could not start the executable.".to_string())?;
+
+    if !status.success() {
+        return Err(format!("Mommy is disappointed. Program exited with code {}", status.code().unwrap_or(-1)));
+    }
 
     Ok(())
 }
-
 fn compile_to_gcc(config: &Config) -> Result<(), String>{
 
     let output = Command::new("gcc")

@@ -1,5 +1,5 @@
-mayihave 10 in x is int
-mayihave null in p is box
+mayihave 10 in x as int
+mayihave null in p as box
 replace p with x address
 replace p with 999 inside
 say x
