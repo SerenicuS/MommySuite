@@ -162,9 +162,7 @@ fn main() {
 
     if let Err(e) = transpile_code_to_c(&config){ //Convert mommylang to C
         println!("{}", mommy_response::MommyLangError::ErrorBegins);
-        if fs::remove_file(config.c_path).is_err(){ // temporary deletion if converting mommylang to c fails
-            println!("{}", mommy_response::MommyLangError::TranspilingError);
-        }
+        let _ = fs::remove_file(&config.c_path); // Remove the file if the process of compiling it into C fails. Deleting the file manually is tiring.
         eprintln!("{}", mommy_response::MommyLangError::ConvertLangFailed);
         eprintln!("{}", e);
         println!("{}", mommy_response::MommyLangError::ErrorEnds);
