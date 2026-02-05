@@ -13,7 +13,7 @@ pub fn create_variable(
     }
 
 
-    if &tokens[4].to_string() != "as"{
+    if &tokens[4] != "as"{
         return Err(MommyLangError::SyntaxError)
     }
 
