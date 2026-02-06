@@ -86,6 +86,7 @@ pub enum MommyShellError {
     CannotCreateFile,
     CannotDeleteFile,
     CannotListFiles,
+    RootDirError,
 
     // Process / OS
     SystemCrash,
@@ -220,6 +221,7 @@ impl fmt::Display for MommyShellError {
             Self::CannotCreateFile => write!(f, "I refuse to create that file."),
             Self::CannotDeleteFile => write!(f, "I'm keeping that file. You don't get to delete it."),
             Self::CannotListFiles => write!(f, "There is nothing here for you."),
+            Self::RootDirError => write!(f, "Mommy can't find the floor."),
 
             Self::SystemCrash => write!(f, "Look what you did. You broke it. Now I have to clean up your mess."),
             Self::ProcessNotFound => write!(f, "That doesn't exist. Focus, sweetie."),
