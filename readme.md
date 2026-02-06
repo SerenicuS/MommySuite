@@ -1,5 +1,5 @@
 # 🦀 MommySuite: Rust-Based Systems Ecosystem
-> *A Custom Shell, Compiler, and Standard Library written in Rust & C.*
+> *A Custom Shell, Compiler, and Standard Library written in Rust.*
 
 ## 🤔 Why did I create this unhinged masterpiece?
 As a student who wants to learn system concepts, I want to understand how each system feature *actually* works. Building a terminal seemed like a good way to learn, but I wanted to go deeper.
