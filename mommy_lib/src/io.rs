@@ -19,7 +19,10 @@ pub fn say(tokens: &Vec<String>, symbols: &HashMap<String, String>) -> Result<St
             Ok(format!("printf(\"%s\\n\", {});", message))
         } else if var_type == "float" {
             Ok(format!("printf(\"%f\\n\", {});", message))
-        } else {
+        } else if var_type == "pointer"{
+            Ok(format!("printf(\"%p\\n\", (void*){});", message))
+        }
+        else {
             Ok(format!("printf(\"%d\\n\", {});", message))
         }
     }

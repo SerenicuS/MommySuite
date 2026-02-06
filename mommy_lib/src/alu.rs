@@ -16,11 +16,22 @@ fn validate_operation(
     symbols: &HashMap<String, String>
 ) -> Result<(), MommyLangError> {
 
+
     // Variable does not exist
     let var_type = match symbols.get(target) {
         Some(t) => t,
         None => return Err(MommyLangError::UndeclaredVariable),
     };
+
+    if let Some(first_char) = value.chars().next() { // for negative
+        let is_negative_number = first_char == '-' && value.len() > 1 && value.chars().nth(1).unwrap().is_digit(10);
+
+        if !first_char.is_digit(10) && !is_negative_number {
+            if !symbols.contains_key(value) {
+                return Err(MommyLangError::UndeclaredVariable);
+            }
+        }
+    }
 
 
     // Trying to do math in strings

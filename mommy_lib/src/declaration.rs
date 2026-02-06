@@ -37,6 +37,10 @@ pub fn create_variable(
         return Err(MommyLangError::InvalidVariableName);
     }
 
+    if symbols.contains_key(name) {
+        return Err(MommyLangError::VariableAlreadyExists); // Or make a new error: VariableAlreadyExists
+    }
+
     if raw_type == "box"{
         symbols.insert(name.to_string(), "pointer".to_string());
     }
