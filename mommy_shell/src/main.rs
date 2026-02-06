@@ -1,5 +1,5 @@
 use std::env::set_current_dir;
-use std::{fs};
+use std::{env, fs};
 use std::io;
 use std::io::Write;
 use std::path::Path;
@@ -115,14 +115,14 @@ fn shell_list_files_in_directory(){
     }
 }
 fn shell_get_directory(){
-    let dir = std::env::current_dir().expect(&mommy_response::MommyShellError::DirectoryNotFound.to_string());
+    let dir = env::current_dir().expect(&mommy_response::MommyShellError::DirectoryNotFound.to_string());
     println!("{}", dir.display());
 
 }
 
 
 fn shell_get_directory_return() -> String{
-    let dir = std::env::current_dir().expect(&mommy_response::MommyShellError::DirectoryNotFound.to_string());
+    let dir = env::current_dir().expect(&mommy_response::MommyShellError::DirectoryNotFound.to_string());
 
     dir.display().to_string()
 
@@ -269,30 +269,40 @@ fn shell_start_coding() {
 
 }
 
-fn shell_save_coding(lite_ide: &str){
+fn shell_save_coding(lite_ide: &str) {
     println!("{}", SEPARATOR);
     println!("{}", mommy_response::MommyLangStatus::RenameFile);
+
     let mut input_name = String::new();
-    io::stdin().read_line(&mut input_name).expect(&mommy_response::MommyShellError::CannotCreateFile.to_string());
-    let clean_name =  input_name.trim();
+    io::stdin()
+        .read_line(&mut input_name)
+        .expect("Failed to read input");
 
-    let final_filename = {
-        validate_file(&clean_name)   // the user might add .mommy in the filename, if yes do not try to add another one
-    };
+    let clean_name = input_name.trim();
 
+    let final_filename = validate_file(&clean_name);
 
-    let full_path = format!("sandbox/{}", final_filename);
+    // Without this, fs::write crashes on a fresh install.
+    let sandbox_dir = "sandbox";
+    if !Path::new(sandbox_dir).exists() {
+        if let Err(_) = fs::create_dir_all(sandbox_dir) {
+            println!("Mommy Error: I tried to build the sandbox, but the OS said no.");
+            return;
+        }
+    }
 
+    let full_path = format!("{}/{}", sandbox_dir, final_filename);
+
+    // Write and Run
     match fs::write(&full_path, lite_ide) {
         Ok(_) => {
             println!("{}", mommy_response::MommyShellOk::FileCreated);
-            shell_instant_run_mommy_file(&full_path)
-
+            // Run the file immediately so they see their results
+            shell_instant_run_mommy_file(&full_path);
         },
         Err(_) => println!("{}", mommy_response::MommyShellError::CannotCreateFile),
     }
 }
-
 
 fn shell_instant_run_mommy_file(full_path: &str){
     println!("{}", SEPARATOR);
@@ -327,31 +337,45 @@ fn run_mommy_lang(filename: &str) {
 
     println!("{}", SEPARATOR);
 
-    let status_result = if cfg!(debug_assertions) {
+
+    let (cmd, args) = if cfg!(debug_assertions) {
+        // DEV MODE: Use Cargo
         println!("[DEBUG] Running via Cargo...");
-        Command::new("cargo")
-            .args(["run", "-p", "mommy_lang", "--", filename])
-            .status()
+        ("cargo".to_string(), vec!["run", "-p", "mommy_lang", "--", filename])
     } else {
-        let exe_name = if cfg!(target_os = "windows") { "mommy_lang.exe" } else { "mommy_lang" };
-        println!("[RELEASE] Running {}...", exe_name);
-        Command::new(format!("./{}", exe_name))
-            .arg(filename)
-            .status()
+        // PROD MODE: Locate sibling executable
+        // Get the path where 'mommy_shell.exe' actually lives
+        let mut path = env::current_exe().expect("Unable to get current process path");
+        path.pop();
+
+        // Append 'mommy_lang.exe'
+        if cfg!(target_os = "windows") {
+            path.push("mommy_lang.exe");
+        } else {
+            path.push("mommy_lang");
+        }
+
+        if !path.exists() {
+            println!("Mommy Error: I cannot find 'mommy_lang.exe'. We need to be in the same folder, sweetie.");
+            return;
+        }
+
+        println!("[RELEASE] Running Mommy Compiler...");
+        (path.to_string_lossy().to_string(), vec![filename])
     };
+
+    let status_result = Command::new(cmd)
+        .args(&args)
+        .status();
 
     println!("{}", SEPARATOR);
 
     match status_result {
         Ok(status) if status.success() => println!("{}", mommy_response::MommyLangStatus::ResultOk),
-        Err(_) => {
-            println!("{}", mommy_response::MommyLangStatus::ResultError)
-        },
+        Err(_) => println!("{}", mommy_response::MommyLangStatus::ResultError),
         _ => println!("{}", mommy_response::MommyLangStatus::ResultError),
     }
 }
-
-
 
 
 
