@@ -43,6 +43,7 @@ pub enum MommyLangStatus {
     ResultOk,
     ResultOkButConfused, // "Read everything but confused"
     ResultError,
+    CheckingFile,
 }
 
 // =========================================================
@@ -179,6 +180,7 @@ impl fmt::Display for MommyLangStatus {
             Self::ResultOkButConfused => write!(f, "I did what you asked, but your logic is... questionable."),
             Self::ResultError => write!(f, "No. I am not doing that. Look at your errors."),
             Self::ReadingFile => write!(f, "Shh. Mommy is reading..."),
+            Self::CheckingFile => write!(f, "Mommy is reading every line... If I find a virus, malware, or a script trying to help you leave me, I will delete it. And then I will punish you.....")
         }
     }
 }

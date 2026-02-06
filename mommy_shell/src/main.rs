@@ -105,62 +105,65 @@ fn check_args_len(args: &Vec<&str>) -> bool {
         args.len() > 1
     }
 
-    fn shell_create_file(file_name: &str) {
-        match fs::File::create(file_name) {
-            Ok(_) => println!("{}", mommy_response::MommyShellOk::FileCreated),
-            Err(_) => println!("{}", mommy_response::MommyShellError::CannotCreateFile)
-        }
+fn shell_create_file(file_name: &str) {
+    match fs::File::create(file_name) {
+        Ok(_) => println!("{}", mommy_response::MommyShellOk::FileCreated),
+        Err(_) => println!("{}", mommy_response::MommyShellError::CannotCreateFile)
     }
+}
 
-    fn shell_delete_file(file_name: &str) {
-        match fs::remove_file(file_name) {
-            Ok(_) => println!("{}", mommy_response::MommyShellOk::FileDeleted),
-            Err(_) => println!("{}", mommy_response::MommyShellError::CannotDeleteFile),
-        }
+fn shell_delete_file(file_name: &str) {
+    match fs::remove_file(file_name) {
+        Ok(_) => println!("{}", mommy_response::MommyShellOk::FileDeleted),
+        Err(_) => println!("{}", mommy_response::MommyShellError::CannotDeleteFile),
     }
-    fn shell_list_files_in_directory() {
-        let files = fs::read_dir(".").expect(&mommy_response::MommyShellError::CannotListFiles.to_string());
+}
+fn shell_list_files_in_directory() {
+    let files = fs::read_dir(".").expect(&mommy_response::MommyShellError::CannotListFiles.to_string());
 
-        for entry in files {
-            let entry = entry.expect(&mommy_response::MommyShellError::CannotListFiles.to_string());
-            println!("{}", entry.path().display());
-        }
+    for entry in files {
+        let entry = entry.expect(&mommy_response::MommyShellError::CannotListFiles.to_string());
+        println!("{}", entry.path().display());
     }
-    fn shell_get_directory() {
-        let dir = env::current_dir().expect(&mommy_response::MommyShellError::DirectoryNotFound.to_string());
-        println!("{}", dir.display());
-    }
+}
+fn shell_get_directory() {
+    let dir = env::current_dir().expect(&mommy_response::MommyShellError::DirectoryNotFound.to_string());
+    println!("{}", dir.display());
 
-    fn shell_get_directory_return() -> String {
-        let dir = env::current_dir().expect(&mommy_response::MommyShellError::DirectoryNotFound.to_string());
+}
 
-        dir.display().to_string()
-    }
-    fn shell_print_basic_help() {
-        println!("{}", SHELL_BASIC_COMMANDS);
-    }
+fn shell_get_directory_return() -> String {
+    let dir = env::current_dir().expect(&mommy_response::MommyShellError::DirectoryNotFound.to_string());
 
-    fn shell_print_advance_help() {
-        println!("{}", SHELL_ADVANCE_COMMANDS);
-    }
+    dir.display().to_string()
+}
+fn shell_print_basic_help() {
+    println!("{}", SHELL_BASIC_COMMANDS);
+}
 
-    fn shell_move_directory(path: &str, root_dir: &std::path::PathBuf) {
-        let current_dir = env::current_dir().unwrap();
-        let target_path = current_dir.join(path);
+fn shell_print_advance_help() {
+    println!("{}", SHELL_ADVANCE_COMMANDS);
+}
 
-        match target_path.canonicalize() {
-            Ok(canonical_target) => {
-                if canonical_target.starts_with(root_dir.canonicalize().unwrap()) {
-                    if set_current_dir(&canonical_target).is_ok() {
-                        println!("Moved Inside: {}", shell_get_directory_return());
-                    }
-                } else {
-                    println!("{}", mommy_response::MommyShellError::RootDirectoryLocked);
+fn shell_move_directory(path: &str, root_dir: &std::path::PathBuf) {
+    let current_dir = env::current_dir().unwrap();
+    let target_path = current_dir.join(path);
+
+    match target_path.canonicalize() {
+        Ok(canonical_target) => {
+            if canonical_target.starts_with(root_dir.canonicalize().unwrap()) {
+                if set_current_dir(&canonical_target).is_ok() {
+                    let raw_path = shell_get_directory_return();
+                    let display_path = raw_path.replace("\\\\?\\", "");
+                    println!("Moved Inside: {}", display_path);
                 }
+            } else {
+                println!("{}", mommy_response::MommyShellError::RootDirectoryLocked);
             }
-            Err(_) => println!("{}", mommy_response::MommyShellError::DirectoryNotFound),
         }
+        Err(_) => println!("{}", mommy_response::MommyShellError::DirectoryNotFound),
     }
+}
 
 
 
@@ -198,211 +201,214 @@ fn shell_attempt_command(input: &str, root_dir: &std::path::PathBuf) {
 
 
 
-    fn shell_run_file(filename: &str) {
-        let extension = Path::new(filename).extension().and_then(|ext| ext.to_str()).
-            unwrap_or("");
+fn shell_run_file(filename: &str) {
+    let extension = Path::new(filename).extension().and_then(|ext| ext.to_str()).
+        unwrap_or("");
 
-        match extension { //file type selection NOTE: it does not run without specifying the name
-            "mommy" => {
-                run_mommy_lang(filename); // Running files that end with .mommy
-            },
-            "txt" => {
-                simple_exec("notepad.exe", filename);
-            },
-            "py" => {
-                simple_exec("python", filename);
-            },
-            _ => {
-                println!("{}", mommy_response::MommyShellError::CannotOpenFile)
-            }
-        }
-    }
-
-    // For running non-mommy files
-    fn simple_exec(tool: &str, filename: &str) {
-        println!("Opening {} with {}...", filename, tool);
-        Command::new(tool)
-            .arg(filename)
-            .status()
-            .expect("Failed to run the command");
-    }
-
-    fn shell_prepare_coding() {
-        let mut input = String::new();
-        println!("{}", SEPARATOR);
-        println!("{}", mommy_response::MommyUI::PrepareCoding);
-        println!("{}", mommy_response::MommyUI::WelcomePrompt);
-        input.clear();
-        io::stdout().flush().unwrap();
-        io::stdin().read_line(&mut input).expect(&mommy_response::MommyUI::ExitMessage.to_string());
-
-
-        match input.trim() {
-            "Y" => shell_start_coding(),
-            _ => {
-                println!("{}", mommy_response::MommyUI::RefuseCoding);
-                return;
-            },
-        }
-    }
-
-    fn shell_start_coding() {
-        println!("{}", SEPARATOR);
-        println!("{}", mommy_response::MommyUI::StartCoding);
-        println!("{}", SEPARATOR);
-
-        let mut lite_ide = String::new();
-        let mut line_count = 1;
-
-        loop { // Writing process
-            print!("{}. ", line_count);
-
-            io::stdout().flush().unwrap();
-
-            let mut input = String::new();
-
-            io::stdin().read_line(&mut input).expect(&mommy_response::MommyShellError::CannotCreateFile.to_string());
-
-            if input.trim() == "SAVE" {
-                break;
-            } else if input.trim() == "EXIT" {
-                return;
-            } else if input.trim() == "CLEAR" {
-                lite_ide.clear();
-                line_count = 1;
-                println!("{}", mommy_response::MommyUI::RestartCLI);
-                continue
-            }
-            lite_ide.push_str(&input);
-
-            line_count += 1;
-        }
-
-        shell_save_coding(&lite_ide);
-    }
-
-    fn shell_save_coding(lite_ide: &str) {
-        println!("{}", SEPARATOR);
-        println!("{}", mommy_response::MommyLangStatus::RenameFile);
-
-        let mut input_name = String::new();
-        io::stdin()
-            .read_line(&mut input_name)
-            .expect("Failed to read input");
-
-        let clean_name = input_name.trim();
-
-        let final_filename = validate_file(&clean_name);
-
-        // Without this, fs::write crashes on a fresh install.
-        let sandbox_dir = "sandbox";
-        if !Path::new(sandbox_dir).exists() {
-            if let Err(_) = fs::create_dir_all(sandbox_dir) {
-                println!("Mommy Error: I tried to build the sandbox, but the OS said no.");
-                return;
-            }
-        }
-
-        let full_path = format!("{}/{}", sandbox_dir, final_filename);
-
-        // Write and Run
-        match fs::write(&full_path, lite_ide) {
-            Ok(_) => {
-                println!("{}", mommy_response::MommyShellOk::FileCreated);
-                // Run the file immediately so they see their results
-                shell_instant_run_mommy_file(&full_path);
-            },
-            Err(_) => println!("{}", mommy_response::MommyShellError::CannotCreateFile),
-        }
-    }
-
-    fn shell_instant_run_mommy_file(full_path: &str) {
-        println!("{}", SEPARATOR);
-        println!("{}", mommy_response::MommyLangStatus::PrepareRun);
-        let mut ans = String::new();
-        io::stdin().read_line(&mut ans).unwrap();
-
-
-        if ans.trim().eq_ignore_ascii_case("Y") { // Run it immediately
-            run_mommy_lang(&full_path);
-        } else {
-            println!("{}", mommy_response::MommyLangStatus::SaveOnly);
-            return
-        }
-    }
-
-    fn validate_file(clean_name: &str) -> String {
-        if clean_name.ends_with(".mommy") {
-            clean_name.to_string()
-        } else {
-            format!("{}.mommy", clean_name)
-        }
-    }
-
-    fn run_mommy_lang(filename: &str) {
-        println!("{}", SEPARATOR);
-
-
-        let (cmd, args) = if cfg!(debug_assertions) {
-            // DEV MODE: Use Cargo
-            println!("[DEBUG] Running via Cargo...");
-            ("cargo".to_string(), vec!["run", "-p", "mommy_lang", "--", filename])
-        } else {
-            // PROD MODE: Locate sibling executable
-            // Get the path where 'mommy_shell.exe' actually lives
-            let mut path = env::current_exe().expect("Unable to get current process path");
-            path.pop();
-
-            // Append 'mommy_lang.exe'
-            if cfg!(target_os = "windows") {
-                path.push("mommy_lang.exe");
+    match extension { //file type selection NOTE: it does not run without specifying the name
+        "mommy" => {
+            if let Ok(full_path) = fs::canonicalize(filename) {
+                run_mommy_lang(&full_path.to_string_lossy());
             } else {
-                path.push("mommy_lang");
+                run_mommy_lang(filename);
             }
+        },
+        "txt" => {
+            simple_exec("notepad.exe", filename);
+        },
+        "py" => {
+            simple_exec("python", filename);
+        },
+        _ => {
+            println!("{}", mommy_response::MommyShellError::CannotOpenFile)
+        }
+    }
+}
 
-            if !path.exists() {
-                println!("Mommy Error: I cannot find 'mommy_lang.exe'. We need to be in the same folder, sweetie.");
-                return;
-            }
+// For running non-mommy files
+fn simple_exec(tool: &str, filename: &str) {
+    println!("Opening {} with {}...", filename, tool);
+    Command::new(tool)
+        .arg(filename)
+        .status()
+        .expect("Failed to run the command");
+}
 
-            println!("[RELEASE] Running Mommy Compiler...");
-            (path.to_string_lossy().to_string(), vec![filename])
-        };
+fn shell_prepare_coding() {
+    let mut input = String::new();
+    println!("{}", SEPARATOR);
+    println!("{}", mommy_response::MommyUI::PrepareCoding);
+    println!("{}", mommy_response::MommyUI::WelcomePrompt);
+    input.clear();
+    io::stdout().flush().unwrap();
+    io::stdin().read_line(&mut input).expect(&mommy_response::MommyUI::ExitMessage.to_string());
 
-        let status_result = Command::new(cmd)
-            .args(&args)
-            .status();
 
-        println!("{}", SEPARATOR);
+    match input.trim() {
+        "Y" => shell_start_coding(),
+        _ => {
+            println!("{}", mommy_response::MommyUI::RefuseCoding);
+            return;
+        },
+    }
+}
 
-        match status_result {
-            Ok(status) if status.success() => println!("{}", mommy_response::MommyLangStatus::ResultOk),
-            Err(_) => println!("{}", mommy_response::MommyLangStatus::ResultError),
-            _ => println!("{}", mommy_response::MommyLangStatus::ResultError),
+fn shell_start_coding() {
+    println!("{}", SEPARATOR);
+    println!("{}", mommy_response::MommyUI::StartCoding);
+    println!("{}", SEPARATOR);
+
+    let mut lite_ide = String::new();
+    let mut line_count = 1;
+
+    loop { // Writing process
+        print!("{}. ", line_count);
+
+        io::stdout().flush().unwrap();
+
+        let mut input = String::new();
+
+        io::stdin().read_line(&mut input).expect(&mommy_response::MommyShellError::CannotCreateFile.to_string());
+
+        if input.trim() == "SAVE" {
+            break;
+        } else if input.trim() == "EXIT" {
+            return;
+        } else if input.trim() == "CLEAR" {
+            lite_ide.clear();
+            line_count = 1;
+            println!("{}", mommy_response::MommyUI::RestartCLI);
+            continue
+        }
+        lite_ide.push_str(&input);
+
+        line_count += 1;
+    }
+
+    shell_save_coding(&lite_ide);
+}
+
+fn shell_save_coding(lite_ide: &str) {
+    println!("{}", SEPARATOR);
+    println!("{}", mommy_response::MommyLangStatus::RenameFile);
+
+    let mut input_name = String::new();
+    io::stdin()
+        .read_line(&mut input_name)
+        .expect("Failed to read input");
+
+    let clean_name = input_name.trim();
+
+    let final_filename = validate_file(&clean_name);
+
+    // Without this, fs::write crashes on a fresh install.
+    let sandbox_dir = "sandbox";
+    if !Path::new(sandbox_dir).exists() {
+        if let Err(_) = fs::create_dir_all(sandbox_dir) {
+            println!("Mommy Error: I tried to build the sandbox, but the OS said no.");
+            return;
         }
     }
 
-    /*
+    let full_path = format!("{}/{}", sandbox_dir, final_filename);
 
-        WINDOWS COMMANDS
-     */
-
-    fn shell_windows_call(windows_command: &str) {
-        match windows_command {
-            "ipconfig" => windows_command_console_output(windows_command),
-            _ => println!("{}", mommy_response::MommyShellError::ExternalIPConfigCallFail),
-        }
+    // Write and Run
+    match fs::write(&full_path, lite_ide) {
+        Ok(_) => {
+            println!("{}", mommy_response::MommyShellOk::FileCreated);
+            // Run the file immediately so they see their results
+            shell_instant_run_mommy_file(&full_path);
+        },
+        Err(_) => println!("{}", mommy_response::MommyShellError::CannotCreateFile),
     }
+}
 
-    fn windows_command_console_output(var: &str) {
-        match Command::new(var).output() {
-            Ok(output) => {
-                let console_output = String::from_utf8_lossy(&output.stdout);
-                println!("{}", console_output);
-            }
-            Err(_) => println!("{}", mommy_response::MommyShellError::ExternalCommandFailed),
-        }
+fn shell_instant_run_mommy_file(full_path: &str) {
+    println!("{}", SEPARATOR);
+    println!("{}", mommy_response::MommyLangStatus::PrepareRun);
+    let mut ans = String::new();
+    io::stdin().read_line(&mut ans).unwrap();
+
+
+    if ans.trim().eq_ignore_ascii_case("Y") { // Run it immediately
+        run_mommy_lang(&full_path);
+    } else {
+        println!("{}", mommy_response::MommyLangStatus::SaveOnly);
+        return
     }
+}
+
+fn validate_file(clean_name: &str) -> String {
+    if clean_name.ends_with(".mommy") {
+        clean_name.to_string()
+    } else {
+        format!("{}.mommy", clean_name)
+    }
+}
+
+fn run_mommy_lang(filename: &str) {
+    println!("{}", SEPARATOR);
+    println!("{}", mommy_response::MommyLangStatus::CheckingFile);
+
+    let absolute_path = fs::canonicalize(filename)
+        .unwrap_or_else(|_| std::path::PathBuf::from(filename));
+
+    let clean_path = absolute_path.to_string_lossy().replace("\\\\?\\", "");
+
+    let (cmd, args) = if cfg!(debug_assertions) {
+        ("cargo".to_string(), vec!["run".into(), "-p".into(), "mommy_lang".into(), "--".into(), clean_path])
+    } else {
+        let mut path = env::current_exe().expect("Unable to get current process path");
+        path.pop();
+
+        if cfg!(target_os = "windows") {
+            path.push("mommy_lang.exe");
+        } else {
+            path.push("mommy_lang");
+        }
+
+        if !path.exists() {
+            println!("Mommy Error: I cannot find 'mommy_lang.exe'.");
+            return;
+        }
+
+        (path.to_string_lossy().to_string(), vec![clean_path])
+    };
+
+    let status_result = Command::new(cmd)
+        .args(&args)
+        .status();
+
+    println!("{}", SEPARATOR);
+
+    match status_result {
+        Ok(status) if status.success() => println!("{}", mommy_response::MommyLangStatus::ResultOk),
+        Err(_) => println!("{}", mommy_response::MommyLangStatus::ResultError),
+        _ => println!("{}", mommy_response::MommyLangStatus::ResultError),
+    }
+}
+
+/*
+
+    WINDOWS COMMANDS
+ */
+
+fn shell_windows_call(windows_command: &str) {
+    match windows_command {
+        "ipconfig" => windows_command_console_output(windows_command),
+        _ => println!("{}", mommy_response::MommyShellError::ExternalIPConfigCallFail),
+    }
+}
+
+fn windows_command_console_output(var: &str) {
+    match Command::new(var).output() {
+        Ok(output) => {
+            let console_output = String::from_utf8_lossy(&output.stdout);
+            println!("{}", console_output);
+        }
+        Err(_) => println!("{}", mommy_response::MommyShellError::ExternalCommandFailed),
+    }
+}
 }
 
 
