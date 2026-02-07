@@ -1,7 +1,8 @@
 use std::env::set_current_dir;
 use std::{env, fs};
+use std::fs::File;
 use std::io;
-use std::io::Write;
+use std::io::{BufRead, BufReader, Write};
 use std::path::Path;
 use std::process::Command;
 use mommy_lib::mommy_response;
@@ -90,6 +91,24 @@ fn shell_open_file(file_name: &str){
     }
 }
 
+fn shell_read_file(file_name: &str){
+    let file = match File::open(file_name) {
+        Ok(f) => f,
+        Err(_) => {
+            println!("{}", mommy_response::MommyShellError::CannotReadFile);
+            return;
+        }
+    };
+
+    let reader = BufReader::new(file);
+    for (index, line) in reader.lines().enumerate() {
+        match line {
+            Ok(l) => println!("{}. {}", index + 1, l),
+            Err(_) => break,
+        }
+    }
+}
+
 fn shell_return_to_prev_directory(root_dir: &std::path::PathBuf) {
     let current_dir = env::current_dir().unwrap();
 
@@ -109,7 +128,7 @@ fn check_args_len(args: &Vec<&str>) -> bool {
     }
 
 fn shell_create_file(file_name: &str) {
-    match fs::File::create(file_name) {
+    match File::create(file_name) {
         Ok(_) => println!("{}", mommy_response::MommyShellOk::FileCreated),
         Err(_) => println!("{}", mommy_response::MommyShellError::CannotCreateFile)
     }
@@ -199,6 +218,7 @@ fn shell_attempt_command(input: &str, root_dir: &std::path::PathBuf) {
         "takethe" if check_args_len(&args) => shell_delete_file(args[1]),
         "openthis" if check_args_len(&args) => shell_open_file(args[1]),
         "runthis" if check_args_len(&args) => shell_run_file(args[1]),
+        "readthis" if check_args_len(&args) => shell_read_file(args[1]),
         _ => println!("{}", mommy_response::MommyShellError::GeneralInvalid),
     }
 

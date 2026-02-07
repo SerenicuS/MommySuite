@@ -18,6 +18,7 @@ use mommy_lib::constants;
       PHASE 1 - DONE
       PHASE 2 - CURRENT
       0. Use Constants in every magic numbers in all files
+      0.5 Add ReadFile to see files
       1. Data Structures - Arrays - group
       2. Memory Management - Malloc (Dynamic Memory) -ibegyou
       3. Input Handling - Scanf/Input commands -> listen
@@ -26,6 +27,8 @@ use mommy_lib::constants;
       PHASE 3
       1. Operating System - MommyOS (Kernel/Process Management)
       2. Cleanup - Refactoring & Optimization
+      BONUS:
+      1. Mommy's Fingers(REGISTRY like assembly)
 
  */
 
@@ -153,7 +156,7 @@ fn transpile_code_to_c(config: &Config) -> Result<(), String> {
 
     let mut symbol_table: HashMap<String, String> = HashMap::new();
 
-    writeln!(output_file, "#include <stdio.h>").unwrap();
+    writeln!(output_file, "#include <stdio.h>").unwrap(); // this should be dynamic as we want to make the user add modules/packages
     writeln!(output_file, "int main(){{").unwrap();
 
     for (i, line) in content.lines().enumerate() {
