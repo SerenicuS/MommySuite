@@ -154,7 +154,6 @@ fn transpile_code_to_c(config: &Config) -> Result<(), String> {
     let mut symbol_table: HashMap<String, String> = HashMap::new();
 
     writeln!(output_file, "#include <stdio.h>").unwrap();
-    writeln!(output_file, "#include <stdlib.h>").unwrap();
     writeln!(output_file, "int main(){{").unwrap();
 
     for (i, line) in content.lines().enumerate() {
