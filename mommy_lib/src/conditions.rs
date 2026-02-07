@@ -13,6 +13,6 @@ pub fn ask(tokens: &Vec<String>) -> Result<String, mommy_response::MommyLangErro
     Ok(format!("if ({}) {{", condition))
 }
 
-pub fn or() -> Result<String, mommy_response::MommyLangError>{
-    Ok(format!("else {{"))
+pub fn or() -> Result<String, mommy_response::MommyLangError> {
+    Ok(format!("}} else {{"))
 }

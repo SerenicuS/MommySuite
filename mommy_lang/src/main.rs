@@ -9,6 +9,25 @@ use std::collections::HashMap;
 use std::{env, fs};
 use std::process::Command;
 use mommy_lib::mommy_response;
+use mommy_lib::constants;
+
+
+
+/*
+    TODO:
+      PHASE 1 - DONE
+      PHASE 2 - CURRENT
+      0. Use Constants in every magic numbers in all files
+      1. Data Structures - Arrays - group
+      2. Memory Management - Malloc (Dynamic Memory) -ibegyou
+      3. Input Handling - Scanf/Input commands -> listen
+      4. Package System - Modules/Packages (The "please" keyword) -please(use) makemetalk(stdio.io?)
+      5. Security - Permissions/Sandboxing features
+      PHASE 3
+      1. Operating System - MommyOS (Kernel/Process Management)
+      2. Cleanup - Refactoring & Optimization
+
+ */
 
 fn parse_line(
     tokens: Vec<String>,
@@ -34,7 +53,7 @@ fn parse_line(
 
         // --- Math (ALU) ---
         mommy_lib::commands::CommandType::Math => {
-            if tokens.len() < 4 {
+            if tokens.len() < constants::MIN_ARGS_MATH {
                 return Err(mommy_response::MommyLangError::MissingArguments);
             }
 
@@ -76,7 +95,6 @@ fn parse_line(
             conditions::ask(&tokens)
         },
         mommy_lib::commands::CommandType::ConditionElse => { // "or"
-            *scope_depth += 1;
             conditions::or()
         },
 
@@ -102,7 +120,7 @@ struct Config{
 impl Config{
     fn new(args: &[String]) -> Result<Config, String>{
 
-        if args.len() < 2{
+        if args.len() < constants::MIN_ARGS_FILE_CMD{
             return Err(mommy_response::MommyLangError::StatusNoFile.to_string())
         }
 
@@ -136,6 +154,7 @@ fn transpile_code_to_c(config: &Config) -> Result<(), String> {
     let mut symbol_table: HashMap<String, String> = HashMap::new();
 
     writeln!(output_file, "#include <stdio.h>").unwrap();
+    writeln!(output_file, "#include <stdlib.h>").unwrap();
     writeln!(output_file, "int main(){{").unwrap();
 
     for (i, line) in content.lines().enumerate() {
@@ -228,7 +247,7 @@ fn run_mommy_file(config: &Config) -> Result<(), String> {
 }
 fn compile_to_gcc(config: &Config) -> Result<(), String>{
 
-    let output = Command::new("gcc")
+    let output = Command::new(constants::COMPILER_TOOL)
         .arg(&config.c_path)
         .arg("-o")
         .arg(&config.exe_path)

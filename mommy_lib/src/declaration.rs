@@ -1,5 +1,6 @@
 use std::collections::HashMap;
 use crate::mommy_response::MommyLangError;
+use crate::constants;
 
 pub fn create_variable(
     tokens: &Vec<String>,
@@ -8,12 +9,12 @@ pub fn create_variable(
 
     // Syntax: mayihave <VAR> in <VALUE/box> as int
 
-    if tokens.len() < 6 {
+    if tokens.len() < constants::MIN_CREATE_VAR_ARGS {
         return Err(MommyLangError::MissingArguments);
     }
 
 
-    if &tokens[4] != "as"{
+    if tokens[constants::INDEX_KEYWORD_CREATE_CONNECTOR_VARIABLE_NAME_TO_VARIABLE_TYPE] != "as" {
         return Err(MommyLangError::SyntaxError)
     }
 
@@ -21,7 +22,7 @@ pub fn create_variable(
     let in_index = tokens.iter().position(|r| r == "in")
         .ok_or(MommyLangError::SyntaxError)?;
 
-
+    // Get Type (Last token)
     let raw_type = tokens.last().unwrap();
 
     let c_type = match raw_type.as_str(){
@@ -30,7 +31,7 @@ pub fn create_variable(
         _ => raw_type,
     };
 
-    let name_index = tokens.len() - 3;
+    let name_index = tokens.len() - constants::MIN_INDEX_NAME_LEN;
     let name = &tokens[name_index];
 
     if name == "int" || name == "return" || name == "void" {
@@ -63,13 +64,13 @@ pub fn replace_variable (
     symbols: &mut HashMap<String, String>
 ) -> Result<String, MommyLangError> {
 
-    if tokens.len() < 4{
+    if tokens.len() < constants::MIN_REPLACE_VAR_ARGS {
     return Err(MommyLangError::MissingArguments);
     }
 
-    let var_name = &tokens[1];
-    let keyword_with = &tokens[2];
-    let value = &tokens[3];
+    let var_name = &tokens[constants::INDEX_KEYWORD_REPLACE_VARIABLE_TARGET];
+    let keyword_with = &tokens[constants::INDEX_KEYWORD_REPLACE_CONNECTOR_VARIABLE_NAME_TARGET_TO_VALUE];
+    let value = &tokens[constants::INDEX_KEYWORD_REPLACE_VALUE];
 
     if keyword_with != "with" {
         return Err(MommyLangError::SyntaxError)
@@ -82,14 +83,15 @@ pub fn replace_variable (
 
     let var_type = symbols.get(var_name).unwrap();
 
-    if tokens.len() == 5 && tokens[4] == "address" {
+    if tokens.len() == constants::INDEX_KEYWORD_CREATE_VARIABLE_TYPE && tokens[constants::INDEX_KEYWORD_CREATE_CONNECTOR_VARIABLE_NAME_TO_VARIABLE_TYPE] == "address" {
         if !symbols.contains_key(value) {
             return Err(MommyLangError::UndeclaredVariable);
         }
         return Ok(format!("{} = &{};", var_name, value));
     }
 
-    if tokens.len() == 5 && tokens[4] == "inside" {
+    if tokens.len() == constants::INDEX_KEYWORD_CREATE_VARIABLE_TYPE
+        && tokens[constants::INDEX_KEYWORD_CREATE_CONNECTOR_VARIABLE_NAME_TO_VARIABLE_TYPE] == "inside" {
        if var_type != "pointer"{
            return Err(MommyLangError::TypeMismatch)
        }

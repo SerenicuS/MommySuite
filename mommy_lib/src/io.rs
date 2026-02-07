@@ -1,7 +1,8 @@
 use std::collections::HashMap;
 use crate::mommy_response::MommyLangError;
+use crate::constants;
 pub fn say(tokens: &Vec<String>, symbols: &HashMap<String, String>) -> Result<String, MommyLangError> {
-   if tokens.len() < 2{
+   if tokens.len() < constants::MIN_ARGS_LEN {
        return Err(MommyLangError::MissingArguments)
    }
 

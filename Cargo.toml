@@ -1,8 +1,8 @@
 [workspace]
 members = [
-    "mommy_lang",     # Your Compiler
-    "mommy_shell",    # Your Terminal
-    "mommy_lib",       # Your Shared Library
+    "mommy_lang",     #  Compiler
+    "mommy_shell",    #  Terminal
+    "mommy_lib",      #  Shared Library
 ]
 resolver = "2"
 

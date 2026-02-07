@@ -5,6 +5,7 @@ use std::io::Write;
 use std::path::Path;
 use std::process::Command;
 use mommy_lib::mommy_response;
+use mommy_lib::constants;
 
 const SEPARATOR: &str = "----------------------------------------------------------------";
 
@@ -71,11 +72,13 @@ fn shell_start_default(mut input: String, root_dir: &std::path::PathBuf) { // Ad
 
         io::stdin()
             .read_line(&mut input)
-            .expect(&mommy_response::MommyShellError::GeneralInvalid.to_string());
+            .expect(&mommy_response::MommyUI::ExitMessage.to_string());
+
+
 
         println!("{}", SEPARATOR);
 
-        // Pass the root_dir down the chain
+
         shell_attempt_command(&input, root_dir);
     }
 }
@@ -214,10 +217,10 @@ fn shell_run_file(filename: &str) {
             }
         },
         "txt" => {
-            simple_exec("notepad.exe", filename);
+            simple_exec(constants::RUN_NOTEPAD, filename);
         },
         "py" => {
-            simple_exec("python", filename);
+            simple_exec(constants::RUN_PYTHON, filename);
         },
         _ => {
             println!("{}", mommy_response::MommyShellError::CannotOpenFile)
@@ -302,7 +305,7 @@ fn shell_save_coding(lite_ide: &str) {
     let final_filename = validate_file(&clean_name);
 
     // Without this, fs::write crashes on a fresh install.
-    let sandbox_dir = "sandbox";
+    let sandbox_dir = constants::IDE_OUTPUT_DIRECTORY;
     if !Path::new(sandbox_dir).exists() {
         if let Err(_) = fs::create_dir_all(sandbox_dir) {
             println!("Mommy Error: I tried to build the sandbox, but the OS said no.");
@@ -316,7 +319,6 @@ fn shell_save_coding(lite_ide: &str) {
     match fs::write(&full_path, lite_ide) {
         Ok(_) => {
             println!("{}", mommy_response::MommyShellOk::FileCreated);
-            // Run the file immediately so they see their results
             shell_instant_run_mommy_file(&full_path);
         },
         Err(_) => println!("{}", mommy_response::MommyShellError::CannotCreateFile),
@@ -339,10 +341,10 @@ fn shell_instant_run_mommy_file(full_path: &str) {
 }
 
 fn validate_file(clean_name: &str) -> String {
-    if clean_name.ends_with(".mommy") {
+    if clean_name.ends_with(constants::EXTENSION_SOURCE) {
         clean_name.to_string()
     } else {
-        format!("{}.mommy", clean_name)
+        format!("{}{}", clean_name, constants::EXTENSION_SOURCE)
     }
 }
 

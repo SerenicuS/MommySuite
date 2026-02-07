@@ -1,5 +1,5 @@
-use std::collections::HashMap;
 // Arithmetic logic unit
+use std::collections::HashMap;
 use crate::mommy_response::{MommyLangError};
 
 pub fn calculate_two(target: &str, operator: &str, value: &str, symbols: &HashMap<String, String>) -> Result<String, MommyLangError> {
