@@ -18,7 +18,6 @@ use mommy_lib::constants;
       PHASE 1 - DONE
       PHASE 2 - CURRENT
       0. Use Constants in every magic numbers in all files
-      0.5 Add ReadFile to see files
       1. Data Structures - Arrays - group
       2. Memory Management - Malloc (Dynamic Memory) -ibegyou
       3. Input Handling - Scanf/Input commands -> listen
