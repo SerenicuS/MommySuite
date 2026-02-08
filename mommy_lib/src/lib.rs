@@ -5,5 +5,6 @@ pub mod loops;
 pub mod conditions;
 pub mod io;
 pub mod mommy_response;
-pub mod commands;
+pub mod mommy_lang_syntax;
 pub mod constants;
+pub mod mommy_shell_commands;

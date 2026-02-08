@@ -7,8 +7,15 @@ use std::path::Path;
 use std::process::Command;
 use mommy_lib::mommy_response;
 use mommy_lib::constants;
-
+use mommy_lib::mommy_shell_commands;
 const SEPARATOR: &str = "----------------------------------------------------------------";
+
+
+/*
+    TODO:
+        1. Handles many commands/arguments using the shell.
+
+ */
 
 const SHELL_BASIC_COMMANDS: &str = r#"
     You are too greedy.
@@ -21,13 +28,11 @@ const SHELL_BASIC_COMMANDS: &str = r#"
      6. goback                      ->    Return to Previous Directory
      7. canihave <filename>         ->    Create File
      8. takethe <filename>          ->    Delete File
-     9. letusplayhouse <directory>  ->    Create a Directory
-    10. removethehouse <directory>  ->    Delete a Directory
-    11. openthis <filename>         ->    Open the File
-    12. readthis <filename>         ->    Read the File's contents
-    13. doxxme                      ->    Windows Ip Configuration
-    14. callmeplease <ip/dns>       ->    Ping device
-    15. runthis <filename>          ->    Run File
+     9. openthis <filename>         ->    Open the File
+    10. readthis <filename>         ->    Read the File's contents
+    11. doxxme                      ->    Windows Ip Configuration
+    12. callmeplease <ip/dns>       ->    Ping device
+    13. runthis <filename>          ->    Run File
     ---------------
     "#;
 
@@ -68,7 +73,7 @@ fn shell_start_default(mut input: String, root_dir: &std::path::PathBuf) { // Ad
 
     loop {
         input.clear();
-        print!(">");
+        print!("{}", constants::SHELL_LINE_INDICATOR);
         io::stdout().flush().unwrap();
 
         io::stdin()
@@ -103,7 +108,7 @@ fn shell_read_file(file_name: &str){
     let reader = BufReader::new(file);
     for (index, line) in reader.lines().enumerate() {
         match line {
-            Ok(l) => println!("{}. {}", index + 1, l),
+            Ok(l) => println!("{}. {}", index + constants::SHELL_LINE_INCREMENTOR, l),
             Err(_) => break,
         }
     }
@@ -115,7 +120,7 @@ fn shell_return_to_prev_directory(root_dir: &std::path::PathBuf) {
     if current_dir.canonicalize().unwrap() == root_dir.canonicalize().unwrap() {
         println!("{}", mommy_response::MommyShellError::RootDirectoryLocked);
     } else {
-        match set_current_dir("..") {
+        match set_current_dir(constants::SHELL_PREVIOUS_DIRECTORY_KEYWORD) {
             Ok(_) => println!("{}", mommy_response::MommyShellOk::DirectoryChanged),
             Err(_) => println!("{}", mommy_response::MommyShellError::GeneralInvalid),
         }
@@ -141,7 +146,7 @@ fn shell_delete_file(file_name: &str) {
     }
 }
 fn shell_list_files_in_directory() {
-    let files = fs::read_dir(".").expect(&mommy_response::MommyShellError::CannotListFiles.to_string());
+    let files = fs::read_dir(constants::SHELL_CURRENT_DIRECTORY_KEYWORD).expect(&mommy_response::MommyShellError::CannotListFiles.to_string());
 
     for entry in files {
         let entry = entry.expect(&mommy_response::MommyShellError::CannotListFiles.to_string());
@@ -176,7 +181,7 @@ fn shell_move_directory(path: &str, root_dir: &std::path::PathBuf) {
             if canonical_target.starts_with(root_dir.canonicalize().unwrap()) {
                 if set_current_dir(&canonical_target).is_ok() {
                     let raw_path = shell_get_directory_return();
-                    let display_path = raw_path.replace("\\\\?\\", "");
+                    let display_path = raw_path.replace(constants::WINDOWS_EXTENDED_LENGTH_PATH_PREFIX, constants::SHELL_EMPTY_STRING);
                     println!("Moved Inside: {}", display_path);
                 }
             } else {
@@ -198,27 +203,32 @@ fn shell_attempt_command(input: &str, root_dir: &std::path::PathBuf) {
         return;
     }
 
-    match args[0] {
+    let first_args = mommy_shell_commands::MommyShellCommands::from_str(args[constants::INDEX_DEFAULT_STARTING_COMMAND_ARGS]);
+
+    match first_args{ // 0
         //1 Args
-        "tellme" => shell_print_basic_help(),
-        "tellmesecret" => shell_print_advance_help(),
-        "mayileave" => std::process::exit(0),
-        "iamhere" => shell_get_directory(),
-        "mommy?" => shell_list_files_in_directory(),
-        "doxxme" => shell_windows_call("ipconfig"),
-        "goback" => shell_return_to_prev_directory(root_dir),
+        mommy_shell_commands::MommyShellCommands::ShellHelp => shell_print_basic_help(),
+        mommy_shell_commands::MommyShellCommands::ShellHelpAdvanced => shell_print_advance_help(),
+        mommy_shell_commands::MommyShellCommands::ShellExit => std::process::exit(0),
+        mommy_shell_commands::MommyShellCommands::ShellCurrentDirectory => shell_get_directory(),
+        mommy_shell_commands::MommyShellCommands::ShellListFilesCurrentDirectory => shell_list_files_in_directory(),
+        mommy_shell_commands::MommyShellCommands::ShellShowIPConfig => shell_windows_call("ipconfig"),
+        mommy_shell_commands::MommyShellCommands::ShellReturnToPrevDirectory => shell_return_to_prev_directory(root_dir),
 
 
         //Advanced
-        "startcoding" => shell_prepare_coding(),
+        mommy_shell_commands::MommyShellCommands::ShellStartCoding => shell_prepare_coding(),
 
         // 2 Args
-        "walkwithme" if check_args_len(&args) => shell_move_directory(args[1], root_dir),
-        "canihave" if check_args_len(&args) => shell_create_file(args[1]),
-        "takethe" if check_args_len(&args) => shell_delete_file(args[1]),
-        "openthis" if check_args_len(&args) => shell_open_file(args[1]),
-        "runthis" if check_args_len(&args) => shell_run_file(args[1]),
-        "readthis" if check_args_len(&args) => shell_read_file(args[1]),
+        mommy_shell_commands::MommyShellCommands::ShellChangeDirectory if check_args_len(&args) => shell_move_directory(args[1], root_dir),
+        mommy_shell_commands::MommyShellCommands::ShellCreateFile if check_args_len(&args) => shell_create_file(args[1]),
+        mommy_shell_commands::MommyShellCommands::ShellDeleteFile if check_args_len(&args) => shell_delete_file(args[1]),
+        mommy_shell_commands::MommyShellCommands::ShellOpenFile if check_args_len(&args) => shell_open_file(args[1]),
+        mommy_shell_commands::MommyShellCommands::ShellRunFile if check_args_len(&args) => shell_run_file(args[1]),
+        mommy_shell_commands::MommyShellCommands::ShellReadFile if check_args_len(&args) => shell_read_file(args[1]),
+
+        // Error
+        mommy_shell_commands::MommyShellCommands::ShellUnknownCommand => println!("{}", mommy_response::MommyShellError::GeneralInvalid),
         _ => println!("{}", mommy_response::MommyShellError::GeneralInvalid),
     }
 
@@ -293,11 +303,11 @@ fn shell_start_coding() {
 
         io::stdin().read_line(&mut input).expect(&mommy_response::MommyShellError::CannotCreateFile.to_string());
 
-        if input.trim() == "SAVE" {
+        if input.trim() == constants::SHELL_IDE_SAVE_FILE_KEYWORD {
             break;
-        } else if input.trim() == "EXIT" {
+        } else if input.trim() == constants:: SHELL_IDE_EXIT_KEYWORD {
             return;
-        } else if input.trim() == "CLEAR" {
+        } else if input.trim() == constants::SHELL_IDE_CLEAR_KEYWORD {
             lite_ide.clear();
             line_count = 1;
             println!("{}", mommy_response::MommyUI::RestartCLI);
@@ -375,10 +385,11 @@ fn run_mommy_lang(filename: &str) {
     let absolute_path = fs::canonicalize(filename)
         .unwrap_or_else(|_| std::path::PathBuf::from(filename));
 
-    let clean_path = absolute_path.to_string_lossy().replace("\\\\?\\", "");
+    let clean_path = absolute_path.to_string_lossy().replace(
+        constants::WINDOWS_EXTENDED_LENGTH_PATH_PREFIX, constants::SHELL_EMPTY_STRING);
 
     let (cmd, args) = if cfg!(debug_assertions) {
-        ("cargo".to_string(), vec!["run".into(), "-p".into(), "mommy_lang".into(), "--".into(), clean_path])
+        ("cargo".to_string(), vec!["run".into(), "-p".into(), "mommy_lang".into(), "--".into(), clean_path]) // Do not touch this to be a const for now.
     } else {
         let mut path = env::current_exe().expect("Unable to get current process path");
         path.pop();

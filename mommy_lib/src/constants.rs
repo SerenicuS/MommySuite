@@ -17,7 +17,7 @@ pub const RUN_PYTHON: &str = "python";
 pub const RUN_NOTEPAD: &str = "notepad.exe";
 
 
-// --- Declaration Const ---
+// --- DECLARATION CONSTANTS ---
 
 //  Syntax: mayihave <variable_name> in <NAME> as int
 pub const MIN_CREATE_VAR_ARGS: usize = 6;
@@ -36,3 +36,17 @@ pub const INDEX_KEYWORD_REPLACE_VARIABLE_TARGET: usize = 1; // variable_name
 pub const INDEX_KEYWORD_REPLACE_CONNECTOR_VARIABLE_NAME_TARGET_TO_VALUE: usize = 2; // with
 pub const INDEX_KEYWORD_REPLACE_VALUE: usize = 3; // value
 
+
+// --- MOMMY SHELL CONSTANTS ---
+pub const INDEX_DEFAULT_STARTING_COMMAND_ARGS: usize = 0;
+pub const SHELL_LINE_INCREMENTOR: usize = 1;
+pub const SHELL_LINE_INDICATOR: &str = ">";
+pub const SHELL_CURRENT_DIRECTORY_KEYWORD: &str = ".";
+pub const SHELL_PREVIOUS_DIRECTORY_KEYWORD: &str = "..";
+
+pub const WINDOWS_EXTENDED_LENGTH_PATH_PREFIX: &str = "\\\\?\\";
+pub const SHELL_EMPTY_STRING: &str = "";
+
+pub const SHELL_IDE_SAVE_FILE_KEYWORD: &str = "SAVE";
+pub const SHELL_IDE_EXIT_KEYWORD: &str = "EXIT";
+pub const SHELL_IDE_CLEAR_KEYWORD: &str = "CLEAR";

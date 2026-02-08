@@ -1,0 +1,52 @@
+say "=== MommyLang Full Feature Test ==="
+
+say "--- Integer declaration ---"
+mayihave 10 in x as int
+say x
+
+say "--- Assignment ---"
+replace x with 20
+say x
+
+say "--- Arithmetic ---"
+add x with 5
+say x
+subtract x with 3
+say x
+multiply x with 2
+say x
+divide x with 4
+say x
+
+say "--- Pointer (box) ---"
+mayihave null in p as box
+replace p with x address
+replace p with 99 inside
+say x
+
+say "--- If condition (true) ---"
+ask if x == 99
+    say "If works"
+done
+
+say "--- If / Else ---"
+ask if x == 0
+    say "Wrong branch"
+or
+    say "Else works"
+done
+
+say "--- Loop ---"
+punishme 3
+    say "Looping"
+done
+
+say "--- Loop with break ---"
+punishme 5
+    say "Before break"
+    satisfied
+    say "After break"
+done
+
+say "--- Program exit ---"
+leave

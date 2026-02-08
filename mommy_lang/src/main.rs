@@ -15,7 +15,6 @@ use mommy_lib::constants;
 
 /*
     TODO:
-      PHASE 1 - DONE
       PHASE 2 - CURRENT
       0. Use Constants in every magic numbers in all files
       1. Data Structures - Arrays - group
@@ -31,6 +30,20 @@ use mommy_lib::constants;
 
  */
 
+
+/*
+   TODO:
+    Phase 1 (Abusive): Rejection. "You are stupid." // Done
+    Phase 2 (Discipline): Correction. "Do it my way."
+    Phase 3 (Stockholm): Acceptance. "This is my home."
+
+   TODO: FUTURE
+    Phase 3.5 (Gaslighting): Confusion. "Did I do that?"
+    Phase 4 (Domestic): Responsibility. "I must feed the system."
+    Phase 5 (Freedom): False Hope. "I can leave... but do I want to?"
+
+ */
+
 fn parse_line(
     tokens: Vec<String>,
     symbols: &mut HashMap<String, String>,
@@ -41,20 +54,20 @@ fn parse_line(
         return Ok(String::new());
     }
 
-    let command = mommy_lib::commands::CommandType::from_str(&tokens[0]);
+    let command = mommy_lib::mommy_lang_syntax::MommyLangSyntax::from_str(&tokens[0]);
 
     match command {
 
         // --- Variables ---
-        mommy_lib::commands::CommandType::Declaration => {
+        mommy_lib::mommy_lang_syntax::MommyLangSyntax::Declaration => {
             declaration::create_variable(&tokens, symbols)
         },
-        mommy_lib::commands::CommandType::Assignment => {
+        mommy_lib::mommy_lang_syntax::MommyLangSyntax::Assignment => {
             declaration::replace_variable(&tokens, symbols)
         },
 
         // --- Math (ALU) ---
-        mommy_lib::commands::CommandType::Math => {
+        mommy_lib::mommy_lang_syntax::MommyLangSyntax::Math => {
             if tokens.len() < constants::MIN_ARGS_MATH {
                 return Err(mommy_response::MommyLangError::MissingArguments);
             }
@@ -71,42 +84,42 @@ fn parse_line(
         },
 
         // --- I/O ---
-        mommy_lib::commands::CommandType::IO => {
+        mommy_lib::mommy_lang_syntax::MommyLangSyntax::IO => {
             io::say(&tokens, symbols)
         },
 
         // --- Loops ---
-        mommy_lib::commands::CommandType::LoopStart => { // "punishme"
+        mommy_lib::mommy_lang_syntax::MommyLangSyntax::LoopStart => { // "punishme"
             *scope_depth += 1;
             Ok(loops::for_loop(&tokens))
         },
-        mommy_lib::commands::CommandType::LoopEnd => {   // "done"
+        mommy_lib::mommy_lang_syntax::MommyLangSyntax::LoopEnd => {   // "done"
             if *scope_depth == 0 {
                 return Err(mommy_response::MommyLangError::UnexpectedDone);
             }
             *scope_depth -= 1;
             Ok(loops::done())
         },
-        mommy_lib::commands::CommandType::LoopBreak => { // "satisfied"
+        mommy_lib::mommy_lang_syntax::MommyLangSyntax::LoopBreak => { // "satisfied"
             Ok(loops::satisfied())
         },
 
         // --- Conditions ---
-        mommy_lib::commands::CommandType::Condition => { // "ask"
+        mommy_lib::mommy_lang_syntax::MommyLangSyntax::Condition => { // "ask"
             *scope_depth += 1;
             conditions::ask(&tokens)
         },
-        mommy_lib::commands::CommandType::ConditionElse => { // "or"
+        mommy_lib::mommy_lang_syntax::MommyLangSyntax::ConditionElse => { // "or"
             conditions::or()
         },
 
         // --- System ---
-        mommy_lib::commands::CommandType::ProgramEnd => { // "leave"
+        mommy_lib::mommy_lang_syntax::MommyLangSyntax::ProgramEnd => { // "leave"
             Ok("return 0;".to_string())
         },
 
         // --- Error Handling ---
-        mommy_lib::commands::CommandType::Unknown => {
+        mommy_lib::mommy_lang_syntax::MommyLangSyntax::Unknown => {
             Err(mommy_response::MommyLangError::SyntaxError)
         }
     }
