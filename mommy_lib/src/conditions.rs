@@ -14,5 +14,5 @@ pub fn ask(tokens: &Vec<String>) -> Result<String, mommy_response::MommyLangErro
 }
 
 pub fn or() -> Result<String, mommy_response::MommyLangError> {
-    Ok(format!("else {{"))
+    Ok(format!("}}else {{"))
 }
