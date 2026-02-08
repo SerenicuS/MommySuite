@@ -10,9 +10,7 @@ use std::{env, fs};
 use std::process::Command;
 use mommy_lib::mommy_response;
 use mommy_lib::constants;
-
-
-
+use mommy_lib::lang_enums::ScopeType;
 /*
     TODO:
       PHASE 2 - CURRENT
@@ -31,6 +29,7 @@ use mommy_lib::constants;
  */
 
 
+
 /*
    TODO:
     Phase 1 (Abusive): Rejection. "You are stupid." // Done
@@ -44,11 +43,15 @@ use mommy_lib::constants;
 
  */
 
+
+
 fn parse_line(
     tokens: Vec<String>,
     symbols: &mut HashMap<String, String>,
-    scope_depth: &mut i32
+    scope_stack: &mut Vec<ScopeType>
 ) -> Result<String, mommy_response::MommyLangError> {
+
+
 
     if tokens.is_empty() {
         return Ok(String::new());
@@ -90,27 +93,44 @@ fn parse_line(
 
         // --- Loops ---
         mommy_lib::mommy_lang_syntax::MommyLangSyntax::LoopStart => { // "punishme"
-            *scope_depth += 1;
+            scope_stack.push(ScopeType::Loop);
             Ok(loops::for_loop(&tokens))
         },
         mommy_lib::mommy_lang_syntax::MommyLangSyntax::LoopEnd => {   // "done"
-            if *scope_depth == 0 {
-                return Err(mommy_response::MommyLangError::UnexpectedDone);
+            match scope_stack.pop() {
+                Some(_) => Ok(loops::done()), // "}"
+                None => Err(mommy_response::MommyLangError::UnexpectedDone)
             }
-            *scope_depth -= 1;
-            Ok(loops::done())
         },
         mommy_lib::mommy_lang_syntax::MommyLangSyntax::LoopBreak => { // "satisfied"
+            if !scope_stack.contains(&ScopeType::Loop) {
+                return Err(mommy_response::MommyLangError::UnexpectedSatisfied);
+            }
             Ok(loops::satisfied())
         },
 
         // --- Conditions ---
         mommy_lib::mommy_lang_syntax::MommyLangSyntax::Condition => { // "ask"
-            *scope_depth += 1;
+            scope_stack.push(ScopeType::Condition);
             conditions::ask(&tokens)
         },
         mommy_lib::mommy_lang_syntax::MommyLangSyntax::ConditionElse => { // "or"
-            conditions::or()
+            match scope_stack.last() {
+                Some(ScopeType::Condition) => {
+                    conditions::or()
+                },
+                Some(ScopeType::Loop) => {
+                    // Error: You can't put 'or' directly inside a loop without an 'ask'
+                    Err(mommy_response::MommyLangError::OrphanElse)
+                },
+                None => {
+                    // Error: 'or' with nothing before it
+                    Err(mommy_response::MommyLangError::OrphanElse)
+                }
+                _ => {
+                    Err(mommy_response::MommyLangError::SyntaxError)
+                }
+            }
         },
 
         // --- System ---
@@ -158,7 +178,7 @@ impl Config{
 
 fn transpile_code_to_c(config: &Config) -> Result<(), String> {
 
-    let mut scope_depth = 0;
+    let mut scope_stack: Vec<ScopeType> = Vec::new();
 
     let content = fs::read_to_string(&config.input_path)
         .map_err(|_| format!("Could not read file: {}", config.input_path))?;
@@ -178,7 +198,7 @@ fn transpile_code_to_c(config: &Config) -> Result<(), String> {
         }
 
         let tokens = syntax_parser::insert_token(trimmed_line);
-        let result = parse_line(tokens, &mut symbol_table, &mut scope_depth);
+        let result = parse_line(tokens, &mut symbol_table, &mut scope_stack);
 
         match result {
             Ok(c_code) => {
@@ -191,7 +211,7 @@ fn transpile_code_to_c(config: &Config) -> Result<(), String> {
         }
     }
 
-    if scope_depth > 0 {
+    if !scope_stack.is_empty() {
         return Err(mommy_response::MommyLangError::UnclosedBlock.to_string());
     }
 

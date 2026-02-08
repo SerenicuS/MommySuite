@@ -17,22 +17,18 @@ fn validate_operation(
 ) -> Result<(), MommyLangError> {
 
 
-    // Variable does not exist
+    // Does the variable exist?
     let var_type = match symbols.get(target) {
         Some(t) => t,
         None => return Err(MommyLangError::UndeclaredVariable),
     };
 
-    if let Some(first_char) = value.chars().next() { // for negative
-        let is_negative_number = first_char == '-' && value.len() > 1 && value.chars().nth(1).unwrap().is_digit(10);
 
-        if !first_char.is_digit(10) && !is_negative_number {
-            if !symbols.contains_key(value) {
-                return Err(MommyLangError::UndeclaredVariable);
-            }
+    if !symbols.contains_key(value){ // Is it a variable name?
+        if value.parse::<f64>().is_err(){ // Can it be parsed like a number?(check if it is fully number)
+            return Err(MommyLangError::UndeclaredVariable);
         }
     }
-
 
     // Trying to do math in strings
     if var_type == "String" || var_type == "char*" {
@@ -43,16 +39,6 @@ fn validate_operation(
     // Dividing 0
     if operator == "/" && value == "0" {
         return Err(MommyLangError::DivideByZero);
-    }
-
-
-    // I do not know what this is
-    if let Some(first_char) = value.chars().next() {
-        if !first_char.is_digit(10) {
-            if !symbols.contains_key(value) {
-                return Err(MommyLangError::UndeclaredVariable);
-            }
-        }
     }
 
     Ok(())

@@ -15,7 +15,7 @@ pub enum MommyLangSyntax {
 
 impl MommyLangSyntax {
     pub fn from_str(token: &str) -> Self {
-        match token {
+        match token.trim() {
             "mayihave" => MommyLangSyntax::Declaration,
             "replace" => MommyLangSyntax::Assignment,
             "add" | "divide" | "subtract" | "multiply" => MommyLangSyntax::Math,

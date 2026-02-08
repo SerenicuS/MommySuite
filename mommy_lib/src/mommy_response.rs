@@ -15,6 +15,8 @@ pub enum MommyLangError {
     UnclosedBlock,
     UnexpectedDone,
     VariableAlreadyExists,
+    UnexpectedSatisfied,
+    OrphanElse,
 
     // File / System (Specific to the Compiler)
     StatusNoFile,       // Can't find the .mommy file
@@ -150,6 +152,8 @@ impl fmt::Display for MommyLangError {
             Self::UnclosedBlock => write!(f, "You opened a door and forgot to close it. Were you raised in a barn? Close your blocks."),
             Self::UnexpectedDone => write!(f, "You said 'done' but you haven't even started anything. Focus."),
             Self::VariableAlreadyExists => write!(f, "We already have a variable named that. Be creative, or be silent."),
+            Self::UnexpectedSatisfied => write!(f, "You skipped without putting anything."),
+            Self::OrphanElse => write!(f, "Poor and alone little else."),
 
             // MATH ERRORS
             Self::MathOnString => write!(f, "You cannot do math on words. Stop acting childish."),

@@ -1,3 +1,0 @@
-mayihave "Hello, World" in x as String
-say x
-leave
