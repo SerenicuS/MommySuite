@@ -10,6 +10,12 @@ I'm hoping to keep improving and get better as a **Systems Programmer** through 
 
 ---
 
+## Architecture
+* Lexer & Parser: Custom-built tokenizer that handles state management (e.g., handling spaces inside string literals vs. code blocks).
+* Transpilation: Maps abstract syntax to optimized C code, leveraging GCC for binary generation.
+* Process Management: Uses Rust's std::process to spawn child processes for compilation and system commands.
+* Memory Safety: While MommyLang allows raw pointers (box), the compiler (Rust) ensures the transpiler itself is memory-safe.
+
 ## ⚠️ DISCLAIMER
 **This project is for EDUCATIONAL PURPOSES ONLY.**
 * 🎓 Created to practice system-level concepts (Processes, Memory, Pointers).
