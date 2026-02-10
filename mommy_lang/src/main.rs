@@ -1,3 +1,45 @@
+//! # MommyLang Compiler Infrastructure
+//!
+//! This is the entry point for the MommyLang compiler. It handles file parsing,
+//! C transpilation, and GCC invocation.
+//!
+//! ---
+//!
+//! ## 🛠️ Development Roadmap
+//!
+//! ### Phase 2: The Discipline Update (Current)
+//! Focused on memory safety, data structures, and stricter control.
+//! - [x] **Step 0:** Refactor magic numbers to `constants` module.
+//! - [x] **Step 1:** Data Structures - Stack Arrays (`group`).
+//! - [ ] **Step 2:** Memory Management - Heap Allocation (`ibegyou`). **[CURRENT WORK]**
+//! - [ ] **Step 3:** Input Handling - Stdin Wrapper (`listen`).
+//! - [ ] **Step 4:** Package System - Modules (`please use`).
+//! - [ ] **Step 5:** Security - Permissions & Sandboxing.
+//!
+//! ### Phase 3: The Stockholm Update
+//! Focused on OS-level features and system dependency.
+//! - [ ] **Step 1:** MommyOS (Kernel/Process Management).
+//! - [ ] **Step 2:** Cleanup (Refactoring & Optimization).
+//!
+//! ### Bonus Objectives
+//! - [ ] **Mommy's Fingers:** Registry-like assembly manipulation.
+//!
+//! ---
+//!
+//! ## 🧠 Psychological Phases (The Lore)
+//!
+//! The compiler's personality evolves with the user's proficiency.
+//!
+//! 1.  **Phase 1 (Abusive):** Rejection. *"You are stupid."* (Syntax Errors = Insults)
+//! 2.  **Phase 2 (Discipline):** Correction. *"Do it my way."* (Strict Typing/Borrow Checking)
+//! 3.  **Phase 3 (Stockholm):** Acceptance. *"This is my home."* (Vendor Lock-in)
+//!
+//! ### Future Expansions
+//! * **Phase 3.5 (Gaslighting):** Confusion. *"Did I do that?"* (Randomized warnings)
+//! * **Phase 4 (Domestic):** Responsibility. *"I must feed the system."* (Manual memory management)
+//! * **Phase 5 (Freedom):** False Hope. *"I can leave... but do I want to?"* (The final test)
+
+
 use std::io::Write;
 use mommy_lib::syntax_parser;
 use mommy_lib::alu;
@@ -8,40 +50,9 @@ use mommy_lib::declaration;
 use std::collections::HashMap;
 use std::{env, fs};
 use std::process::Command;
-use mommy_lib::mommy_response;
+use mommy_lib::responses;
 use mommy_lib::constants;
 use mommy_lib::lang_enums::ScopeType;
-/*
-    TODO:
-      PHASE 2 - CURRENT
-      0. Use Constants in every magic numbers in all files
-      1. Data Structures - Arrays - group
-      2. Memory Management - Malloc (Dynamic Memory) -ibegyou
-      3. Input Handling - Scanf/Input commands -> listen
-      4. Package System - Modules/Packages (The "please" keyword) -please(use) makemetalk(stdio.io?)
-      5. Security - Permissions/Sandboxing features
-      PHASE 3
-      1. Operating System - MommyOS (Kernel/Process Management)
-      2. Cleanup - Refactoring & Optimization
-      BONUS:
-      1. Mommy's Fingers(REGISTRY like assembly)
-
- */
-
-
-
-/*
-   TODO:
-    Phase 1 (Abusive): Rejection. "You are stupid." // Done
-    Phase 2 (Discipline): Correction. "Do it my way."
-    Phase 3 (Stockholm): Acceptance. "This is my home."
-
-   TODO: FUTURE
-    Phase 3.5 (Gaslighting): Confusion. "Did I do that?"
-    Phase 4 (Domestic): Responsibility. "I must feed the system."
-    Phase 5 (Freedom): False Hope. "I can leave... but do I want to?"
-
- */
 
 
 
@@ -49,7 +60,7 @@ fn parse_line(
     tokens: Vec<String>,
     symbols: &mut HashMap<String, String>,
     scope_stack: &mut Vec<ScopeType>
-) -> Result<String, mommy_response::MommyLangError> {
+) -> Result<String, responses::MommyLangError> {
 
 
 
@@ -57,22 +68,26 @@ fn parse_line(
         return Ok(String::new());
     }
 
-    let command = mommy_lib::mommy_lang_syntax::MommyLangSyntax::from_str(&tokens[0]);
+    let command = mommy_lib::lang_syntax::MommyLangSyntax::from_str(&tokens[0]);
 
     match command {
 
         // --- Variables ---
-        mommy_lib::mommy_lang_syntax::MommyLangSyntax::Declaration => {
+        mommy_lib::lang_syntax::MommyLangSyntax::Declaration => {
             declaration::create_variable(&tokens, symbols)
         },
-        mommy_lib::mommy_lang_syntax::MommyLangSyntax::Assignment => {
-            declaration::replace_variable(&tokens, symbols)
+        mommy_lib::lang_syntax::MommyLangSyntax::Assignment => {
+            declaration::replace(&tokens, symbols)
         },
 
+        mommy_lib::lang_syntax::MommyLangSyntax::Array =>{
+            declaration::create_array(&tokens, symbols)
+        }
+
         // --- Math (ALU) ---
-        mommy_lib::mommy_lang_syntax::MommyLangSyntax::Math => {
+        mommy_lib::lang_syntax::MommyLangSyntax::Math => {
             if tokens.len() < constants::MIN_ARGS_MATH {
-                return Err(mommy_response::MommyLangError::MissingArguments);
+                return Err(responses::MommyLangError::MissingArguments);
             }
 
             let op = match tokens[0].as_str() {
@@ -80,67 +95,67 @@ fn parse_line(
                 "divide" => "/",
                 "subtract" => "-",
                 "multiply" => "*",
-                _ => return Err(mommy_response::MommyLangError::SyntaxError), // Should never happen
+                _ => return Err(responses::MommyLangError::SyntaxError), // Should never happen
             };
 
             alu::calculate_two(&tokens[1], op, &tokens[3], symbols)
         },
 
         // --- I/O ---
-        mommy_lib::mommy_lang_syntax::MommyLangSyntax::IO => {
+        mommy_lib::lang_syntax::MommyLangSyntax::IO => {
             io::say(&tokens, symbols)
         },
 
         // --- Loops ---
-        mommy_lib::mommy_lang_syntax::MommyLangSyntax::LoopStart => { // "punishme"
+        mommy_lib::lang_syntax::MommyLangSyntax::LoopStart => { // "punishme"
             scope_stack.push(ScopeType::Loop);
             Ok(loops::for_loop(&tokens))
         },
-        mommy_lib::mommy_lang_syntax::MommyLangSyntax::LoopEnd => {   // "done"
+        mommy_lib::lang_syntax::MommyLangSyntax::LoopEnd => {   // "done"
             match scope_stack.pop() {
                 Some(_) => Ok(loops::done()), // "}"
-                None => Err(mommy_response::MommyLangError::UnexpectedDone)
+                None => Err(responses::MommyLangError::UnexpectedDone)
             }
         },
-        mommy_lib::mommy_lang_syntax::MommyLangSyntax::LoopBreak => { // "satisfied"
+        mommy_lib::lang_syntax::MommyLangSyntax::LoopBreak => { // "satisfied"
             if !scope_stack.contains(&ScopeType::Loop) {
-                return Err(mommy_response::MommyLangError::UnexpectedSatisfied);
+                return Err(responses::MommyLangError::UnexpectedSatisfied);
             }
             Ok(loops::satisfied())
         },
 
         // --- Conditions ---
-        mommy_lib::mommy_lang_syntax::MommyLangSyntax::Condition => { // "ask"
+        mommy_lib::lang_syntax::MommyLangSyntax::Condition => { // "ask"
             scope_stack.push(ScopeType::Condition);
             conditions::ask(&tokens)
         },
-        mommy_lib::mommy_lang_syntax::MommyLangSyntax::ConditionElse => { // "or"
+        mommy_lib::lang_syntax::MommyLangSyntax::ConditionElse => { // "or"
             match scope_stack.last() {
                 Some(ScopeType::Condition) => {
                     conditions::or()
                 },
                 Some(ScopeType::Loop) => {
-                    // Error: You can't put 'or' directly inside a loop without an 'ask'
-                    Err(mommy_response::MommyLangError::OrphanElse)
+                    // You can't put 'or' directly inside a loop without an 'ask'
+                    Err(responses::MommyLangError::OrphanElse)
                 },
                 None => {
-                    // Error: 'or' with nothing before it
-                    Err(mommy_response::MommyLangError::OrphanElse)
+                    // You can't put 'or' with nothing before it
+                    Err(responses::MommyLangError::OrphanElse)
                 }
                 _ => {
-                    Err(mommy_response::MommyLangError::SyntaxError)
+                    Err(responses::MommyLangError::SyntaxError)
                 }
             }
         },
 
         // --- System ---
-        mommy_lib::mommy_lang_syntax::MommyLangSyntax::ProgramEnd => { // "leave"
+        mommy_lib::lang_syntax::MommyLangSyntax::ProgramEnd => { // "leave"
             Ok("return 0;".to_string())
         },
 
         // --- Error Handling ---
-        mommy_lib::mommy_lang_syntax::MommyLangSyntax::Unknown => {
-            Err(mommy_response::MommyLangError::SyntaxError)
+        mommy_lib::lang_syntax::MommyLangSyntax::Unknown => {
+            Err(responses::MommyLangError::SyntaxError)
         }
     }
 }
@@ -156,13 +171,13 @@ impl Config{
     fn new(args: &[String]) -> Result<Config, String>{
 
         if args.len() < constants::MIN_ARGS_FILE_CMD{
-            return Err(mommy_response::MommyLangError::StatusNoFile.to_string())
+            return Err(responses::MommyLangError::StatusNoFile.to_string())
         }
 
         let input_path = args[1].clone();
 
         if !input_path.ends_with(".mommy"){
-            return Err(mommy_response::MommyLangError::WrongFileType.to_string())
+            return Err(responses::MommyLangError::WrongFileType.to_string())
         }
 
         let c_path = input_path.replace(".mommy", ".c");
@@ -212,7 +227,7 @@ fn transpile_code_to_c(config: &Config) -> Result<(), String> {
     }
 
     if !scope_stack.is_empty() {
-        return Err(mommy_response::MommyLangError::UnclosedBlock.to_string());
+        return Err(responses::MommyLangError::UnclosedBlock.to_string());
     }
 
     writeln!(output_file, "}}").unwrap();
@@ -235,28 +250,28 @@ fn main() {
 
 
     if let Err(e) = transpile_code_to_c(&config){ //Convert mommylang to C
-        println!("{}", mommy_response::MommyLangError::ErrorBegins);
+        println!("{}", responses::MommyLangError::ErrorBegins);
         eprintln!("{}", e);
         show_c_conversion_error(&config); // show fragmented c code
-        eprintln!("{}", mommy_response::MommyLangError::ConvertLangFailed);
-        println!("{}", mommy_response::MommyLangError::ErrorEnds);
+        eprintln!("{}", responses::MommyLangError::ConvertLangFailed);
+        println!("{}", responses::MommyLangError::ErrorEnds);
         std::process::exit(1);
     }
 
     if let Err(e) = compile_to_gcc(&config){ //use GCC to create exe file for the converted C
-        println!("{}", mommy_response::MommyLangError::ErrorBegins);
-        eprintln!("{}", mommy_response::MommyLangError::GCCError);
+        println!("{}", responses::MommyLangError::ErrorBegins);
+        eprintln!("{}", responses::MommyLangError::GCCError);
         eprintln!("{}", e);
-        println!("{}", mommy_response::MommyLangError::ErrorEnds);
+        println!("{}", responses::MommyLangError::ErrorEnds);
         std::process::exit(1);
     }
 
     println!("--- MOMMY OUTPUT BEGINS ---");
     if let Err(e) = run_mommy_file(&config){ // Run the exe file
-        println!("{}", mommy_response::MommyLangError::ErrorBegins);
-        eprintln!("{}", mommy_response::MommyLangError::RuntimeError);
+        println!("{}", responses::MommyLangError::ErrorBegins);
+        eprintln!("{}", responses::MommyLangError::RuntimeError);
         eprintln!("{}", e);
-        println!("{}", mommy_response::MommyLangError::ErrorEnds);
+        println!("{}", responses::MommyLangError::ErrorEnds);
         std::process::exit(1);
     }
     println!("\n--- MOMMY OUTPUT ENDS ---");
@@ -298,7 +313,7 @@ fn compile_to_gcc(config: &Config) -> Result<(), String>{
 }
 
 fn show_c_conversion_error(log: &Config){
-    let contents = fs::read_to_string(&log.c_path).expect(&mommy_response::MommyLangError::CannotReadFile.to_string()); // temporary, replace it with legit error
+    let contents = fs::read_to_string(&log.c_path).expect(&responses::MommyLangError::CannotReadFile.to_string()); // temporary, replace it with legit error
     println!("--- PARTIAL C CODE GENERATED ---");
     println!("{}", contents);
     println!("--- [CRASH HERE] ---");

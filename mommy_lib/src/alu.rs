@@ -1,6 +1,6 @@
 // Arithmetic logic unit
 use std::collections::HashMap;
-use crate::mommy_response::{MommyLangError};
+use crate::responses::{MommyLangError};
 
 pub fn calculate_two(target: &str, operator: &str, value: &str, symbols: &HashMap<String, String>) -> Result<String, MommyLangError> {
     // calculate("x", "*", "10") -> "x = x * 10;"
@@ -17,15 +17,15 @@ fn validate_operation(
 ) -> Result<(), MommyLangError> {
 
 
-    // Does the variable exist?
+    // Does the target variable exist?
     let var_type = match symbols.get(target) {
         Some(t) => t,
         None => return Err(MommyLangError::UndeclaredVariable),
     };
 
 
-    if !symbols.contains_key(value){ // Is it a variable name?
-        if value.parse::<f64>().is_err(){ // Can it be parsed like a number?(check if it is fully number)
+    if !symbols.contains_key(value){ // Is it a variable?
+        if value.parse::<f64>().is_err(){ // if it is not a variable, can it be a number?
             return Err(MommyLangError::UndeclaredVariable);
         }
     }

@@ -5,9 +5,9 @@ use std::io;
 use std::io::{BufRead, BufReader, Write};
 use std::path::Path;
 use std::process::Command;
-use mommy_lib::mommy_response;
+use mommy_lib::responses;
 use mommy_lib::constants;
-use mommy_lib::mommy_shell_commands;
+use mommy_lib::shell_commands;
 const SEPARATOR: &str = "----------------------------------------------------------------";
 
 
@@ -48,28 +48,35 @@ const SHELL_ADVANCE_COMMANDS: &str = r#"
 
 
 fn main() {
-    let root_dir = env::current_dir().expect(&mommy_response::MommyShellError::RootDirError.to_string());
+    let root_dir = env::current_dir().expect(&responses::MommyShellError::RootDirError.to_string());
 
-    println!("{}", mommy_response::MommyUI::WelcomeTitle);
-    println!("{}", mommy_response::MommyUI::WelcomeSubtitle);
-    println!("{}", mommy_response::MommyUI::WelcomePrompt);
+    println!("{}", responses::MommyUI::WelcomeTitle);
+    println!("{}", responses::MommyUI::WelcomeSubtitle);
+    println!("{}", responses::MommyUI::WelcomePrompt);
 
     loop{
 
         let mut input = String::new();// lineBuffer
         println!();
-        io::stdin().read_line(&mut input).expect(&mommy_response::MommyUI::ExitMessage.to_string());
+        io::stdin().read_line(&mut input).expect(&responses::MommyUI::ExitMessage.to_string());
 
         match input.trim(){
             "Y" => shell_start_default(input, &root_dir),
+            "T" => shell_skip_default(&root_dir),
             _ => std::process::exit(0),
         }
     }
 
 }
 
+fn shell_skip_default(root_dir: &std::path::PathBuf){
+    shell_move_directory("sandbox", root_dir);
+    run_mommy_lang("discipline-update-test.mommy");
+}
+
+
 fn shell_start_default(mut input: String, root_dir: &std::path::PathBuf) { // Added root_dir
-    println!("{}", mommy_response::MommyUI::GenericObedience);
+    println!("{}", responses::MommyUI::GenericObedience);
 
     loop {
         input.clear();
@@ -78,7 +85,7 @@ fn shell_start_default(mut input: String, root_dir: &std::path::PathBuf) { // Ad
 
         io::stdin()
             .read_line(&mut input)
-            .expect(&mommy_response::MommyUI::ExitMessage.to_string());
+            .expect(&responses::MommyUI::ExitMessage.to_string());
 
 
 
@@ -91,8 +98,8 @@ fn shell_start_default(mut input: String, root_dir: &std::path::PathBuf) { // Ad
 
 fn shell_open_file(file_name: &str){
     match Command::new("cmd").args(&["/C", "start", file_name]).output(){
-        Ok(_) => println!("{}", mommy_response::MommyShellOk::FileOpened),
-        Err(_) => println!("{}", mommy_response::MommyShellError::FileNotFound),
+        Ok(_) => println!("{}", responses::MommyShellOk::FileOpened),
+        Err(_) => println!("{}", responses::MommyShellError::FileNotFound),
     }
 }
 
@@ -100,7 +107,7 @@ fn shell_read_file(file_name: &str){
     let file = match File::open(file_name) {
         Ok(f) => f,
         Err(_) => {
-            println!("{}", mommy_response::MommyShellError::CannotReadFile);
+            println!("{}", responses::MommyShellError::CannotReadFile);
             return;
         }
     };
@@ -118,11 +125,11 @@ fn shell_return_to_prev_directory(root_dir: &std::path::PathBuf) {
     let current_dir = env::current_dir().unwrap();
 
     if current_dir.canonicalize().unwrap() == root_dir.canonicalize().unwrap() {
-        println!("{}", mommy_response::MommyShellError::RootDirectoryLocked);
+        println!("{}", responses::MommyShellError::RootDirectoryLocked);
     } else {
         match set_current_dir(constants::SHELL_PREVIOUS_DIRECTORY_KEYWORD) {
-            Ok(_) => println!("{}", mommy_response::MommyShellOk::DirectoryChanged),
-            Err(_) => println!("{}", mommy_response::MommyShellError::GeneralInvalid),
+            Ok(_) => println!("{}", responses::MommyShellOk::DirectoryChanged),
+            Err(_) => println!("{}", responses::MommyShellError::GeneralInvalid),
         }
     }
 }
@@ -134,33 +141,33 @@ fn check_args_len(args: &Vec<&str>) -> bool {
 
 fn shell_create_file(file_name: &str) {
     match File::create(file_name) {
-        Ok(_) => println!("{}", mommy_response::MommyShellOk::FileCreated),
-        Err(_) => println!("{}", mommy_response::MommyShellError::CannotCreateFile)
+        Ok(_) => println!("{}", responses::MommyShellOk::FileCreated),
+        Err(_) => println!("{}", responses::MommyShellError::CannotCreateFile)
     }
 }
 
 fn shell_delete_file(file_name: &str) {
     match fs::remove_file(file_name) {
-        Ok(_) => println!("{}", mommy_response::MommyShellOk::FileDeleted),
-        Err(_) => println!("{}", mommy_response::MommyShellError::CannotDeleteFile),
+        Ok(_) => println!("{}", responses::MommyShellOk::FileDeleted),
+        Err(_) => println!("{}", responses::MommyShellError::CannotDeleteFile),
     }
 }
 fn shell_list_files_in_directory() {
-    let files = fs::read_dir(constants::SHELL_CURRENT_DIRECTORY_KEYWORD).expect(&mommy_response::MommyShellError::CannotListFiles.to_string());
+    let files = fs::read_dir(constants::SHELL_CURRENT_DIRECTORY_KEYWORD).expect(&responses::MommyShellError::CannotListFiles.to_string());
 
     for entry in files {
-        let entry = entry.expect(&mommy_response::MommyShellError::CannotListFiles.to_string());
+        let entry = entry.expect(&responses::MommyShellError::CannotListFiles.to_string());
         println!("{}", entry.path().display());
     }
 }
 fn shell_get_directory() {
-    let dir = env::current_dir().expect(&mommy_response::MommyShellError::DirectoryNotFound.to_string());
+    let dir = env::current_dir().expect(&responses::MommyShellError::DirectoryNotFound.to_string());
     println!("{}", dir.display());
 
 }
 
 fn shell_get_directory_return() -> String {
-    let dir = env::current_dir().expect(&mommy_response::MommyShellError::DirectoryNotFound.to_string());
+    let dir = env::current_dir().expect(&responses::MommyShellError::DirectoryNotFound.to_string());
 
     dir.display().to_string()
 }
@@ -185,10 +192,10 @@ fn shell_move_directory(path: &str, root_dir: &std::path::PathBuf) {
                     println!("Moved Inside: {}", display_path);
                 }
             } else {
-                println!("{}", mommy_response::MommyShellError::RootDirectoryLocked);
+                println!("{}", responses::MommyShellError::RootDirectoryLocked);
             }
         }
-        Err(_) => println!("{}", mommy_response::MommyShellError::DirectoryNotFound),
+        Err(_) => println!("{}", responses::MommyShellError::DirectoryNotFound),
     }
 }
 
@@ -199,39 +206,39 @@ fn shell_attempt_command(input: &str, root_dir: &std::path::PathBuf) {
     let args: Vec<&str> = clean_input.split_whitespace().collect();
 
     if args.is_empty() {
-        println!("{}", mommy_response::MommyShellError::IncompleteArgs);
+        println!("{}", responses::MommyShellError::IncompleteArgs);
         return;
     }
 
-    let first_args = mommy_shell_commands::MommyShellCommands::from_str(args[constants::INDEX_DEFAULT_STARTING_COMMAND_ARGS]);
+    let first_args = shell_commands::MommyShellCommands::from_str(args[constants::INDEX_DEFAULT_STARTING_COMMAND_ARGS]);
 
-    match first_args{ // 0
+    match first_args { // 0
         //1 Args
-        mommy_shell_commands::MommyShellCommands::ShellHelp => shell_print_basic_help(),
-        mommy_shell_commands::MommyShellCommands::ShellHelpAdvanced => shell_print_advance_help(),
-        mommy_shell_commands::MommyShellCommands::ShellExit => std::process::exit(0),
-        mommy_shell_commands::MommyShellCommands::ShellCurrentDirectory => shell_get_directory(),
-        mommy_shell_commands::MommyShellCommands::ShellListFilesCurrentDirectory => shell_list_files_in_directory(),
-        mommy_shell_commands::MommyShellCommands::ShellShowIPConfig => shell_windows_call("ipconfig"),
-        mommy_shell_commands::MommyShellCommands::ShellReturnToPrevDirectory => shell_return_to_prev_directory(root_dir),
+        shell_commands::MommyShellCommands::ShellHelp => shell_print_basic_help(),
+        shell_commands::MommyShellCommands::ShellHelpAdvanced => shell_print_advance_help(),
+        shell_commands::MommyShellCommands::ShellExit => std::process::exit(0),
+        shell_commands::MommyShellCommands::ShellCurrentDirectory => shell_get_directory(),
+        shell_commands::MommyShellCommands::ShellListFilesCurrentDirectory => shell_list_files_in_directory(),
+        shell_commands::MommyShellCommands::ShellShowIPConfig => shell_windows_call("ipconfig"),
+        shell_commands::MommyShellCommands::ShellReturnToPrevDirectory => shell_return_to_prev_directory(root_dir),
 
 
         //Advanced
-        mommy_shell_commands::MommyShellCommands::ShellStartCoding => shell_prepare_coding(),
+        shell_commands::MommyShellCommands::ShellStartCoding => shell_prepare_coding(),
 
         // 2 Args
-        mommy_shell_commands::MommyShellCommands::ShellChangeDirectory if check_args_len(&args) => shell_move_directory(args[1], root_dir),
-        mommy_shell_commands::MommyShellCommands::ShellCreateFile if check_args_len(&args) => shell_create_file(args[1]),
-        mommy_shell_commands::MommyShellCommands::ShellDeleteFile if check_args_len(&args) => shell_delete_file(args[1]),
-        mommy_shell_commands::MommyShellCommands::ShellOpenFile if check_args_len(&args) => shell_open_file(args[1]),
-        mommy_shell_commands::MommyShellCommands::ShellRunFile if check_args_len(&args) => shell_run_file(args[1]),
-        mommy_shell_commands::MommyShellCommands::ShellReadFile if check_args_len(&args) => shell_read_file(args[1]),
+        shell_commands::MommyShellCommands::ShellChangeDirectory if check_args_len(&args) => shell_move_directory(args[1], root_dir),
+        shell_commands::MommyShellCommands::ShellCreateFile if check_args_len(&args) => shell_create_file(args[1]),
+        shell_commands::MommyShellCommands::ShellDeleteFile if check_args_len(&args) => shell_delete_file(args[1]),
+        shell_commands::MommyShellCommands::ShellOpenFile if check_args_len(&args) => shell_open_file(args[1]),
+        shell_commands::MommyShellCommands::ShellRunFile if check_args_len(&args) => shell_run_file(args[1]),
+        shell_commands::MommyShellCommands::ShellReadFile if check_args_len(&args) => shell_read_file(args[1]),
 
         // Error
-        mommy_shell_commands::MommyShellCommands::ShellUnknownCommand => println!("{}", mommy_response::MommyShellError::GeneralInvalid),
-        _ => println!("{}", mommy_response::MommyShellError::GeneralInvalid),
+        shell_commands::MommyShellCommands::ShellUnknownCommand => println!("{}", responses::MommyShellError::GeneralInvalid),
+        _ => println!("{}", responses::MommyShellError::GeneralInvalid),
     }
-
+}
 
 
 fn shell_run_file(filename: &str) {
@@ -253,7 +260,7 @@ fn shell_run_file(filename: &str) {
             simple_exec(constants::RUN_PYTHON, filename);
         },
         _ => {
-            println!("{}", mommy_response::MommyShellError::CannotOpenFile)
+            println!("{}", responses::MommyShellError::CannotOpenFile)
         }
     }
 }
@@ -270,17 +277,17 @@ fn simple_exec(tool: &str, filename: &str) {
 fn shell_prepare_coding() {
     let mut input = String::new();
     println!("{}", SEPARATOR);
-    println!("{}", mommy_response::MommyUI::PrepareCoding);
-    println!("{}", mommy_response::MommyUI::WelcomePrompt);
+    println!("{}", responses::MommyUI::PrepareCoding);
+    println!("{}", responses::MommyUI::WelcomePrompt);
     input.clear();
     io::stdout().flush().unwrap();
-    io::stdin().read_line(&mut input).expect(&mommy_response::MommyUI::ExitMessage.to_string());
+    io::stdin().read_line(&mut input).expect(&responses::MommyUI::ExitMessage.to_string());
 
 
     match input.trim() {
         "Y" => shell_start_coding(),
         _ => {
-            println!("{}", mommy_response::MommyUI::RefuseCoding);
+            println!("{}", responses::MommyUI::RefuseCoding);
             return;
         },
     }
@@ -288,7 +295,7 @@ fn shell_prepare_coding() {
 
 fn shell_start_coding() {
     println!("{}", SEPARATOR);
-    println!("{}", mommy_response::MommyUI::StartCoding);
+    println!("{}", responses::MommyUI::StartCoding);
     println!("{}", SEPARATOR);
 
     let mut lite_ide = String::new();
@@ -301,7 +308,7 @@ fn shell_start_coding() {
 
         let mut input = String::new();
 
-        io::stdin().read_line(&mut input).expect(&mommy_response::MommyShellError::CannotCreateFile.to_string());
+        io::stdin().read_line(&mut input).expect(&responses::MommyShellError::CannotCreateFile.to_string());
 
         if input.trim() == constants::SHELL_IDE_SAVE_FILE_KEYWORD {
             break;
@@ -310,7 +317,7 @@ fn shell_start_coding() {
         } else if input.trim() == constants::SHELL_IDE_CLEAR_KEYWORD {
             lite_ide.clear();
             line_count = 1;
-            println!("{}", mommy_response::MommyUI::RestartCLI);
+            println!("{}", responses::MommyUI::RestartCLI);
             continue
         }
         lite_ide.push_str(&input);
@@ -323,7 +330,7 @@ fn shell_start_coding() {
 
 fn shell_save_coding(lite_ide: &str) {
     println!("{}", SEPARATOR);
-    println!("{}", mommy_response::MommyLangStatus::RenameFile);
+    println!("{}", responses::MommyLangStatus::RenameFile);
 
     let mut input_name = String::new();
     io::stdin()
@@ -348,16 +355,16 @@ fn shell_save_coding(lite_ide: &str) {
     // Write and Run
     match fs::write(&full_path, lite_ide) {
         Ok(_) => {
-            println!("{}", mommy_response::MommyShellOk::FileCreated);
+            println!("{}", responses::MommyShellOk::FileCreated);
             shell_instant_run_mommy_file(&full_path);
         },
-        Err(_) => println!("{}", mommy_response::MommyShellError::CannotCreateFile),
+        Err(_) => println!("{}", responses::MommyShellError::CannotCreateFile),
     }
 }
 
 fn shell_instant_run_mommy_file(full_path: &str) {
     println!("{}", SEPARATOR);
-    println!("{}", mommy_response::MommyLangStatus::PrepareRun);
+    println!("{}", responses::MommyLangStatus::PrepareRun);
     let mut ans = String::new();
     io::stdin().read_line(&mut ans).unwrap();
 
@@ -365,7 +372,7 @@ fn shell_instant_run_mommy_file(full_path: &str) {
     if ans.trim().eq_ignore_ascii_case("Y") { // Run it immediately
         run_mommy_lang(&full_path);
     } else {
-        println!("{}", mommy_response::MommyLangStatus::SaveOnly);
+        println!("{}", responses::MommyLangStatus::SaveOnly);
         return
     }
 }
@@ -380,7 +387,7 @@ fn validate_file(clean_name: &str) -> String {
 
 fn run_mommy_lang(filename: &str) {
     println!("{}", SEPARATOR);
-    println!("{}", mommy_response::MommyLangStatus::CheckingFile);
+    println!("{}", responses::MommyLangStatus::CheckingFile);
 
     let absolute_path = fs::canonicalize(filename)
         .unwrap_or_else(|_| std::path::PathBuf::from(filename));
@@ -415,11 +422,13 @@ fn run_mommy_lang(filename: &str) {
     println!("{}", SEPARATOR);
 
     match status_result {
-        Ok(status) if status.success() => println!("{}", mommy_response::MommyLangStatus::ResultOk),
-        Err(_) => println!("{}", mommy_response::MommyLangStatus::ResultError),
-        _ => println!("{}", mommy_response::MommyLangStatus::ResultError),
+        Ok(status) if status.success() => println!("{}", responses::MommyLangStatus::ResultOk),
+        Err(_) => println!("{}", responses::MommyLangStatus::ResultError),
+        _ => println!("{}", responses::MommyLangStatus::ResultError),
     }
 }
+
+
 
 /*
 
@@ -429,7 +438,7 @@ fn run_mommy_lang(filename: &str) {
 fn shell_windows_call(windows_command: &str) {
     match windows_command {
         "ipconfig" => windows_command_console_output(windows_command),
-        _ => println!("{}", mommy_response::MommyShellError::ExternalIPConfigCallFail),
+        _ => println!("{}", responses::MommyShellError::ExternalIPConfigCallFail),
     }
 }
 
@@ -439,10 +448,13 @@ fn windows_command_console_output(var: &str) {
             let console_output = String::from_utf8_lossy(&output.stdout);
             println!("{}", console_output);
         }
-        Err(_) => println!("{}", mommy_response::MommyShellError::ExternalCommandFailed),
+        Err(_) => println!("{}", responses::MommyShellError::ExternalCommandFailed),
     }
 }
-}
+
+
+
+
 
 
 

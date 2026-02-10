@@ -1,0 +1,99 @@
+say "========================================"
+say "      MOMMYLANG GRAND TEST SUITE        "
+say "========================================"
+
+say "--- SECTION 1: BASICS & MATH (INTEGERS) ---"
+mayihave 10 in num as int
+mayihave 5 in val as int
+
+say "Start: 10"
+add num with 10
+say "Add 10 (Expect 20):"
+say num
+
+subtract num with 5
+say "Sub 5 (Expect 15):"
+say num
+
+multiply num with 2
+say "Mul 2 (Expect 30):"
+say num
+
+divide num with 3
+say "Div 3 (Expect 10):"
+say num
+
+say "--- SECTION 2: FLOATS & GRADES ---"
+mayihave 85.5 in math_score as float
+mayihave 90.5 in sci_score as float
+mayihave 2.0 in count as float
+mayihave 0.0 in total as float
+
+add total with math_score
+add total with sci_score
+divide total with count
+
+say "Math: 85.5, Science: 90.5"
+say "Average (Expect 88.0):"
+say total
+
+ask if total > 85.0
+    say "Grade: PASSED (Mommy is proud)."
+or
+    say "Grade: FAILED (You are grounded)."
+done
+
+say "--- SECTION 3: POINTERS (THE BOX) ---"
+mayihave 69 in magic as int
+mayihave null in ptr as box
+
+replace ptr with magic address
+say "Pointer Address:"
+say ptr
+
+replace ptr with 999 inside
+say "Value inside magic (Expect 999):"
+say magic
+
+say "--- SECTION 4: COMPLEX LOGIC (IF/ELSE) ---"
+ask if magic == 999
+    say "Logic OK: Magic is 999."
+or
+    say "Logic FAIL: This should not print."
+done
+
+ask if magic < 100
+    say "Logic FAIL: 999 is not < 100."
+or
+    say "Logic OK: 999 is big."
+done
+
+say "--- SECTION 5: NESTED LOGIC ---"
+mayihave 10 in a as int
+mayihave 20 in b as int
+mayihave 30 in c as int
+
+ask if c > b
+    ask if c > a
+        say "Nested OK: C is the biggest."
+    done
+done
+
+say "--- SECTION 6: LOOPS & BREAK ---"
+mayihave 0 in i as int
+
+say "Looping 10 times, breaking at 3:"
+punishme 10
+    add i with 1
+    say i
+
+    ask if i == 3
+        say "Satisfied. Breaking loop now."
+        satisfied
+    done
+done
+
+say "========================================"
+say "         ALL TESTS COMPLETED            "
+say "========================================"
+leave

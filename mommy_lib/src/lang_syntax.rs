@@ -10,6 +10,7 @@ pub enum MommyLangSyntax {
     Condition,      // ask
     ConditionElse,  // or
     ProgramEnd,     // leave
+    Array,          // group
     Unknown,        // ???
 }
 
@@ -26,6 +27,7 @@ impl MommyLangSyntax {
             "ask" => MommyLangSyntax::Condition,
             "or" => MommyLangSyntax::ConditionElse,
             "leave" => MommyLangSyntax::ProgramEnd,
+            "group" => MommyLangSyntax::Array, // => array
             _ => MommyLangSyntax::Unknown,
         }
     }

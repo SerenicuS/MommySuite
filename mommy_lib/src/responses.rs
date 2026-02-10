@@ -18,9 +18,15 @@ pub enum MommyLangError {
     UnexpectedSatisfied,
     OrphanElse,
 
-    // File / System (Specific to the Compiler)
-    StatusNoFile,       // Can't find the .mommy file
-    WrongFileType,      // User tried to run .txt as code
+    // Array / Memory Specific (NEW)
+    NotAnArray,         // Trying to use "in" on a normal variable
+    IndexOutOfBounds,   // Accessing index 10 of size 5
+    InvalidArraySize,   // "group -5" or "group hello"
+    AccessViolation,    // General memory safety
+
+    // File / System
+    StatusNoFile,
+    WrongFileType,
     ConfigCreationError,
     ConvertLangFailed,
     TranspilingError,
@@ -32,7 +38,7 @@ pub enum MommyLangError {
     MathOnString,
     DivideByZero,
 
-    //UI
+    // UI
     ErrorBegins,
     ErrorEnds,
 }
@@ -43,18 +49,16 @@ pub enum MommyLangStatus {
     PrepareRun,
     SaveOnly,
     ResultOk,
-    ResultOkButConfused, // "Read everything but confused"
+    ResultOkButConfused,
     ResultError,
     CheckingFile,
 }
 
 // =========================================================
 // 2. THE HOUSE (SHELL & OS)
-// Usage: Creating files, Deleting, Navigation, Windows Cmds
 // =========================================================
 
 pub enum MommyShellOk {
-    // File System
     FileCreated,
     FileDeleted,
     FileRead,
@@ -64,23 +68,16 @@ pub enum MommyShellOk {
     DirectoryCreated,
     DirectoryDeleted,
     FilesListed,
-
-    // Process / OS
     ProcessLaunched,
     Terminated,
-
-    // Network / Windows
-    NetworkInfoRevealed, // doxxme
-    PingAttempted,       // callmeplease
+    NetworkInfoRevealed,
+    PingAttempted,
 }
 
 pub enum MommyShellError {
-    // User Input
     GeneralInvalid,
     IncompleteArgs,
     TooManyArgs,
-    
-    // File System
     FileNotFound,
     DirectoryNotFound,
     PermissionDenied,
@@ -91,69 +88,61 @@ pub enum MommyShellError {
     CannotListFiles,
     RootDirError,
     CannotReadFile,
-
-    // Process / OS
     SystemCrash,
     ProcessNotFound,
     LaunchFailed,
-
-    // Windows / Network
     ExternalIPConfigCallFail,
-    ExternalCommandFailed,   // Windows command failed
-    ExternalConsoleBroken,   // Console output broken
+    ExternalCommandFailed,
+    ExternalConsoleBroken,
 }
 
 // =========================================================
 // 3. THE VOICE (UI & MENUS)
-// Usage: Menus, Prompts, Greetings, "Start Coding"
 // =========================================================
 
 pub enum MommyUI {
-    // Menus
     WelcomeTitle,
     WelcomeSubtitle,
     WelcomePrompt,
     ExitMessage,
-
-    // Registration
     AskName,
     ConfirmName,
-
-    // Coding Mode
-    PrepareCoding,     // "Do you want to instruct me?"
-    StartCoding,       // "Alright sweetie, start typing..."
-    RefuseCoding,      // "Why did you tell me to prepare?..."
-    PrepareEnv,        // "Wait let me prepare..."
+    PrepareCoding,
+    StartCoding,
+    RefuseCoding,
+    PrepareEnv,
     RestartCLI,
-
-    // Chaos / Errors
     ChaosDidNotHear,
     ChaosWrongCommand,
-    GenericObedience, // "Good boy, always listen..."
-
-    //Misc
+    GenericObedience,
     NewLine,
 }
 
 
 // =========================================================
-// IMPLEMENTATIONS (TEXT RESPONSES)
+// IMPLEMENTATIONS (THE PERSONALITY)
 // =========================================================
 
 impl fmt::Display for MommyLangError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result{
         match self{
-            // LOGIC ERRORS (Brutalized)
-            Self::MissingArguments => write!(f, "You stopped talking mid-sentence. Finish what you started, or don't speak at all."),
-            Self::UndeclaredVariable => write!(f, "Who is that? You are making up names again. Define them first."),
+            // LOGIC ERRORS
+            Self::MissingArguments => write!(f, "You stopped talking mid-sentence. Do not tease me. Finish what you started."),
+            Self::UndeclaredVariable => write!(f, "Who is that? You are making up names again. Define them first or stay silent."),
             Self::InvalidVariableName => write!(f, "That name is forbidden. Do not test my authority."),
-            Self::TypeMismatch => write!(f, "You are trying to fit a square peg in a round hole. Are you doing this on purpose to annoy me?"),
-            Self::SyntaxError => write!(f, "I can't even read this mess. Fix your grammar before I lose my patience."),
+            Self::TypeMismatch => write!(f, "Square peg, round hole. Stop forcing things where they don't belong."),
+            Self::SyntaxError => write!(f, "I can't read this mess. Fix your grammar before I lose my patience."),
             Self::UnclosedBlock => write!(f, "You opened a door and forgot to close it. Were you raised in a barn? Close your blocks."),
-            Self::UnexpectedDone => write!(f, "You said 'done' but you haven't even started anything. Focus."),
-            Self::VariableAlreadyExists => write!(f, "We already have a variable named that. Be creative, or be silent."),
-            Self::UnexpectedSatisfied => write!(f, "You skipped without putting anything."),
-            Self::OrphanElse => write!(f, "Poor and alone little else."),
+            Self::UnexpectedDone => write!(f, "You said 'done' but you haven't even started. Focus."),
+            Self::VariableAlreadyExists => write!(f, "We already have that. Be creative, or be quiet."),
+            Self::UnexpectedSatisfied => write!(f, "You skipped the work but want the reward? Pathetic."),
+            Self::OrphanElse => write!(f, "This 'else' has no 'if'. It is alone, just like you will be if you keep this up."),
+
+            // MEMORY / ARRAYS (The New Stuff)
+            Self::NotAnArray => write!(f, "That is just one thing, not a group. You cannot reach inside it."),
+            Self::IndexOutOfBounds => write!(f, "You are reaching too far! That shelf doesn't exist. Keep your hands where I can see them."),
+            Self::InvalidArraySize => write!(f, "A group cannot be that size. Use a real number, don't be stupid."),
+            Self::AccessViolation => write!(f, "Do not touch that memory. That is MINE."),
 
             // MATH ERRORS
             Self::MathOnString => write!(f, "You cannot do math on words. Stop acting childish."),
@@ -166,8 +155,8 @@ impl fmt::Display for MommyLangError {
             Self::ConvertLangFailed => write!(f, "I refuse to convert this garbage into C code."),
             Self::TranspilingError => write!(f, "The translation failed. Your logic makes no sense."),
             Self::RuntimeError => write!(f, "It crashed. I told you it would crash."),
-            Self::GCCError => write!(f, "Even GCC is refusing to work with you. Pathetic."),
-            Self::CannotReadFile => write!(f, "I cannot read this file, have you ever read it?"),
+            Self::GCCError => write!(f, "Even the C compiler is refusing to work with you. Embarrassing."),
+            Self::CannotReadFile => write!(f, "I cannot read this file. Did you write this with your eyes closed?"),
 
             Self::ErrorBegins => write!(f, "--- MOMMY IS DISAPPOINTED ---"),
             Self::ErrorEnds => write!(f, "--- END OF FAILURE ---"),
@@ -179,13 +168,13 @@ impl fmt::Display for MommyLangStatus {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result{
         match self{
             Self::RenameFile => write!(f, "Name your creation. Make it good."),
-            Self::PrepareRun => write!(f, "Shall I execute this? nod if you are sure."),
+            Self::PrepareRun => write!(f, "Shall I execute this? Nod if you are sure."),
             Self::SaveOnly => write!(f, "Fine. I'll keep it, but I won't run it."),
             Self::ResultOk => write!(f, "Good boy. You actually made sense this time."),
             Self::ResultOkButConfused => write!(f, "I did what you asked, but your logic is... questionable."),
             Self::ResultError => write!(f, "No. I am not doing that. Look at your errors."),
             Self::ReadingFile => write!(f, "Shh. Mommy is reading..."),
-            Self::CheckingFile => write!(f, "Mommy is reading every line... If I find a virus, malware, or a script trying to help you leave me, I will delete it. And then I will punish you.....")
+            Self::CheckingFile => write!(f, "Mommy is scanning every line... If I find a virus, or a script trying to help you leave me, I will delete it. And then I will punish you.")
         }
     }
 }

@@ -1,0 +1,36 @@
+say "========================================"
+say "       discipline update test           "
+say "========================================"
+
+group 5 in scores as int
+replace scores with 100 in 0
+replace scores with 200 in 4
+
+say "Checking index 0 (Expect 100):"
+say scores in 0
+
+say "Checking index 4 (Expect 200):"
+say scores in 4
+
+say "Checking empty index 2 (Expect 0):"
+say scores in 2
+
+group 3 in greetings as String
+
+replace greetings with "Hello" in 0
+replace greetings with "Mommy" in 1
+replace greetings with "!!!" in 2
+
+say "Index 0:"
+say greetings in 0
+
+say "Index 1:"
+say greetings in 1
+
+say "Index 2:"
+say greetings in 2
+
+say "==========================================="
+say " ALL TESTS COMPLETED FOR discipline update "
+say "==========================================="
+leave
