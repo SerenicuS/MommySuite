@@ -93,11 +93,29 @@ pub fn replace(
         return Err(MommyLangError::MissingArguments);
     }
 
-    // Check if this is an Array Assignment
-    // Pattern: replace <NAME> with <VALUE> in <INDEX>
-    // It must have "in" at index 4 (0-based)
+    // Check if this is an Array Operation (Has "in")
+    // Pattern: replace A with B in C
     if tokens.len() >= 6 && tokens[4] == "in" {
-        return replace_array_value(tokens, symbols);
+
+        let first_var = &tokens[1];
+
+        // Safety: Variable must exist to check its type
+        if !symbols.contains_key(first_var) {
+            return Err(MommyLangError::UndeclaredVariable);
+        }
+
+        let first_type = symbols.get(first_var).unwrap();
+
+        // --- THE SMART ROUTER ---
+        if first_type.starts_with("array") {
+            // Case A: The First Word is an Array -> WRITE
+            // "replace ARR with VAL in IDX" -> arr[idx] = val;
+            return replace_array_write(tokens, symbols);
+        } else {
+            // Case B: The First Word is a Variable -> READ
+            // "replace VAR with ARR in IDX" -> var = arr[idx];
+            return replace_array_read(tokens, symbols);
+        }
     }
 
     // Otherwise, it is a normal Variable/Pointer assignment
@@ -108,43 +126,67 @@ pub fn replace(
 // SPECIALIZED WORKERS
 // ================================================================
 
-fn replace_array_value(
+fn replace_array_write(
     tokens: &Vec<String>,
     symbols: &mut HashMap<String, String>
 ) -> Result<String, MommyLangError> {
-    // Syntax: replace <NAME> with <VALUE> in <INDEX>
-    // tokens: [0]     [1]    [2]  [3]     [4] [5]
 
-    let name = &tokens[1];
-    let value = &tokens[3];
-    let index = &tokens[5];
+    let name = &tokens[1];   // arr
+    let value = &tokens[3];  // 5
+    let index = &tokens[5];  // 0
 
-    // 1. Ensure Variable Exists
-    ensure_var_exists(name, symbols)?;
+    // 1. We already know 'name' exists and is an array (checked in Router)
     let var_type = symbols.get(name).unwrap();
 
-    // 2. Verify it is an Array
-    if !var_type.starts_with("array") {
-        return Err(MommyLangError::TypeMismatch); // "That is not a group!"
-    }
-
-    // 3. Compile-Time Bounds Check (Safety!)
+    // 2. Compile-Time Bounds Check
     let parts: Vec<&str> = var_type.split(':').collect();
-    // parts[0]="array", parts[1]="type", parts[2]="size"
-
     if let Ok(max_size) = parts[2].parse::<usize>() {
         if let Ok(idx_num) = index.parse::<usize>() {
             if idx_num >= max_size {
-                // You tried to access slot 10 of a size 10 array
                 return Err(MommyLangError::AccessViolation);
             }
         }
     }
 
-    // 4. Generate C Code
+    // 3. Generate C Code
+    // arr[0] = 5;
     Ok(format!("{}[{}] = {};", name, index, value))
 }
 
+fn replace_array_read(
+    tokens: &Vec<String>,
+    symbols: &mut HashMap<String, String>
+) -> Result<String, MommyLangError> {
+
+    let dest_var = &tokens[1];   // x
+    let src_array = &tokens[3];  // arr
+    let index = &tokens[5];      // 0
+
+    // 1. Validate Source Array
+    if !symbols.contains_key(src_array) {
+        return Err(MommyLangError::UndeclaredVariable);
+    }
+
+    let array_type = symbols.get(src_array).unwrap();
+    if !array_type.starts_with("array") {
+        // You tried to read from something that isn't an array!
+        return Err(MommyLangError::TypeMismatch);
+    }
+
+    // 2. Compile-Time Bounds Check
+    let parts: Vec<&str> = array_type.split(':').collect();
+    if let Ok(max_size) = parts[2].parse::<usize>() {
+        if let Ok(idx_num) = index.parse::<usize>() {
+            if idx_num >= max_size {
+                return Err(MommyLangError::AccessViolation);
+            }
+        }
+    }
+
+    // 3. Generate C Code
+    // x = arr[0];
+    Ok(format!("{} = {}[{}];", dest_var, src_array, index))
+}
 fn replace_scalar_value(
     tokens: &Vec<String>,
     symbols: &mut HashMap<String, String>

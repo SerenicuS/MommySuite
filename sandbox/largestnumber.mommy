@@ -1,0 +1,25 @@
+say "--- FIND THE BIGGEST NUMBER ---"
+
+group 3 in numbers as int
+replace numbers with 5 in 0
+replace numbers with 99 in 1
+replace numbers with 2 in 2
+
+mayihave 0 in max_val as int
+mayihave 0 in current_val as int
+mayihave 0 in i as int
+
+say "Scanning..."
+
+punishme 3
+    replace current_val with numbers in i
+
+    ask if current_val > max_val
+        replace max_val with current_val
+    done
+
+    add i with 1
+done
+
+say "The winner is:"
+say max_val
