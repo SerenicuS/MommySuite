@@ -1,0 +1,53 @@
+say "--- TWO SUM CHALLENGE ---"
+
+group 4 in nums as int
+replace nums with 2 in 0
+replace nums with 7 in 1
+replace nums with 11 in 2
+replace nums with 15 in 3
+
+mayihave 0 in i as int
+mayihave 0 in j as int
+mayihave 0 in val_i as int
+mayihave 0 in val_j as int
+mayihave 0 in sum as int
+mayihave 0 in target as int
+replace target with 9
+
+replace i with 0
+
+
+punishmeif i < 4
+
+    replace j with 0
+
+
+    punishmeif j < 4
+
+
+        ask if i != j
+            replace val_i with nums in i
+            replace val_j with nums in j
+
+            replace sum with val_i
+            add sum with val_j
+
+            ask if sum == target
+                say "Target Found!"
+                say val_i
+                say val_j
+
+
+                replace i with 100
+                replace j with 100
+
+
+                satisfied
+            done
+        done
+
+        add j with 1
+    done
+
+    add i with 1
+done

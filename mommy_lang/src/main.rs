@@ -107,10 +107,10 @@ fn parse_line(
         },
 
         // --- Loops ---
-        mommy_lib::lang_syntax::MommyLangSyntax::LoopStart => { // "punishme"
+        mommy_lib::lang_syntax::MommyLangSyntax::LoopStartBasic => { // "punishme"
             scope_stack.push(ScopeType::Loop);
             Ok(loops::for_loop(&tokens))
-        },
+        }
         mommy_lib::lang_syntax::MommyLangSyntax::LoopEnd => {   // "done"
             match scope_stack.pop() {
                 Some(_) => Ok(loops::done()), // "}"
@@ -123,6 +123,14 @@ fn parse_line(
             }
             Ok(loops::satisfied())
         },
+
+        mommy_lib::lang_syntax::MommyLangSyntax::LoopStartCondition => { // "punishmeif"
+            if tokens.len() < 2 {
+                return Err(responses::MommyLangError::MissingArguments);
+            }
+            scope_stack.push(ScopeType::Loop);
+            Ok(loops::while_loop(&tokens))
+        }
 
         // --- Conditions ---
         mommy_lib::lang_syntax::MommyLangSyntax::Condition => { // "ask"

@@ -4,7 +4,7 @@ pub enum MommyLangSyntax {
     Assignment,     // replace
     Math,           // add, divide, etc.
     IO,             // say
-    LoopStart,      // punishme
+    LoopStartBasic, // punishme
     LoopEnd,        // done
     LoopBreak,      // satisfied
     Condition,      // ask
@@ -12,6 +12,7 @@ pub enum MommyLangSyntax {
     ProgramEnd,     // leave
     Array,          // group
     Unknown,        // ???
+    LoopStartCondition, // punishmeif
 }
 
 impl MommyLangSyntax {
@@ -21,13 +22,14 @@ impl MommyLangSyntax {
             "replace" => MommyLangSyntax::Assignment,
             "add" | "divide" | "subtract" | "multiply" => MommyLangSyntax::Math,
             "say" => MommyLangSyntax::IO,
-            "punishme" => MommyLangSyntax::LoopStart,
+            "punishme" => MommyLangSyntax::LoopStartBasic,
             "done" => MommyLangSyntax::LoopEnd,
             "satisfied" => MommyLangSyntax::LoopBreak,
             "ask" => MommyLangSyntax::Condition,
             "or" => MommyLangSyntax::ConditionElse,
             "leave" => MommyLangSyntax::ProgramEnd,
             "group" => MommyLangSyntax::Array, // => array
+            "punishmeif" => MommyLangSyntax::LoopStartCondition,
             _ => MommyLangSyntax::Unknown,
         }
     }
