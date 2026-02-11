@@ -15,7 +15,7 @@ I'm hoping to keep improving and get better as a **Systems Programmer** through 
 * Transpilation: Maps abstract syntax to optimized C code, leveraging GCC for binary generation.
 * Process Management: Uses Rust's std::process to spawn child processes for compilation and system commands.
 * Memory Safety: While MommyLang allows raw pointers (box), the compiler (Rust) ensures the transpiler itself is memory-safe.
-* C and Rust Combination: Using Rust to translate my eso lang into C
+* C and Rust Combination: Using Rust to translate my eso lang into C.
 
 ## ⚠️ DISCLAIMER
 **This project is for EDUCATIONAL PURPOSES ONLY.**
