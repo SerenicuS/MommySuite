@@ -90,15 +90,16 @@ fn parse_line(
                 return Err(responses::MommyLangError::MissingArguments);
             }
 
-            let op = match tokens[0].as_str() {
+            let operand = match tokens[0].as_str() {
                 "add" => "+",
                 "divide" => "/",
                 "subtract" => "-",
                 "multiply" => "*",
+                "mod" => "%",
                 _ => return Err(responses::MommyLangError::SyntaxError), // Should never happen
             };
 
-            alu::calculate_two(&tokens[1], op, &tokens[3], symbols)
+            alu::calculate_two(&tokens[1], operand, &tokens[3], symbols)
         },
 
         // --- I/O ---

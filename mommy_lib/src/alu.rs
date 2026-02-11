@@ -6,6 +6,7 @@ pub fn calculate_two(target: &str, operator: &str, value: &str, symbols: &HashMa
     // calculate("x", "*", "10") -> "x = x * 10;"
     validate_operation(target, operator, value, symbols)?;
     Ok(format!("{} = {} {} {};", target, target, operator, value))
+
 }
 
 

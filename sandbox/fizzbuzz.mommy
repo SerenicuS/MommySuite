@@ -1,0 +1,38 @@
+say "--- MOMMY'S FIZZBUZZ (OPTIMIZED) ---"
+
+mayihave 1 in i as int
+mayihave 101 in limit as int
+
+
+mayihave 0 in rem3 as int
+mayihave 0 in rem5 as int
+
+punishmeif i < limit
+
+
+
+    replace rem3 with i
+    replace rem5 with i
+
+
+    mod rem3 with 3
+    mod rem5 with 5
+
+    ask if rem3 == 0
+        ask if rem5 == 0
+            say "FizzBuzz"
+        or
+            say "Fizz"
+        done
+    or
+        ask if rem5 == 0
+            say "Buzz"
+        or
+            say i
+        done
+    done
+
+    add i with 1
+done
+
+say "--- DONE ---"

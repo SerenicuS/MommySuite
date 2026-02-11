@@ -20,7 +20,7 @@ impl MommyLangSyntax {
         match token.trim() {
             "mayihave" => MommyLangSyntax::Declaration,
             "replace" => MommyLangSyntax::Assignment,
-            "add" | "divide" | "subtract" | "multiply" => MommyLangSyntax::Math,
+            "add" | "divide" | "subtract" | "multiply" | "mod" => MommyLangSyntax::Math,
             "say" => MommyLangSyntax::IO,
             "punishme" => MommyLangSyntax::LoopStartBasic,
             "done" => MommyLangSyntax::LoopEnd,

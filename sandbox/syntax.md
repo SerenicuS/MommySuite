@@ -3,23 +3,23 @@
 ## 1. Core Keywords (The "Banned" List)
 These words are reserved by the parser and cannot be used as variable names.
 
-| Keyword      | Function                    | Source File      |
-|:-------------|:----------------------------|:-----------------|
-| `mayihave`   | Variable Declaration        | `declaration.rs` |
-| `group`      | **[NEW]** Array Declaration | `declaration.rs` |
-| `replace`    | Assignment                  | `declaration.rs` |
-| `in`         | Container/Location Marker   | `declaration.rs` |
-| `as`         | Type Definition Marker      | `declaration.rs` |
-| `with`       | Value Assignment Marker     | `declaration.rs` |
-| `address`    | Pointer Reference (`&`)     | `declaration.rs` |
-| `inside`     | Pointer Dereference (`*`)   | `declaration.rs` |
-| `punishme`   | Basic Loop                  | `loops.rs`       |
-| `punishmeif` | Conditional Loop            | `loops.rs`       |
-| `satisfied`  | Break Loop                  | `loops.rs`       |
-| `done`       | End Block (`}`)             | `loops.rs`       |
-| `ask`        | Condition Start (`if`)      | `conditions.rs`  |
-| `or`         | Condition Else (`else`)     | `conditions.rs`  |
-| `leave`      | End Program (`return 0`)    | `main.rs`        |
+| Keyword      | Function                   | Source File      |
+|:-------------|:---------------------------|:-----------------|
+| `mayihave`   | Variable Declaration       | `declaration.rs` |
+| `group`      | Array Declaration          | `declaration.rs` |
+| `replace`    | Assignment                 | `declaration.rs` |
+| `in`         | Container/Location Marker  | `declaration.rs` |
+| `as`         | Type Definition Marker     | `declaration.rs` |
+| `with`       | Value Assignment Marker    | `declaration.rs` |
+| `address`    | Pointer Reference (`&`)    | `declaration.rs` |
+| `inside`     | Pointer Dereference (`*`)  | `declaration.rs` |
+| `punishme`   | Basic Loop                 | `loops.rs`       |
+| `punishmeif` | Conditional Loop           | `loops.rs`       |
+| `satisfied`  | Break Loop                 | `loops.rs`       |
+| `done`       | End Block (`}`)            | `loops.rs`       |
+| `ask`        | Condition Start (`if`)     | `conditions.rs`  |
+| `or`         | Condition Else (`else`)    | `conditions.rs`  |
+| `leave`      | End Program (`return 0`)   | `main.rs`        |
 
 ---
 
