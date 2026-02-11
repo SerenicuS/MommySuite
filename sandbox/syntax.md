@@ -69,7 +69,7 @@ These words are reserved by the parser and cannot be used as variable names.
 ### D. Math (The "Pain")
 **Syntax:**
 `<OPERATION> <TARGET> with <VALUE>`
-* *Operations:* `add`, `subtract`, `multiply`, `divide`
+* *Operations:* `add`, `subtract`, `multiply`, `divide`, `mod`
 * *Example:* `add age with 1`
 * *Constraint:* Cannot perform math on `String` types.
 
