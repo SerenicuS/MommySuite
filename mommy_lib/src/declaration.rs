@@ -121,33 +121,37 @@ fn replace_array_write(
     tokens: &Vec<String>,
     symbols: &mut HashMap<String, String>
 ) -> Result<String, MommyLangError> {
-
-    // Check syntax structure: replace [NAME] in [IDX] with [VAL]
+    // Syntax: replace [NAME] in [IDX] with [VAL]
     if tokens.len() < 6 || tokens[4] != "with" {
         return Err(MommyLangError::SyntaxError);
     }
 
-    let name = &tokens[1];   // arr
-    let index = &tokens[3];  // idx (CHANGED position)
-    let value = &tokens[5];  // val (CHANGED position)
+    let name = &tokens[1];
+    let index = &tokens[3];
+    let value = &tokens[5];
 
-    // 1. Check if 'name' exists
-    if !symbols.contains_key(name) {
-        return Err(MommyLangError::UndeclaredVariable);
+    ensure_var_exists(name, symbols)?;
+    let var_type = symbols.get(name).unwrap();
+
+    // 1. Validate Type: Allow Array or String
+    if !var_type.starts_with("array") && var_type != "String" {
+        return Err(MommyLangError::TypeMismatch);
     }
 
-    // 2. Bounds Check & Logic (Same as before)
-    let var_type = symbols.get(name).unwrap();
-    let parts: Vec<&str> = var_type.split(':').collect();
-    if let Ok(max_size) = parts[2].parse::<usize>() {
-        if let Ok(idx_num) = index.parse::<usize>() {
-            if idx_num >= max_size {
-                return Err(MommyLangError::AccessViolation);
+    // 2. Conditional Bounds Check
+    // Only split if it's a 'group' array (contains colons)
+    if var_type.starts_with("array") {
+        let parts: Vec<&str> = var_type.split(':').collect();
+        if let Ok(max_size) = parts[2].parse::<usize>() {
+            if let Ok(idx_num) = index.parse::<usize>() {
+                if idx_num >= max_size {
+                    return Err(MommyLangError::AccessViolation);
+                }
             }
         }
     }
 
-    // Output: arr[0] = 5;
+    // Output: word[0] = 'R';
     Ok(format!("{}[{}] = {};", name, index, value))
 }
 
@@ -155,22 +159,36 @@ fn replace_array_read(
     tokens: &Vec<String>,
     symbols: &mut HashMap<String, String>
 ) -> Result<String, MommyLangError> {
+    let dest_var = &tokens[1];
+    let src_array = &tokens[3];
+    let index = &tokens[5];
 
-    // Syntax: replace [DEST] with [SRC] in [IDX]
-    let dest_var = &tokens[1];   // x
-    let src_array = &tokens[3];  // arr
-    let index = &tokens[5];      // 0
-
-    // 1. Validate Source Array
     if !symbols.contains_key(src_array) {
         return Err(MommyLangError::UndeclaredVariable);
     }
 
-    // ... (Keep your existing Bounds Check logic here) ...
+    let array_type = symbols.get(src_array).unwrap();
 
-    // Output: x = arr[0];
+    // Check if it's an array OR a String
+    if !array_type.starts_with("array") && array_type != "String" {
+        return Err(MommyLangError::TypeMismatch);
+    }
+
+    // ONLY perform parts[2] check if it's an actual 'group'
+    if array_type.starts_with("array") {
+        let parts: Vec<&str> = array_type.split(':').collect();
+        if let Ok(max_size) = parts[2].parse::<usize>() {
+            if let Ok(idx_num) = index.parse::<usize>() {
+                if idx_num >= max_size {
+                    return Err(MommyLangError::AccessViolation);
+                }
+            }
+        }
+    }
+
     Ok(format!("{} = {}[{}];", dest_var, src_array, index))
 }
+
 fn replace_scalar_value(
     tokens: &Vec<String>,
     symbols: &mut HashMap<String, String>

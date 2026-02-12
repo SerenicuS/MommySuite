@@ -1,53 +1,48 @@
-say "--- MOMMY'S PALINDROME ---"
+say "========================================"
+say "   MOMMYLANG PALINDROME TEST (v0.2.8)   "
+say "========================================"
+
+group 5 in word as int
+replace word in 0 with 1
+replace word in 1 with 2
+replace word in 2 with 3
+replace word in 3 with 2
+replace word in 4 with 1
 
 
-mayihave "racecar" in s as String
+mayihave 0 in left as int
+mayihave 4 in right as int
+mayihave 1 in is_palindrome as int // 1 = True, 0 = False
 
-mayihave 0 in len as int
-mayihave 0 in char_val as int
-mayihave 0 in loops as int
+mayihave 0 in left_val as int
+mayihave 0 in right_val as int
 
-
-punishme 100
-
-    replace char_val with s in len
-
-    ask if char_val == 0
-        satisfied
-    done
-
-    add len with 1
-done
-
-say "Length found:"
-say len
+say "Checking if array is a palindrome..."
 
 
-mayihave 0 in start as int
-mayihave 0 in end as int
-replace end with len
-subtract end with 1
+punishmeif left < right
+    replace left_val with word in left
+    replace right_val with word in right
 
-mayihave 1 in is_palindrome as int
-mayihave 0 in left_char as int
-mayihave 0 in right_char as int
+    say "Comparing indices..."
+    say left
+    say right
 
-punishmeif start < end
-
-    replace left_char with s in start
-    replace right_char with s in end
-
-    ask if left_char != right_char
+    ask if left_val != right_val
         replace is_palindrome with 0
+        say "Mismatch found!"
         satisfied
     done
 
-    add start with 1
-    subtract end with 1
+    add left with 1
+    subtract right with 1
 done
 
 ask if is_palindrome == 1
-    say "Yes, it is a Palindrome!"
+    say "RESULT: It is a Palindrome!"
 or
-    say "No, it is not."
+    say "RESULT: Not a Palindrome."
 done
+
+say "========================================"
+leave
