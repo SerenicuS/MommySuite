@@ -62,9 +62,9 @@ I'm hoping to keep improving and get better as a **Systems Programmer** through 
 | **`runthis <file>`** | **Compile & Run** | Transpiles your `.mommy` file to C, compiles with GCC, and executes it. |
 | **`startcoding`** | **Enter Lite_IDE** | Launches the internal code editor for writing MommyLang scripts. |
 
-# MOMMYLANG SYNTAX SPECIFICATION
+## MOMMYLANG SYNTAX SPECIFICATION
 
-## 1. Core Keywords (The "Vocabulary")
+### 1. Core Keywords (The "Vocabulary")
 These words are reserved by the parser and define the structure of the language.
 
 | Keyword     | Function                  | Source File      |
@@ -87,9 +87,9 @@ These words are reserved by the parser and define the structure of the language.
 
 ---
 
-## 2. Grammar Patterns
+### 2. Grammar Patterns
 
-### A. Variables (The "Box")
+#### A. Variables (The "Box")
 **Declaration:**
 `mayihave <VALUE> in <NAME> as <TYPE>`
 * **Logic:** "Put 10 inside the box named 'age'."
@@ -100,7 +100,7 @@ These words are reserved by the parser and define the structure of the language.
 `replace <NAME> with <VALUE>`
 * **Example:** `replace age with 20`
 
-### B. Pointers (The "Finger")
+#### B. Pointers (The "Finger")
 **Get Address:**
 `replace <PTR_NAME> with <VAR_NAME> address`
 * **Logic:** "Make 'ptr' look at 'age's address."
@@ -112,7 +112,7 @@ These words are reserved by the parser and define the structure of the language.
 * **Safety:** Includes automatic `NULL` check.
 * **C Output:** `if(ptr!=NULL) *ptr = value;`
 
-### C. Arrays (The "Memory")
+#### C. Arrays (The "Memory")
 **Declaration:**
 `group <SIZE> in <NAME> as <TYPE>`
 * **Logic:** "Reserve 5 slots in memory called 'scores'."
@@ -129,14 +129,14 @@ These words are reserved by the parser and define the structure of the language.
 * **Logic:** "Read slot 0 of 'scores' and put it into 'temp'."
 * **Example:** `replace temp with scores in 0`
 
-### D. Math (The "Pain")
+#### D. Math (The "Pain")
 **Syntax:**
 `<OPERATION> <TARGET> with <VALUE>`
 * **Operations:** `add`, `subtract`, `multiply`, `divide`, `mod`
 * **Example:** `add age with 1`
 * **Constraint:** Cannot perform math on `String` types.
 
-### E. Control Flow (The "Discipline")
+#### E. Control Flow (The "Discipline")
 **Conditions:**
 ```text
 ask if <CONDITION>
