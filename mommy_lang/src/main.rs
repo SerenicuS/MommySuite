@@ -53,6 +53,7 @@ use std::process::Command;
 use mommy_lib::responses;
 use mommy_lib::constants;
 use mommy_lib::lang_enums::ScopeType;
+use mommy_lib::packages;
 
 
 
@@ -91,15 +92,15 @@ fn parse_line(
             }
 
             let operand = match tokens[0].as_str() {
-                "add" => "+",
-                "divide" => "/",
-                "subtract" => "-",
-                "multiply" => "*",
-                "mod" => "%",
+                "add" => constants::SYMBOL_OPERAND_ADDITION,
+                "divide" => constants::SYMBOL_OPERAND_DIVISION,
+                "subtract" => constants::SYMBOL_OPERAND_SUBTRACTION,
+                "multiply" => constants::SYMBOL_OPERAND_MULTIPLICATION,
+                "mod" => constants::SYMBOL_OPERAND_MODULO,
                 _ => return Err(responses::MommyLangError::SyntaxError), // Should never happen
             };
 
-            alu::calculate_two(&tokens[1], operand, &tokens[3], symbols)
+            alu::calculate_two(&tokens[constants::INDEX_VARIABLE_TARGET], operand, &tokens[constants::INDEX_VARIABLE_SOURCE], symbols)
         },
 
         // --- I/O ---
@@ -159,7 +160,7 @@ fn parse_line(
 
         // --- System ---
         mommy_lib::lang_syntax::MommyLangSyntax::ProgramEnd => { // "leave"
-            Ok("return 0;".to_string())
+            Ok(constants::KEYWORD_EXIT_C_FILE.to_string())
         },
 
         // --- Error Handling ---
@@ -183,14 +184,14 @@ impl Config{
             return Err(responses::MommyLangError::StatusNoFile.to_string())
         }
 
-        let input_path = args[1].clone();
+        let input_path = args[constants::INDEX_FILE_NAME].clone();
 
-        if !input_path.ends_with(".mommy"){
+        if !input_path.ends_with(constants::EXTENSION_SOURCE){
             return Err(responses::MommyLangError::WrongFileType.to_string())
         }
 
-        let c_path = input_path.replace(".mommy", ".c");
-        let exe_path = input_path.replace(".mommy", ".exe");
+        let c_path = input_path.replace(constants::EXTENSION_SOURCE, constants::EXTENSION_C);
+        let exe_path = input_path.replace(constants::EXTENSION_SOURCE, constants::EXTENSION_EXE);
 
         Ok(Config{
             input_path,
@@ -205,15 +206,23 @@ fn transpile_code_to_c(config: &Config) -> Result<(), String> {
     let mut scope_stack: Vec<ScopeType> = Vec::new();
 
     let content = fs::read_to_string(&config.input_path)
-        .map_err(|_| format!("Could not read file: {}", config.input_path))?;
+        .map_err(|_| format!("{} :{}", responses::MommyLangError::CannotReadFile, config.input_path))?;
 
     let mut output_file = fs::File::create(&config.c_path)
-        .map_err(|_| "Could not create C file")?;
+        .map_err(|_| responses::MommyLangError::CannotCreateCFile.to_string())?;
 
     let mut symbol_table: HashMap<String, String> = HashMap::new();
 
-    writeln!(output_file, "#include <stdio.h>").unwrap(); // this should be dynamic as we want to make the user add modules/packages
-    writeln!(output_file, "int main(){{").unwrap();
+    // this should be dynamic as we want to make the user add modules/packages
+    let include = packages::CStandardPackages::InputOutput.to_string();
+    if include.trim().is_empty() {
+        eprintln!("{}", responses::MommyLangError::UnknownPackage);
+    } else {
+        writeln!(output_file, "{}", include).unwrap();
+    }
+
+
+    writeln!(output_file, "{}", constants::KEYWORD_START_C_FILE).unwrap(); // int main
 
     for (i, line) in content.lines().enumerate() {
         let trimmed_line = line.trim();
@@ -230,7 +239,8 @@ fn transpile_code_to_c(config: &Config) -> Result<(), String> {
             }
             Err(e) => {
                 // Return the error so main stops!
-                return Err(format!("Line {}: {}", i + 1, e));
+                return Err(format!("{}, {}: {}", constants::TRANSPILE_ERROR_SPECIFIC_LINE
+                                   , i + 1, e));
             }
         }
     }
@@ -239,7 +249,7 @@ fn transpile_code_to_c(config: &Config) -> Result<(), String> {
         return Err(responses::MommyLangError::UnclosedBlock.to_string());
     }
 
-    writeln!(output_file, "}}").unwrap();
+    writeln!(output_file, "{}", constants::SYMBOL_END_C_FILE).unwrap();
 
     Ok(())
 }
@@ -275,7 +285,7 @@ fn main() {
         std::process::exit(1);
     }
 
-    println!("--- MOMMY OUTPUT BEGINS ---");
+    println!("{}", responses::MommyLangStatus::CodeOutputBegins);
     if let Err(e) = run_mommy_file(&config){ // Run the exe file
         println!("{}", responses::MommyLangError::ErrorBegins);
         eprintln!("{}", responses::MommyLangError::RuntimeError);
@@ -283,22 +293,23 @@ fn main() {
         println!("{}", responses::MommyLangError::ErrorEnds);
         std::process::exit(1);
     }
-    println!("\n--- MOMMY OUTPUT ENDS ---");
+    println!("{}", responses::MommyLangStatus::CodeOutputEnds);
 }
 
 fn run_mommy_file(config: &Config) -> Result<(), String> {
-    let output = if config.exe_path.contains('/') || config.exe_path.contains('\\'){
+    let output = if config.exe_path.contains(constants::SYMBOL_SINGLE_SLASH)
+        || config.exe_path.contains(constants::SYMBOL_DOUBLE_SLASH_REVERSE){
         config.exe_path.clone()
     } else {
-        format!("./{}", config.exe_path)
+        format!("{} {}", constants::SYMBOL_SELECTED_DEFAULT_FILE_PATH, config.exe_path)
     };
 
     let status = Command::new(output)
         .status()
-        .map_err(|_| "Could not start the executable.".to_string())?;
+        .map_err(|_| responses::MommyLangError::ExecutableFile.to_string())?;
 
     if !status.success() {
-        return Err(format!("Mommy is disappointed. Program exited with code {}", status.code().unwrap_or(-1)));
+        return Err(format!("{} {}",responses::MommyLangError::RunFile, status.code().unwrap_or(-1)));
     }
 
     Ok(())
@@ -307,10 +318,10 @@ fn compile_to_gcc(config: &Config) -> Result<(), String>{
 
     let output = Command::new(constants::COMPILER_TOOL)
         .arg(&config.c_path)
-        .arg("-o")
+        .arg(constants::GCC_OUTPUT_FLAG)
         .arg(&config.exe_path)
         .output()
-        .map_err(|_| "GCC not found. Is MinGW installed?")?;
+        .map_err(|_| responses::MommyLangError::GCCNotFound.to_string())?;
 
     if output.status.success() {
         Ok(())
@@ -323,8 +334,8 @@ fn compile_to_gcc(config: &Config) -> Result<(), String>{
 
 fn show_c_conversion_error(log: &Config){
     let contents = fs::read_to_string(&log.c_path).expect(&responses::MommyLangError::CannotReadFile.to_string()); // temporary, replace it with legit error
-    println!("--- PARTIAL C CODE GENERATED ---");
+    println!("{}", responses::MommyLangStatus::ConversionErrorStart);
     println!("{}", contents);
-    println!("--- [CRASH HERE] ---");
+    println!("{}", responses::MommyLangStatus::ConversionErrorEnds);
     let _ = fs::remove_file(&log.c_path); // Remove the file if the process of compiling it into C fails. Deleting the file manually is tiring.
 }

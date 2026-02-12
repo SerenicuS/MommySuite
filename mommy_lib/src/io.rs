@@ -92,3 +92,5 @@ fn say_scalar(
         Ok(format!("printf(\"%d\\n\", {});", name))
     }
 }
+
+// TODO: casting "say current as char" so that i do not need to write 50 lines of if statements

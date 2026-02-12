@@ -17,6 +17,8 @@ I'm hoping to keep improving and get better as a **Systems Programmer** through 
 * Memory Safety: While MommyLang allows raw pointers (box), the compiler (Rust) ensures the transpiler itself is memory-safe.
 * C and Rust Combination: Using Rust to translate my eso lang into C.
 
+![Hello World!](readme_assets/hello-world.gif)
+
 ## ⚠️ DISCLAIMER
 **This project is for EDUCATIONAL PURPOSES ONLY.**
 * 🎓 Created to practice system-level concepts (Processes, Memory, Pointers).

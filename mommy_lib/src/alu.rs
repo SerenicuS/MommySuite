@@ -1,7 +1,7 @@
 // Arithmetic logic unit
 use std::collections::HashMap;
 use crate::responses::{MommyLangError};
-
+use crate::constants;
 pub fn calculate_two(target: &str, operator: &str, value: &str, symbols: &HashMap<String, String>) -> Result<String, MommyLangError> {
     // calculate("x", "*", "10") -> "x = x * 10;"
     validate_operation(target, operator, value, symbols)?;
@@ -32,13 +32,13 @@ fn validate_operation(
     }
 
     // Trying to do math in strings
-    if var_type == "String" || var_type == "char*" {
+    if var_type == constants::VARIABLE_TYPE_STRING  || var_type == constants::VARIABLE_TYPE_C_STRING {
         return Err(MommyLangError::MathOnString);
     }
 
 
     // Dividing 0
-    if operator == "/" && value == "0" {
+    if operator == constants::OPERATOR_DIVISION && value == constants::VALUE_ZERO {
         return Err(MommyLangError::DivideByZero);
     }
 

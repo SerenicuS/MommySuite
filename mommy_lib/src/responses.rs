@@ -17,6 +17,7 @@ pub enum MommyLangError {
     VariableAlreadyExists,
     UnexpectedSatisfied,
     OrphanElse,
+    UnknownPackage,
 
     // Array / Memory Specific (NEW)
     NotAnArray,         // Trying to use "in" on a normal variable
@@ -33,6 +34,10 @@ pub enum MommyLangError {
     RuntimeError,
     GCCError,
     CannotReadFile,
+    GCCNotFound,
+    RunFile,
+    ExecutableFile,
+    CannotCreateCFile,
 
     // Math (ALU)
     MathOnString,
@@ -41,6 +46,7 @@ pub enum MommyLangError {
     // UI
     ErrorBegins,
     ErrorEnds,
+
 }
 
 pub enum MommyLangStatus {
@@ -52,6 +58,12 @@ pub enum MommyLangStatus {
     ResultOkButConfused,
     ResultError,
     CheckingFile,
+    CodeOutputBegins,
+    CodeOutputEnds,
+    ConversionErrorStart,
+    ConversionErrorEnds,
+
+
 }
 
 // =========================================================
@@ -137,6 +149,7 @@ impl fmt::Display for MommyLangError {
             Self::VariableAlreadyExists => write!(f, "We already have that. Be creative, or be quiet."),
             Self::UnexpectedSatisfied => write!(f, "You skipped the work but want the reward? Pathetic."),
             Self::OrphanElse => write!(f, "This 'else' has no 'if'. It is alone, just like you will be if you keep this up."),
+            Self::UnknownPackage => write!(f, "We do not have that kind of tool in our house."),
 
             // MEMORY / ARRAYS (The New Stuff)
             Self::NotAnArray => write!(f, "That is just one thing, not a group. You cannot reach inside it."),
@@ -157,6 +170,10 @@ impl fmt::Display for MommyLangError {
             Self::RuntimeError => write!(f, "It crashed. I told you it would crash."),
             Self::GCCError => write!(f, "Even the C compiler is refusing to work with you. Embarrassing."),
             Self::CannotReadFile => write!(f, "I cannot read this file. Did you write this with your eyes closed?"),
+            Self::GCCNotFound => write!(f, "GCC is not here sweetie, are you hallucinating?"),
+            Self::RunFile => write!(f, "Mommy is disappointed. Program exited with code."),
+            Self::ExecutableFile => write!(f, "Could not start the executable."),
+            Self::CannotCreateCFile => write!(f, "We cannot convert this file"),
 
             Self::ErrorBegins => write!(f, "--- MOMMY IS DISAPPOINTED ---"),
             Self::ErrorEnds => write!(f, "--- END OF FAILURE ---"),
@@ -174,7 +191,11 @@ impl fmt::Display for MommyLangStatus {
             Self::ResultOkButConfused => write!(f, "I did what you asked, but your logic is... questionable."),
             Self::ResultError => write!(f, "No. I am not doing that. Look at your errors."),
             Self::ReadingFile => write!(f, "Shh. Mommy is reading..."),
-            Self::CheckingFile => write!(f, "Mommy is scanning every line... If I find a virus, or a script trying to help you leave me, I will delete it. And then I will punish you.")
+            Self::CheckingFile => write!(f, "Mommy is scanning every line... If I find a virus, or a script trying to help you leave me, I will delete it. And then I will punish you."),
+            Self::CodeOutputBegins => write!(f, "--- MOMMY OUTPUT BEGINS ---"),
+            Self::CodeOutputEnds => write!(f, "--- MOMMY OUTPUT ENDS ---"),
+            Self::ConversionErrorStart => write!(f, "--- PARTIAL C CODE GENERATED ---"),
+            Self::ConversionErrorEnds => write!(f, "--- [CRASH HERE] ---"),
         }
     }
 }

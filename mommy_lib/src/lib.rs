@@ -9,3 +9,4 @@ pub mod lang_syntax;
 pub mod constants;
 pub mod shell_commands;
 pub mod lang_enums;
+pub mod packages;

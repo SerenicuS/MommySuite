@@ -3,12 +3,17 @@ pub const EXTENSION_SOURCE: &str = ".mommy";
 pub const EXTENSION_C: &str = ".c";
 pub const EXTENSION_EXE: &str = ".exe";
 pub const IDE_OUTPUT_DIRECTORY: &str = "sandbox";
+pub const SYMBOL_SINGLE_SLASH: char = '/';
+pub const SYMBOL_DOUBLE_SLASH_REVERSE: char = '\\';
+pub const SYMBOL_SELECTED_DEFAULT_FILE_PATH: &str = "./";
+
 
 // --- Compiler Rules ---
 pub const MIN_ARGS_MATH: usize = 4;
 pub const MIN_ARGS_FILE_CMD: usize = 2;
 pub const MIN_ARGS_LEN: usize = 2 ;
 pub const MIN_INDEX_NAME_LEN: usize = 3;
+pub const GCC_OUTPUT_FLAG: &str = "-o";
 
 
 // --- Tools ---
@@ -58,4 +63,30 @@ pub const SHELL_IDE_CLEAR_KEYWORD: &str = "CLEAR";
 pub const MIN_ARGS_CONDITIONS_LEN: usize = 3;
 pub const CONDITIONS_IF_KEYWORD: &str = "if";
 pub const CONDITIONS_OR_KEYWORD: &str = "}else {";
+
+
+// --- mommy_lang.rs CONSTANTS ---
+pub const SYMBOL_OPERAND_ADDITION: &str = "+";
+pub const SYMBOL_OPERAND_SUBTRACTION: &str = "-";
+pub const SYMBOL_OPERAND_DIVISION: &str = "/";
+pub const SYMBOL_OPERAND_MULTIPLICATION: &str = "*";
+pub const SYMBOL_OPERAND_MODULO: &str = "%";
+
+pub const KEYWORD_START_C_FILE: &str = "int main(){";
+pub const SYMBOL_END_C_FILE: &str = "}";
+pub const KEYWORD_EXIT_C_FILE: &str = "return 0;";
+
+pub const TRANSPILE_ERROR_SPECIFIC_LINE: &str = "Line";
+pub const INDEX_FILE_NAME: usize = 1;
+
+
+// --- alu.rs CONSTANTS ---
+
+pub const INDEX_VARIABLE_TARGET: usize = 1;
+pub const INDEX_VARIABLE_SOURCE: usize = 3;
+
+pub const VARIABLE_TYPE_STRING: &str = "String";
+pub const VARIABLE_TYPE_C_STRING: &str = "char*";
+pub const OPERATOR_DIVISION: &str = "/";
+pub const VALUE_ZERO: &str = "0";
 
