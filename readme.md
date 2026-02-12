@@ -10,7 +10,7 @@ I'm hoping to keep improving and get better as a **Systems Programmer** through 
 
 ---
 
-## Architecture
+## ⚙️ Architecture
 * Lexer & Parser: Custom-built tokenizer that handles state management (e.g., handling spaces inside string literals vs. code blocks).
 * Transpilation: Maps abstract syntax to optimized C code, leveraging GCC for binary generation.
 * Process Management: Uses Rust's std::process to spawn child processes for compilation and system commands.
@@ -56,13 +56,13 @@ I'm hoping to keep improving and get better as a **Systems Programmer** through 
 | **`doxxme`** | `ipconfig` | Show network configuration. |
 | **`callmeplease <ip>`** | `ping` | Ping a device. |
 
-### 🛠️ Developer Tools (Advanced)
+### Developer Tools (Advanced)
 | Command | Function | Description |
 | :--- | :--- | :--- |
 | **`runthis <file>`** | **Compile & Run** | Transpiles your `.mommy` file to C, compiles with GCC, and executes it. |
 | **`startcoding`** | **Enter Lite_IDE** | Launches the internal code editor for writing MommyLang scripts. |
 
-## MOMMYLANG SYNTAX SPECIFICATION
+## 💬 MOMMYLANG SYNTAX SPECIFICATION
 
 ### 1. Core Keywords (The "Vocabulary")
 These words are reserved by the parser and define the structure of the language.
