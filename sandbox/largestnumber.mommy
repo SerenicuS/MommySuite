@@ -1,9 +1,9 @@
 say "--- FIND THE BIGGEST NUMBER ---"
 
 group 3 in numbers as int
-replace numbers with 5 in 0
+replace numbers with 10 in 0
 replace numbers with 99 in 1
-replace numbers with 2 in 2
+replace numbers with 5 in 2
 
 mayihave 0 in max_val as int
 mayihave 0 in current_val as int

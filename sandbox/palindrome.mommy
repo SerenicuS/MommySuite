@@ -1,0 +1,53 @@
+say "--- MOMMY'S PALINDROME ---"
+
+
+mayihave "racecar" in s as String
+
+mayihave 0 in len as int
+mayihave 0 in char_val as int
+mayihave 0 in loops as int
+
+
+punishme 100
+
+    replace char_val with s in len
+
+    ask if char_val == 0
+        satisfied
+    done
+
+    add len with 1
+done
+
+say "Length found:"
+say len
+
+
+mayihave 0 in start as int
+mayihave 0 in end as int
+replace end with len
+subtract end with 1
+
+mayihave 1 in is_palindrome as int
+mayihave 0 in left_char as int
+mayihave 0 in right_char as int
+
+punishmeif start < end
+
+    replace left_char with s in start
+    replace right_char with s in end
+
+    ask if left_char != right_char
+        replace is_palindrome with 0
+        satisfied
+    done
+
+    add start with 1
+    subtract end with 1
+done
+
+ask if is_palindrome == 1
+    say "Yes, it is a Palindrome!"
+or
+    say "No, it is not."
+done

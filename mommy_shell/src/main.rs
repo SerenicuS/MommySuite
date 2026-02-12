@@ -11,12 +11,6 @@ use mommy_lib::shell_commands;
 const SEPARATOR: &str = "----------------------------------------------------------------";
 
 
-/*
-    TODO:
-        1. Handles many commands/arguments using the shell.
-
- */
-
 const SHELL_BASIC_COMMANDS: &str = r#"
     You are too greedy.
     ---------------

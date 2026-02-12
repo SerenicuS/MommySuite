@@ -1,36 +1,90 @@
 say "========================================"
-say "       discipline update test           "
+say "      MOMMYLANG GRAND TEST SUITE v0.2   "
 say "========================================"
 
-group 5 in scores as int
-replace scores with 100 in 0
-replace scores with 200 in 4
+say "--- SECTION 1: BASICS & MATH ---"
+mayihave 10 in num as int
+add num with 10
+say "Add 10 (Expect 20):"
+say num
 
-say "Checking index 0 (Expect 100):"
-say scores in 0
+say "--- SECTION 2: FLOATS ---"
+mayihave 85.5 in score as float
+say "Float Value:"
+say score
 
-say "Checking index 4 (Expect 200):"
-say scores in 4
+say "--- SECTION 3: POINTERS (THE BOX) ---"
+mayihave 69 in magic as int
+mayihave null in ptr as box
 
-say "Checking empty index 2 (Expect 0):"
-say scores in 2
+replace ptr with magic address
+replace ptr with 999 inside
+say "Pointer Write (Expect 999):"
+say magic
 
-group 3 in greetings as String
+say "--- SECTION 4: LOGIC ---"
+ask if magic == 999
+    say "Logic: OK."
+or
+    say "Logic: FAIL."
+done
 
-replace greetings with "Hello" in 0
-replace greetings with "Mommy" in 1
-replace greetings with "!!!" in 2
+say "--- SECTION 5: LOOPS ---"
+mayihave 0 in i as int
+say "Looping to 3:"
+punishme 5
+    add i with 1
+    say i
+    ask if i == 3
+        satisfied
+    done
+done
 
-say "Index 0:"
-say greetings in 0
+say "========================================"
+say "       SECTION 7: ARRAYS (NEW!)         "
+say "========================================"
 
-say "Index 1:"
-say greetings in 1
+group 5 in numbers as int
+say "Array Created."
 
-say "Index 2:"
-say greetings in 2
 
-say "==========================================="
-say " ALL TESTS COMPLETED FOR discipline update "
-say "==========================================="
+say "Writing 100 to index 0..."
+replace numbers in 0 with 100
+
+say "Writing 200 to index 1..."
+replace numbers in 1 with 200
+
+say "Check Write (Expect 100):"
+say numbers in 0
+
+
+mayihave 0 in temp_val as int
+
+say "Reading index 1 into variable..."
+replace temp_val with numbers in 1
+
+say "Variable now holds (Expect 200):"
+say temp_val
+
+
+say "Adding 50 to variable..."
+add temp_val with 50
+
+say "Writing 250 to index 2..."
+replace numbers in 2 with temp_val
+
+say "Check Index 2 (Expect 250):"
+say numbers in 2
+
+
+say "Copying Index 0 (100) to Index 4..."
+replace temp_val with numbers in 0
+replace numbers in 4 with temp_val
+
+say "Check Index 4 (Expect 100):"
+say numbers in 4
+
+say "========================================"
+say "         ALL SYSTEMS GO. GOOD JOB.      "
+say "========================================"
 leave
