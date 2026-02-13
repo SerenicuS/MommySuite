@@ -93,6 +93,8 @@ fn say_scalar(
     tokens: &Vec<String>,
     symbols: &HashMap<String, String>
 ) -> Result<String, MommyLangError> {
+
+
     let name = &tokens[1];
     let var_type = symbols.get(name).ok_or(MommyLangError::UndeclaredVariable)?;
 

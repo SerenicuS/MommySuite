@@ -1,0 +1,30 @@
+group 5 in nums as int
+
+replace nums in 0 with 1
+replace nums in 1 with 1
+replace nums in 2 with 2
+replace nums in 3 with 2
+replace nums in 4 with 3
+
+mayihave 0 in k as int
+mayihave 0 in curr_val as int
+mayihave -999 in prev_val as int
+
+punishme 5
+    replace curr_val with nums in i
+
+    ask if curr_val > prev_val
+        replace nums in k with curr_val
+        add k with 1
+        replace prev_val with curr_val
+    done
+done
+
+
+say k
+
+say nums in 0
+say nums in 1
+say nums in 2
+
+leave

@@ -1,20 +1,23 @@
-group 5 in secret as ascii
+group 6 in secret as ascii
 
 mayihave 0 in temp as int
+mayihave 0 in i as int
 
 replace secret in 0 with 72
-replace secret in 1 with 69
-replace secret in 2 with 76
-replace secret in 3 with 76
-replace secret in 4 with 79
+replace secret in 1 with 97
+replace secret in 2 with 114
+replace secret in 3 with 111
+replace secret in 4 with 108
+replace secret in 5 with 100
 
 say secret in ?
 
-punishme 5
+punishmeif i < 6
 
     replace temp with secret in i
     add temp with 1
     replace secret in i with temp
+    add i with 1
 done
 
 say secret in ?
