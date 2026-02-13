@@ -64,79 +64,88 @@ I'm hoping to keep improving and get better as a **Systems Programmer** through 
 
 ## 💬 MOMMYLANG SYNTAX SPECIFICATION
 
-### 1. Core Keywords (The "Vocabulary")
+## 1. Core Keywords (The "Vocabulary")
 These words are reserved by the parser and define the structure of the language.
 
-| Keyword     | Function                  | Source File      |
-|:------------|:--------------------------|:-----------------|
-| `mayihave`  | Variable Declaration      | `declaration.rs` |
-| `group`     | Array Declaration         | `declaration.rs` |
-| `replace`   | Assignment (Var & Array)  | `declaration.rs` |
-| `in`        | Index / Container Marker  | `declaration.rs` |
-| `as`        | Type Definition Marker    | `declaration.rs` |
-| `with`      | Value Assignment Marker   | `declaration.rs` |
-| `address`   | Pointer Reference (`&`)   | `declaration.rs` |
-| `inside`    | Pointer Dereference (`*`) | `declaration.rs` |
-| `punishme`  | Loop (Count / Infinite)   | `loops.rs`       |
-| `satisfied` | Break Loop                | `loops.rs`       |
-| `done`      | End Block (`}`)           | `loops.rs`       |
-| `ask`       | Condition Start (`if`)    | `conditions.rs`  |
-| `or`        | Condition Else (`else`)   | `conditions.rs`  |
-| `leave`     | End Program (`return 0`)  | `main.rs`        |
-| `say`       | Print Output              | `io.rs`          |
+| Keyword      | Function                  | Source File      |
+|:-------------|:--------------------------|:-----------------|
+| `mayihave`   | Variable Declaration      | `declaration.rs` |
+| `group`      | Array Declaration         | `declaration.rs` |
+| `replace`    | Assignment (Var & Array)  | `declaration.rs` |
+| `in`         | Index / Container Marker  | `declaration.rs` |
+| `as`         | Type Definition Marker    | `declaration.rs` |
+| `with`       | Value Assignment Marker   | `declaration.rs` |
+| `address`    | Pointer Reference (`&`)   | `declaration.rs` |
+| `inside`     | Pointer Dereference (`*`) | `declaration.rs` |
+| `punishme`   | Loop (Count / Infinite)   | `loops.rs`       |
+| `punishmeif` | Loop Conditional          | `loops.rs`       |
+| `satisfied`  | Break Loop                | `loops.rs`       |
+| `done`       | End Block (`}`)           | `loops.rs`       |
+| `ask`        | Condition Start (`if`)    | `conditions.rs`  |
+| `or`         | Condition Else (`else`)   | `conditions.rs`  |
+| `leave`      | End Program (`return 0`)  | `main.rs`        |
+| `say`        | Print Output              | `io.rs`          |
 
 ---
 
-### 2. Grammar Patterns
+## 2. Grammar Patterns
 
-#### A. Variables (The "Box")
+### A. Variables (The "Box")
 **Declaration:**
 `mayihave <VALUE> in <NAME> as <TYPE>`
 * **Logic:** "Put 10 inside the box named 'age'."
 * **Example:** `mayihave 10 in age as int`
-* **Supported Types:** `int`, `float`, `char`, `String` (char*), `box` (int*)
+* **Supported Types:** `int`, `float`, `char`, `String` (char*), `box` (int*), `ascii` (special character-array mode)
 
 **Assignment:**
 `replace <NAME> with <VALUE>`
 * **Example:** `replace age with 20`
 
-#### B. Pointers (The "Finger")
+### B. Pointers (The "Finger")
 **Get Address:**
 `replace <PTR_NAME> with <VAR_NAME> address`
-* **Logic:** "Make 'ptr' look at 'age's address."
-* **C Output:** `ptr = &age;`
+* **C Output:** `ptr = &var;`
 
 **Write to Address (Dereference):**
 `replace <PTR_NAME> with <VALUE> inside`
-* **Logic:** "Put value INSIDE the box the pointer is pointing at."
 * **Safety:** Includes automatic `NULL` check.
 * **C Output:** `if(ptr!=NULL) *ptr = value;`
 
-#### C. Arrays (The "Memory")
+### C. Arrays (The "Memory")
 **Declaration:**
 `group <SIZE> in <NAME> as <TYPE>`
-* **Logic:** "Reserve 5 slots in memory called 'scores'."
-* **Example:** `group 5 in scores as int`
-* **Metadata:** Stored in symbol table as `"array:<type>:<size>"`.
+* **Example:** `group 5 in hello as ascii`
+* **Metadata:** Stored as `"array:<type>:<size>"`.
 
 **Write to Slot:**
 `replace <ARRAY> in <INDEX> with <VALUE>`
-* **Logic:** "Go to slot 0 of 'scores' and write 100."
-* **Example:** `replace scores in 0 with 100`
+* **Example:** `replace hello in 0 with 72`
 
 **Read from Slot:**
 `replace <VAR> with <ARRAY> in <INDEX>`
-* **Logic:** "Read slot 0 of 'scores' and put it into 'temp'."
-* **Example:** `replace temp with scores in 0`
+* **Example:** `replace temp with hello in i`
 
-#### D. Math (The "Pain")
+### D. Input/Output (The "Voice")
+**Scalar Print:**
+`say <NAME>`
+* **Logic:** Detects type from symbol table and prints with `\n`.
+
+**Array Peek (Specific Index):**
+`say <ARRAY> in <INDEX>`
+* **Example:** `say hello in 0` (Prints 'H')
+
+**Array Dump (Wildcard Operator):**
+`say <ARRAY> in ?`
+* **Logic:** If type is `ascii`, generates a `for` loop to print the full string.
+* **Example:** `say hello in ?` (Prints "HELLO")
+
+### E. Math (The "Pain")
 **Syntax:**
 `<OPERATION> <TARGET> with <VALUE>`
 * **Operations:** `add`, `subtract`, `multiply`, `divide`, `mod`
-* **Example:** `add age with 1`
-* **Constraint:** Cannot perform math on `String` types.
+* **Example:** `add temp with 1`
 
-#### E. Control Flow (The "Discipline")
+### F. Control Flow (The "Discipline")
 **Conditions:**
 ```text
 ask if <CONDITION>
@@ -145,12 +154,13 @@ or
     ...
 done
 
-Loops:
-Plaintext
-
 punishme <COUNT>
     ...
     ask if <CONDITION>
         satisfied  <-- Break
     done
+done
+
+punishmeif <CONDITION>
+    say "hello"
 done
