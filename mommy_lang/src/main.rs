@@ -84,6 +84,10 @@ fn parse_line(
         mommy_lib::lang_syntax::MommyLangSyntax::Array =>{
             declaration::create_array(&tokens, symbols)
         }
+        
+        mommy_lib::lang_syntax::MommyLangSyntax::String =>{ // new
+            declaration::create_array(&tokens, symbols)
+        }
 
         // --- Math (ALU) ---
         mommy_lib::lang_syntax::MommyLangSyntax::Math => {

@@ -13,6 +13,7 @@ pub enum MommyLangSyntax {
     Array,          // group
     Unknown,        // ???
     LoopStartCondition, // punishmeif
+    String,         // ascii
 }
 
 impl MommyLangSyntax {
@@ -30,6 +31,7 @@ impl MommyLangSyntax {
             "leave" => MommyLangSyntax::ProgramEnd,
             "group" => MommyLangSyntax::Array, // => array
             "punishmeif" => MommyLangSyntax::LoopStartCondition,
+            "ascii" => MommyLangSyntax::String,
             _ => MommyLangSyntax::Unknown,
         }
     }

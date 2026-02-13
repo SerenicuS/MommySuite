@@ -60,17 +60,31 @@ fn say_array(
     let inner_type = parts[1];
     let max_size = parts[2].parse::<usize>().unwrap();
 
-    // Verify index if it is a number
-    if let Ok(idx_num) = index.parse::<usize>() {
-        if idx_num >= max_size {
-            return Err(MommyLangError::AccessViolation);
-        }
+    if index == "?" {
+        return match inner_type {
+            // For ascii, we print letters continuously
+            "ascii" => Ok(format!("for(int i = 0; i < {}; i++) {{ printf(\"%c\", {}[i]); }} printf(\"\\n\");", max_size, name)),
+            // Optional: If they use ? on a number array, print numbers separated by space!
+            "float" => Ok(format!("for(int i = 0; i < {}; i++) {{ printf(\"%f \", {}[i]); }} printf(\"\\n\");", max_size, name)),
+            _ => Ok(format!("for(int i = 0; i < {}; i++) {{ printf(\"%d \", {}[i]); }} printf(\"\\n\");", max_size, name)),
+        };
     }
 
-    // Generate Printf based on type
+    // Bounds Check for specific numbers
+    if let Ok(idx_num) = index.parse::<usize>() {
+        if idx_num >= max_size {
+            return Err(MommyLangError::AccessViolation); // Out of bounds!
+        }
+    } else {
+        // If it's not "?" and not a valid number, it's a syntax error
+        return Err(MommyLangError::SyntaxError);
+    }
+
+    // Generate Printf for a SINGLE item based on type
     match inner_type {
         "float" => Ok(format!("printf(\"%f\\n\", {}[{}]);", name, index)),
         "char*" | "String" => Ok(format!("printf(\"%s\\n\", {}[{}]);", name, index)),
+        "ascii" => Ok(format!("printf(\"%c\\n\", {}[{}]);", name, index)), // Prints ONE character!
         _ => Ok(format!("printf(\"%d\\n\", {}[{}]);", name, index)), // Default to int
     }
 }
@@ -93,4 +107,3 @@ fn say_scalar(
     }
 }
 
-// TODO: casting "say current as char" so that i do not need to write 50 lines of if statements

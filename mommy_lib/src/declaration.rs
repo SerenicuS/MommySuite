@@ -66,6 +66,8 @@ pub fn create_array(
     let name = &tokens[3];
     let raw_type = &tokens[5];
 
+
+
     // 2. Validations
     if tokens[2] != "in" || tokens[4] != "as" { return Err(MommyLangError::SyntaxError); }
     ensure_valid_name(name)?;
@@ -76,9 +78,14 @@ pub fn create_array(
     }
 
     // 3. Store Metadata "array:type:size"
-    let c_type = get_c_type(raw_type);
+
     let meta = format!("array:{}:{}", raw_type, size_str);
     symbols.insert(name.to_string(), meta);
+
+    let c_type = match raw_type.as_str(){
+        "ascii" => "int",
+        _ => get_c_type(&raw_type),
+    };
 
     Ok(format!("{} {}[{}] = {{0}};", c_type, name, size_str))
 }
