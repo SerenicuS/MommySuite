@@ -253,12 +253,14 @@ fn replace_scalar_value(
 /// Converts Mommy types to C types
 fn get_c_type(raw_type: &str) -> &str {
     match raw_type {
-        "String" => "char*",
-        "box" => "int*",
+        constants::TYPE_STRING => constants::C_TYPE_CHAR_PTR,
+
+        // FIX: Match BOTH the user keyword ("box") and internal name ("pointer")
+        t if t == constants::KW_BOX || t == constants::KW_POINTER => constants::C_TYPE_INT_PTR,
+
         _ => raw_type,
     }
 }
-
 /// Ensures the variable is NOT in the symbol table (for Declarations)
 fn ensure_var_new(name: &str, symbols: &HashMap<String, String>) -> Result<(), MommyLangError> {
     if symbols.contains_key(name) {
@@ -280,7 +282,13 @@ fn ensure_var_exists(name: &str, symbols: &HashMap<String, String>) -> Result<()
 /// Blacklist checks
 fn ensure_valid_name(name: &str) -> Result<(), MommyLangError> {
     match name {
-        "int" | "return" | "void" | "char" | "if" | "while" => Err(MommyLangError::InvalidVariableName),
+        constants::TYPE_INT |
+        constants::C_KW_RETURN |
+        constants::C_KW_VOID |
+        constants::C_KW_CHAR |
+        constants::KW_IF |
+        constants::C_KW_WHILE => Err(MommyLangError::InvalidVariableName),
+
         _ => Ok(())
     }
 }

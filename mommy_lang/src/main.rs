@@ -41,7 +41,7 @@
 
 
 use std::io::Write;
-use mommy_lib::syntax_parser;
+use mommy_lib::syntax_lexer;
 use mommy_lib::alu;
 use mommy_lib::io;
 use mommy_lib::loops;
@@ -234,7 +234,7 @@ fn transpile_code_to_c(config: &Config) -> Result<(), String> {
             continue;
         }
 
-        let tokens = syntax_parser::insert_token(trimmed_line);
+        let tokens = syntax_lexer::insert_token(trimmed_line);
         let result = parse_line(tokens, &mut symbol_table, &mut scope_stack);
 
         match result {

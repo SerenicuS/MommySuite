@@ -1,4 +1,4 @@
-pub mod syntax_parser;
+pub mod syntax_lexer;
 pub mod alu;
 pub mod declaration;
 pub mod loops;
