@@ -58,7 +58,7 @@ pub const TYPE_ASCII: &str      = "ascii";
 
 // Unique
 
-pub const TYPE_ALL: &str = "?";
+pub const KW_ALL: &str = "?";
 
 // ================================================================
 // 3. C LANGUAGE (Output Generation)

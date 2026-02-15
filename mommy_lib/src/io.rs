@@ -54,7 +54,7 @@ fn say_array(
     let inner_type = if parts.len() > 1 { parts[1] } else { constants::TYPE_STRING };
     let max_size = if parts.len() > 2 { parts[2].parse::<usize>().unwrap_or(0) } else { 0 };
 
-    if index == constants::TYPE_ALL {
+    if index == constants::KW_ALL {
         if max_size == 0 { return Err(MommyLangError::AccessViolation); }
         return match inner_type {
             _ => Ok(format!("for (int i = 0; i < {}; i++) {{ printf(\"%d \", {}[i]); }} printf(\"\\n\");", max_size, name)),
@@ -62,11 +62,16 @@ fn say_array(
     }
 
     if let Ok(idx_num) = index.parse::<usize>() {
-        // WAS: max_size != 0
         if idx_num >= max_size && max_size != constants::SIZE_UNKNOWN {
             return Err(MommyLangError::AccessViolation);
         }
-    } else {
+    }
+
+    else if symbols.contains_key(index) {
+
+    }
+    else {
+        // It's garbage (like "say arr in $#@")
         return Err(MommyLangError::SyntaxError);
     }
 
