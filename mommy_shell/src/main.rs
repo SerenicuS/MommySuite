@@ -28,8 +28,8 @@ const SHELL_BASIC_COMMANDS: &str = r#"
     12. callmeplease <ip/dns>       ->    Ping device
     13. runthis <filename>          ->    Run File
     14. clear                       ->    Clear Terminal
-    15. letusplayhouse
-    16. removethehouse
+    15. letusplayhouse              ->    Create Directory
+    16. removethehouse              ->    Delete Directory
     ---------------
     "#;
 
