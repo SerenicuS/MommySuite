@@ -27,6 +27,9 @@ const SHELL_BASIC_COMMANDS: &str = r#"
     11. doxxme                      ->    Windows Ip Configuration
     12. callmeplease <ip/dns>       ->    Ping device
     13. runthis <filename>          ->    Run File
+    14. clear                       ->    Clear Terminal
+    15. letusplayhouse
+    16. removethehouse
     ---------------
     "#;
 
@@ -215,6 +218,7 @@ fn shell_attempt_command(input: &str, root_dir: &std::path::PathBuf) {
         shell_commands::MommyShellCommands::ShellListFilesCurrentDirectory => shell_list_files_in_directory(),
         shell_commands::MommyShellCommands::ShellShowIPConfig => shell_windows_call("ipconfig"),
         shell_commands::MommyShellCommands::ShellReturnToPrevDirectory => shell_return_to_prev_directory(root_dir),
+        shell_commands::MommyShellCommands::ShellClear => shell_clear(),
 
 
         //Advanced
@@ -227,10 +231,32 @@ fn shell_attempt_command(input: &str, root_dir: &std::path::PathBuf) {
         shell_commands::MommyShellCommands::ShellOpenFile if check_args_len(&args) => shell_open_file(args[1]),
         shell_commands::MommyShellCommands::ShellRunFile if check_args_len(&args) => shell_run_file(args[1]),
         shell_commands::MommyShellCommands::ShellReadFile if check_args_len(&args) => shell_read_file(args[1]),
+        shell_commands::MommyShellCommands::ShellCreateDir if check_args_len(&args) => shell_create_dir(args[1]),
+        shell_commands::MommyShellCommands::ShellDeleteDir if check_args_len(&args) => shell_delete_dir(args[1]),
 
         // Error
         shell_commands::MommyShellCommands::ShellUnknownCommand => println!("{}", responses::MommyShellError::GeneralInvalid),
         _ => println!("{}", responses::MommyShellError::GeneralInvalid),
+    }
+}
+
+fn shell_clear(){
+    print!("{}", responses::MommyUI::Clear);
+     io::stdout().flush().unwrap();
+}
+
+
+fn shell_create_dir(dir_name: &str){
+    match fs::create_dir(dir_name) {
+        Ok(_) => println!("{}", responses::MommyShellOk::DirectoryCreated),
+        Err(_) => println!("{}", responses::MommyShellError::DirectoryNotFound),
+    }
+}
+
+fn shell_delete_dir(dir_name: &str){
+    match fs::remove_dir(dir_name) {
+        Ok(_) => println!("{}", responses::MommyShellOk::DirectoryDeleted),
+        Err(_) => println!("{}", responses::MommyShellError::DirectoryNotFound),
     }
 }
 

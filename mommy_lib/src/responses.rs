@@ -128,6 +128,7 @@ pub enum MommyUI {
     ChaosWrongCommand,
     GenericObedience,
     NewLine,
+    Clear,
 }
 
 
@@ -273,6 +274,7 @@ impl fmt::Display for MommyUI {
             Self::PrepareEnv => write!(f, "Wait. I need to prepare the room."),
             Self::StartCoding => write!(f, "Start typing. Type 'SAVE' when you are done. Don't bore me."),
             Self::RestartCLI => write!(f, "Let's try that again. Do it right this time."),
+            Self::Clear => write!(f, "\x1B[2J\x1B[1;1H"),
 
             Self::NewLine => write!(f, "\n\n\n"),
         }

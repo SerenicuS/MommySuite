@@ -16,6 +16,9 @@ pub enum MommyShellCommands {
     ShellRunFile,                       // runthis <file_name>
     ShellStartCoding,                   // startcoding
     ShellUnknownCommand,                // unknown command
+    ShellClear,                         // clear
+    ShellCreateDir,                     // letusplayhouse    
+    ShellDeleteDir,                     // removethehouse
 
 }
 
@@ -38,6 +41,9 @@ impl MommyShellCommands {
             "callmeplease" => MommyShellCommands::ShellPing,
             "runthis" => MommyShellCommands::ShellRunFile,
             "startcoding" => MommyShellCommands::ShellStartCoding,
+            "clear" => MommyShellCommands::ShellClear,
+            "letusplayhouse" => MommyShellCommands::ShellCreateDir,
+            "removethehouse" => MommyShellCommands::ShellDeleteDir,
             _ => MommyShellCommands::ShellUnknownCommand,
         }
     }
