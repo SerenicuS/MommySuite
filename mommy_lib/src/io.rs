@@ -10,7 +10,7 @@ pub fn say(
     symbols: &HashMap<String, String>
 ) -> Result<String, MommyLangError> {
 
-    if tokens.len() < constants::MIN_ARGS_LEN {
+    if tokens.len() < constants::ARGS_MIN_IO {
         return Err(MommyLangError::MissingArguments)
     }
 

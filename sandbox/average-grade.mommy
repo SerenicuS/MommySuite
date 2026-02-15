@@ -1,0 +1,22 @@
+group 5 in subjects as float
+
+replace subjects in 0 with 90.0
+replace subjects in 1 with 85.0
+replace subjects in 2 with 95.0
+replace subjects in 3 with 89.0
+replace subjects in 4 with 82.0
+
+
+mayihave 0 in temp as float
+mayihave 0 in final as float
+
+punishme 5
+    replace temp with subjects in i
+    add final with temp
+done
+
+divide final with 5.0
+
+say final
+leave
+

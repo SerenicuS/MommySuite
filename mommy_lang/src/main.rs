@@ -91,20 +91,20 @@ fn parse_line(
 
         // --- Math (ALU) ---
         mommy_lib::lang_syntax::MommyLangSyntax::Math => {
-            if tokens.len() < constants::MIN_ARGS_MATH {
+            if tokens.len() < constants::ARGS_MIN_MATH {
                 return Err(responses::MommyLangError::MissingArguments);
             }
 
             let operand = match tokens[0].as_str() {
-                "add" => constants::SYMBOL_OPERAND_ADDITION,
-                "divide" => constants::SYMBOL_OPERAND_DIVISION,
-                "subtract" => constants::SYMBOL_OPERAND_SUBTRACTION,
-                "multiply" => constants::SYMBOL_OPERAND_MULTIPLICATION,
-                "mod" => constants::SYMBOL_OPERAND_MODULO,
+                "add" => constants::C_OP_ADD,
+                "divide" => constants::C_OP_DIV,
+                "subtract" => constants::C_OP_SUB,
+                "multiply" => constants::C_OP_MUL,
+                "mod" => constants::C_OP_MOD,
                 _ => return Err(responses::MommyLangError::SyntaxError), // Should never happen
             };
 
-            alu::calculate_two(&tokens[constants::INDEX_VARIABLE_TARGET], operand, &tokens[constants::INDEX_VARIABLE_SOURCE], symbols)
+            alu::calculate_two(&tokens[constants::IDX_MATH_TARGET], operand, &tokens[constants::IDX_MATH_SOURCE], symbols)
         },
 
         // --- I/O ---
@@ -164,7 +164,7 @@ fn parse_line(
 
         // --- System ---
         mommy_lib::lang_syntax::MommyLangSyntax::ProgramEnd => { // "leave"
-            Ok(constants::KEYWORD_EXIT_C_FILE.to_string())
+            Ok(constants::C_EXIT_SUCC.to_string())
         },
 
         // --- Error Handling ---
@@ -184,18 +184,18 @@ struct Config{
 impl Config{
     fn new(args: &[String]) -> Result<Config, String>{
 
-        if args.len() < constants::MIN_ARGS_FILE_CMD{
+        if args.len() < constants::ARGS_MIN_FILE{
             return Err(responses::MommyLangError::StatusNoFile.to_string())
         }
 
-        let input_path = args[constants::INDEX_FILE_NAME].clone();
+        let input_path = args[constants::IDX_FILE_NAME].clone();
 
-        if !input_path.ends_with(constants::EXTENSION_SOURCE){
+        if !input_path.ends_with(constants::EXT_SOURCE){
             return Err(responses::MommyLangError::WrongFileType.to_string())
         }
 
-        let c_path = input_path.replace(constants::EXTENSION_SOURCE, constants::EXTENSION_C);
-        let exe_path = input_path.replace(constants::EXTENSION_SOURCE, constants::EXTENSION_EXE);
+        let c_path = input_path.replace(constants::EXT_SOURCE, constants::EXT_C);
+        let exe_path = input_path.replace(constants::EXT_SOURCE, constants::EXT_EXE);
 
         Ok(Config{
             input_path,
@@ -226,7 +226,7 @@ fn transpile_code_to_c(config: &Config) -> Result<(), String> {
     }
 
 
-    writeln!(output_file, "{}", constants::KEYWORD_START_C_FILE).unwrap(); // int main
+    writeln!(output_file, "{}", constants::C_MAIN_START).unwrap(); // int main
 
     for (i, line) in content.lines().enumerate() {
         let trimmed_line = line.trim();
@@ -243,7 +243,7 @@ fn transpile_code_to_c(config: &Config) -> Result<(), String> {
             }
             Err(e) => {
                 // Return the error so main stops!
-                return Err(format!("{}, {}: {}", constants::TRANSPILE_ERROR_SPECIFIC_LINE
+                return Err(format!("{}, {}: {}", constants::MSG_ERR_LINE
                                    , i + 1, e));
             }
         }
@@ -253,7 +253,7 @@ fn transpile_code_to_c(config: &Config) -> Result<(), String> {
         return Err(responses::MommyLangError::UnclosedBlock.to_string());
     }
 
-    writeln!(output_file, "{}", constants::SYMBOL_END_C_FILE).unwrap();
+    writeln!(output_file, "{}", constants::C_MAIN_END).unwrap();
 
     Ok(())
 }
@@ -301,11 +301,11 @@ fn main() {
 }
 
 fn run_mommy_file(config: &Config) -> Result<(), String> {
-    let output = if config.exe_path.contains(constants::SYMBOL_SINGLE_SLASH)
-        || config.exe_path.contains(constants::SYMBOL_DOUBLE_SLASH_REVERSE){
+    let output = if config.exe_path.contains(constants::SYM_SLASH)
+        || config.exe_path.contains(constants::SYM_BACKSLASH){
         config.exe_path.clone()
     } else {
-        format!("{} {}", constants::SYMBOL_SELECTED_DEFAULT_FILE_PATH, config.exe_path)
+        format!("{} {}", constants::PATH_DEFAULT, config.exe_path)
     };
 
     let status = Command::new(output)
@@ -320,9 +320,9 @@ fn run_mommy_file(config: &Config) -> Result<(), String> {
 }
 fn compile_to_gcc(config: &Config) -> Result<(), String>{
 
-    let output = Command::new(constants::COMPILER_TOOL)
+    let output = Command::new(constants::CMD_GCC)
         .arg(&config.c_path)
-        .arg(constants::GCC_OUTPUT_FLAG)
+        .arg(constants::CMD_GCC_FLAG)
         .arg(&config.exe_path)
         .output()
         .map_err(|_| responses::MommyLangError::GCCNotFound.to_string())?;

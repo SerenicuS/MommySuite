@@ -32,13 +32,13 @@ fn validate_operation(
     }
 
     // Trying to do math in strings
-    if var_type == constants::VARIABLE_TYPE_STRING  || var_type == constants::VARIABLE_TYPE_C_STRING {
+    if var_type == constants::TYPE_STRING  || var_type == constants::C_TYPE_CHAR_PTR {
         return Err(MommyLangError::MathOnString);
     }
 
 
     // Dividing 0
-    if operator == constants::OPERATOR_DIVISION && value == constants::VALUE_ZERO {
+    if operator == constants::C_OP_DIV && value == constants::C_VAL_ZERO {
         return Err(MommyLangError::DivideByZero);
     }
 

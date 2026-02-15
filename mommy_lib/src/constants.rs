@@ -1,92 +1,136 @@
-// --- File System ---
-pub const EXTENSION_SOURCE: &str = ".mommy";
-pub const EXTENSION_C: &str = ".c";
-pub const EXTENSION_EXE: &str = ".exe";
-pub const IDE_OUTPUT_DIRECTORY: &str = "sandbox";
-pub const SYMBOL_SINGLE_SLASH: char = '/';
-pub const SYMBOL_DOUBLE_SLASH_REVERSE: char = '\\';
-pub const SYMBOL_SELECTED_DEFAULT_FILE_PATH: &str = "./";
+// ================================================================
+// 1. SYSTEM & CONFIGURATION
+// ================================================================
+pub const EXT_SOURCE: &str = ".mommy";
+pub const EXT_C: &str      = ".c";
+pub const EXT_EXE: &str    = ".exe";
+
+pub const DIR_OUTPUT: &str   = "sandbox";
+pub const PATH_DEFAULT: &str = "./";
+
+// Compiler Tools
+pub const CMD_GCC: &str        = "gcc";
+pub const CMD_GCC_FLAG: &str   = "-o";
+pub const CMD_RUN_PYTHON: &str = "python";
+pub const CMD_RUN_NOTEPAD: &str = "notepad.exe";
+
+// Limits
+pub const ARGS_MIN_MATH: usize = 4;
+pub const ARGS_MIN_FILE: usize = 2;
+pub const ARGS_MIN_LEN: usize  = 2;
+pub const NAME_MIN_LEN: usize  = 3; // Was MIN_INDEX_NAME_LEN
+pub const ARGS_MIN_COND: usize = 3;
+pub const ARGS_MIN_IO: usize = 2;
 
 
-// --- Compiler Rules ---
-pub const MIN_ARGS_MATH: usize = 4;
-pub const MIN_ARGS_FILE_CMD: usize = 2;
-pub const MIN_ARGS_LEN: usize = 2 ;
-pub const MIN_INDEX_NAME_LEN: usize = 3;
-pub const GCC_OUTPUT_FLAG: &str = "-o";
+// ================================================================
+// 2. MOMMY LANGUAGE (Input Syntax)
+// ================================================================
+// Keywords the user types
+pub const KW_VAR_DEC: &str    = "mayihave"; // Was INDEX_KEYWORD_CREATE_VARIABLE (sort of)
+pub const KW_ARRAY_DEC: &str  = "group";
+pub const KW_ASSIGN: &str     = "replace";  // Was INDEX_KEYWORD_REPLACE (sort of)
+
+// Connectors
+pub const KW_IN: &str         = "in";
+pub const KW_AS: &str         = "as";
+pub const KW_WITH: &str       = "with";
+
+// Pointers & Types
+pub const KW_BOX: &str        = "box";     // Pointer type
+pub const KW_ADDR: &str       = "address"; // & operator
+pub const KW_DEREF: &str      = "inside";  // * operator
+pub const KW_NULL: &str       = "null";
+pub const KW_ARRAY: &str      = "array";   // Internal/Type keyword
+pub const KW_POINTER: &str    = "pointer";
+
+// Loop & Logic Keywords
+pub const KW_IF: &str         = "if";
+pub const KW_ELSE_BLOCK: &str = "}else {";
+
+// Types
+pub const TYPE_INT: &str      = "int";
+pub const TYPE_ASCII: &str    = "ascii";
+pub const TYPE_STRING: &str   = "String"; // Only used in parsing logic
+
+// ================================================================
+// 3. C LANGUAGE (Output Generation)
+// ================================================================
+// Boilerplate
+pub const C_MAIN_START: &str  = "int main(){";
+pub const C_MAIN_END: &str    = "}";
+pub const C_EXIT_SUCC: &str   = "return 0;";
+
+// C Keywords & Types
+pub const C_TYPE_CHAR_PTR: &str = "char*";
+pub const C_NULL: &str        = "NULL";
+pub const C_VAL_ZERO: &str    = "0";
+
+// C Operators
+pub const C_OP_ADD: &str      = "+";
+pub const C_OP_SUB: &str      = "-";
+pub const C_OP_DIV: &str      = "/";
+pub const C_OP_MUL: &str      = "*";
+pub const C_OP_MOD: &str      = "%";
+
+// Error Messages / Splitters
+pub const MSG_ERR_LINE: &str  = "Line";
+pub const SYM_SPLITTER: char  = ':';
+pub const SYM_SLASH: char     = '/';
+pub const SYM_BACKSLASH: char = '\\';
+pub const SYM_WHITESPACE: &str = " ";
+
+// ================================================================
+// 4. PARSING INDICES (The "Slots")
+// ================================================================
+
+// Declaration: mayihave <VAL> in <NAME> as <TYPE>
+// Indices:     0        1     2  3      4  5
+pub const ARGS_MIN_DECL: usize      = 6;
+pub const IDX_DECL_KW: usize        = 0; // "mayihave"
+pub const IDX_DECL_VALUE: usize     = 1;
+pub const IDX_DECL_KEY_IN: usize    = 2; // "in"
+pub const IDX_DECL_NAME: usize      = 3;
+pub const IDX_DECL_KEY_AS: usize    = 4; // "as"
+pub const IDX_DECL_TYPE: usize      = 5;
+
+// Assignment: replace <NAME> with <VAL>
+// Indices:    0       1      2    3
+pub const ARGS_MIN_ASSIGN: usize    = 4;
+pub const IDX_ASSIGN_KW: usize      = 0; // "replace"
 
 
-// --- Tools ---
-pub const COMPILER_TOOL: &str = "gcc";
-pub const RUN_PYTHON: &str = "python";
-pub const RUN_NOTEPAD: &str = "notepad.exe";
+pub const IDX_ASSIGN_NAME: usize    = 1;
+pub const IDX_ASSIGN_KEY_WITH: usize= 2; // "with"
+pub const IDX_ASSIGN_VALUE: usize   = 3;
 
+// Array Assignment: replace <NAME> in <IDX> with <VAL>
+// Indices:          0       1      2  3     4    5
+pub const ARGS_MIN_ARR_ASSIGN: usize = 6;
+pub const IDX_ARR_KEY_IN: usize     = 2; // "in"
+pub const IDX_ARR_INDEX: usize      = 3;
+pub const IDX_ARR_KEY_WITH: usize   = 4; // "with"
+pub const IDX_ARR_VALUE: usize      = 5;
 
-// --- declaration.rs CONSTANTS ---
+// Math: add <TARGET> with <SOURCE>
+// Indices: 0   1        2    3
+pub const IDX_MATH_TARGET: usize    = 1;
+pub const IDX_MATH_SOURCE: usize    = 3;
+pub const IDX_FILE_NAME: usize      = 1;
 
-//  Syntax: mayihave <variable_name> in <NAME> as int
-// Syntax: group <variable_size> in <name> as int
-pub const MIN_CREATE_VAR_ARGS: usize = 6;
-pub const INDEX_KEYWORD_CREATE_VARIABLE: usize = 0; //mayihave
-pub const INDEX_KEYWORD_CREATE_INSERT_VARIABLE_VALUE: usize = 1; // value
-pub const INDEX_KEYWORD_CREATE_CONNECTOR_VALUE_TO_VARIABLE_NAME: usize = 2; // in
-pub const INDEX_KEYWORD_CREATE_DEFINE_VARIABLE_NAME: usize = 3; // variable_name
-pub const INDEX_KEYWORD_CREATE_CONNECTOR_VARIABLE_NAME_TO_VARIABLE_TYPE: usize = 4; // as
-pub const INDEX_KEYWORD_CREATE_VARIABLE_TYPE: usize = 5; // int
+// ================================================================
+// 5. SHELL CONSTANTS
+// ================================================================
+pub const SHELL_IDX_CMD: usize = 0;
+pub const SHELL_LINE_INC: usize = 1;
+pub const SHELL_PROMPT: &str = ">";
+pub const SHELL_DIR_CURR: &str = ".";
+pub const SHELL_DIR_PREV: &str = "..";
+pub const SHELL_PATH_PREFIX: &str = "\\\\?\\";
+pub const SHELL_EMPTY: &str = "";
 
+pub const SHELL_CMD_SAVE: &str = "SAVE";
+pub const SHELL_CMD_EXIT: &str = "EXIT";
+pub const SHELL_CMD_CLEAR: &str = "CLEAR";
 
-
-// syntax:replace <variable_name> with <value>
-pub const MIN_REPLACE_VAR_ARGS: usize = 4;
-pub const INDEX_KEYWORD_REPLACE: usize = 0; // replace
-pub const INDEX_KEYWORD_REPLACE_VARIABLE_TARGET: usize = 1; // variable_name
-pub const INDEX_KEYWORD_REPLACE_CONNECTOR_VARIABLE_NAME_TARGET_TO_VALUE: usize = 2; // with
-pub const INDEX_KEYWORD_REPLACE_VALUE: usize = 3; // value
-
-
-// --- mommy_shell CONSTANTS ---
-pub const INDEX_DEFAULT_STARTING_COMMAND_ARGS: usize = 0;
-pub const SHELL_LINE_INCREMENTOR: usize = 1;
-pub const SHELL_LINE_INDICATOR: &str = ">";
-pub const SHELL_CURRENT_DIRECTORY_KEYWORD: &str = ".";
-pub const SHELL_PREVIOUS_DIRECTORY_KEYWORD: &str = "..";
-
-pub const WINDOWS_EXTENDED_LENGTH_PATH_PREFIX: &str = "\\\\?\\";
-pub const SHELL_EMPTY_STRING: &str = "";
-
-pub const SHELL_IDE_SAVE_FILE_KEYWORD: &str = "SAVE";
-pub const SHELL_IDE_EXIT_KEYWORD: &str = "EXIT";
-pub const SHELL_IDE_CLEAR_KEYWORD: &str = "CLEAR";
-
-// --- conditions.rs CONSTANTS ---
-
-pub const MIN_ARGS_CONDITIONS_LEN: usize = 3;
-pub const CONDITIONS_IF_KEYWORD: &str = "if";
-pub const CONDITIONS_OR_KEYWORD: &str = "}else {";
-
-
-// --- mommy_lang.rs CONSTANTS ---
-pub const SYMBOL_OPERAND_ADDITION: &str = "+";
-pub const SYMBOL_OPERAND_SUBTRACTION: &str = "-";
-pub const SYMBOL_OPERAND_DIVISION: &str = "/";
-pub const SYMBOL_OPERAND_MULTIPLICATION: &str = "*";
-pub const SYMBOL_OPERAND_MODULO: &str = "%";
-
-pub const KEYWORD_START_C_FILE: &str = "int main(){";
-pub const SYMBOL_END_C_FILE: &str = "}";
-pub const KEYWORD_EXIT_C_FILE: &str = "return 0;";
-
-pub const TRANSPILE_ERROR_SPECIFIC_LINE: &str = "Line";
-pub const INDEX_FILE_NAME: usize = 1;
-
-
-// --- alu.rs CONSTANTS ---
-
-pub const INDEX_VARIABLE_TARGET: usize = 1;
-pub const INDEX_VARIABLE_SOURCE: usize = 3;
-
-pub const VARIABLE_TYPE_STRING: &str = "String";
-pub const VARIABLE_TYPE_C_STRING: &str = "char*";
-pub const OPERATOR_DIVISION: &str = "/";
-pub const VALUE_ZERO: &str = "0";
-
+pub const IDX_STARTING_COMMAND: usize = 0;

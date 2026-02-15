@@ -74,7 +74,7 @@ fn shell_start_default(mut input: String, root_dir: &std::path::PathBuf) { // Ad
 
     loop {
         input.clear();
-        print!("{}", constants::SHELL_LINE_INDICATOR);
+        print!("{}", constants::SHELL_PROMPT);
         io::stdout().flush().unwrap();
 
         io::stdin()
@@ -109,7 +109,7 @@ fn shell_read_file(file_name: &str){
     let reader = BufReader::new(file);
     for (index, line) in reader.lines().enumerate() {
         match line {
-            Ok(l) => println!("{}. {}", index + constants::SHELL_LINE_INCREMENTOR, l),
+            Ok(l) => println!("{}. {}", index + constants::SHELL_LINE_INC, l),
             Err(_) => break,
         }
     }
@@ -121,7 +121,7 @@ fn shell_return_to_prev_directory(root_dir: &std::path::PathBuf) {
     if current_dir.canonicalize().unwrap() == root_dir.canonicalize().unwrap() {
         println!("{}", responses::MommyShellError::RootDirectoryLocked);
     } else {
-        match set_current_dir(constants::SHELL_PREVIOUS_DIRECTORY_KEYWORD) {
+        match set_current_dir(constants::SHELL_DIR_PREV) {
             Ok(_) => println!("{}", responses::MommyShellOk::DirectoryChanged),
             Err(_) => println!("{}", responses::MommyShellError::GeneralInvalid),
         }
@@ -147,7 +147,7 @@ fn shell_delete_file(file_name: &str) {
     }
 }
 fn shell_list_files_in_directory() {
-    let files = fs::read_dir(constants::SHELL_CURRENT_DIRECTORY_KEYWORD).expect(&responses::MommyShellError::CannotListFiles.to_string());
+    let files = fs::read_dir(constants::SHELL_DIR_CURR).expect(&responses::MommyShellError::CannotListFiles.to_string());
 
     for entry in files {
         let entry = entry.expect(&responses::MommyShellError::CannotListFiles.to_string());
@@ -182,7 +182,7 @@ fn shell_move_directory(path: &str, root_dir: &std::path::PathBuf) {
             if canonical_target.starts_with(root_dir.canonicalize().unwrap()) {
                 if set_current_dir(&canonical_target).is_ok() {
                     let raw_path = shell_get_directory_return();
-                    let display_path = raw_path.replace(constants::WINDOWS_EXTENDED_LENGTH_PATH_PREFIX, constants::SHELL_EMPTY_STRING);
+                    let display_path = raw_path.replace(constants::SHELL_PATH_PREFIX, constants::SHELL_EMPTY);
                     println!("Moved Inside: {}", display_path);
                 }
             } else {
@@ -204,7 +204,7 @@ fn shell_attempt_command(input: &str, root_dir: &std::path::PathBuf) {
         return;
     }
 
-    let first_args = shell_commands::MommyShellCommands::from_str(args[constants::INDEX_DEFAULT_STARTING_COMMAND_ARGS]);
+    let first_args = shell_commands::MommyShellCommands::from_str(args[constants::IDX_STARTING_COMMAND]);
 
     match first_args { // 0
         //1 Args
@@ -248,10 +248,10 @@ fn shell_run_file(filename: &str) {
             }
         },
         "txt" => {
-            simple_exec(constants::RUN_NOTEPAD, filename);
+            simple_exec(constants::CMD_RUN_NOTEPAD, filename);
         },
         "py" => {
-            simple_exec(constants::RUN_PYTHON, filename);
+            simple_exec(constants::CMD_RUN_PYTHON, filename);
         },
         _ => {
             println!("{}", responses::MommyShellError::CannotOpenFile)
@@ -304,11 +304,11 @@ fn shell_start_coding() {
 
         io::stdin().read_line(&mut input).expect(&responses::MommyShellError::CannotCreateFile.to_string());
 
-        if input.trim() == constants::SHELL_IDE_SAVE_FILE_KEYWORD {
+        if input.trim() == constants::SHELL_CMD_SAVE {
             break;
-        } else if input.trim() == constants:: SHELL_IDE_EXIT_KEYWORD {
+        } else if input.trim() == constants:: SHELL_CMD_EXIT {
             return;
-        } else if input.trim() == constants::SHELL_IDE_CLEAR_KEYWORD {
+        } else if input.trim() == constants::SHELL_CMD_CLEAR {
             lite_ide.clear();
             line_count = 1;
             println!("{}", responses::MommyUI::RestartCLI);
@@ -336,7 +336,7 @@ fn shell_save_coding(lite_ide: &str) {
     let final_filename = validate_file(&clean_name);
 
     // Without this, fs::write crashes on a fresh install.
-    let sandbox_dir = constants::IDE_OUTPUT_DIRECTORY;
+    let sandbox_dir = constants::DIR_OUTPUT;
     if !Path::new(sandbox_dir).exists() {
         if let Err(_) = fs::create_dir_all(sandbox_dir) {
             println!("Mommy Error: I tried to build the sandbox, but the OS said no.");
@@ -372,10 +372,10 @@ fn shell_instant_run_mommy_file(full_path: &str) {
 }
 
 fn validate_file(clean_name: &str) -> String {
-    if clean_name.ends_with(constants::EXTENSION_SOURCE) {
+    if clean_name.ends_with(constants::EXT_SOURCE) {
         clean_name.to_string()
     } else {
-        format!("{}{}", clean_name, constants::EXTENSION_SOURCE)
+        format!("{}{}", clean_name, constants::EXT_SOURCE)
     }
 }
 
@@ -387,7 +387,7 @@ fn run_mommy_lang(filename: &str) {
         .unwrap_or_else(|_| std::path::PathBuf::from(filename));
 
     let clean_path = absolute_path.to_string_lossy().replace(
-        constants::WINDOWS_EXTENDED_LENGTH_PATH_PREFIX, constants::SHELL_EMPTY_STRING);
+        constants::SHELL_PATH_PREFIX, constants::SHELL_EMPTY);
 
     let (cmd, args) = if cfg!(debug_assertions) {
         ("cargo".to_string(), vec!["run".into(), "-p".into(), "mommy_lang".into(), "--".into(), clean_path]) // Do not touch this to be a const for now.

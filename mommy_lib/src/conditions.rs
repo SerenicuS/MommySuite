@@ -2,18 +2,25 @@ use crate::responses;
 use crate::constants;
 
 pub fn ask(tokens: &Vec<String>) -> Result<String, responses::MommyLangError>{
-    if tokens.len() < constants::MIN_ARGS_CONDITIONS_LEN{
+    // 1. Check if we have enough words ("ask if x")
+    if tokens.len() < constants::ARGS_MIN_COND {
         return Err(responses::MommyLangError::MissingArguments);
     }
 
-    if tokens[1] != constants::CONDITIONS_IF_KEYWORD {
-        return Err(responses::MommyLangError::SyntaxError); // Or "Mommy expects you to ask nicely with 'if'"
+    // 2. Ensure the user said "if"
+    // Note: tokens[0] is "ask", tokens[1] must be "if"
+    if tokens[1] != constants::KW_IF {
+        return Err(responses::MommyLangError::SyntaxError);
     }
 
-    let condition = &tokens[2..].join(" ");
-    Ok(format!("if ({}) {{", condition)) 
+    // 3. Construct the C condition
+    // Join the rest of the tokens (x == 10) with spaces
+    let condition = tokens[2..].join(constants::SYM_WHITESPACE);
+
+    Ok(format!("if ({}) {{", condition))
 }
 
 pub fn or() -> Result<String, responses::MommyLangError> {
-    Ok(format!("{}", constants::CONDITIONS_OR_KEYWORD))
+    // Just return "} else {"
+    Ok(constants::KW_ELSE_BLOCK.to_string())
 }
