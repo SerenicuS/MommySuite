@@ -1,7 +1,6 @@
 # 🦀 MommySuite: Rust-Based Systems Ecosystem
 
 > A **complete language ecosystem** built in Rust: custom shell + transpiler + compiler + standard library.
-> Think of it as building your own programming language from scratch.
 
 ---
 
