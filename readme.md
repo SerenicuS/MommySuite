@@ -1,166 +1,410 @@
 # 🦀 MommySuite: Rust-Based Systems Ecosystem
-> *A Custom Shell, Compiler, and Standard Library written in Rust.*
 
-## 🤔 Why did I create this unhinged masterpiece?
-As a student who wants to learn system concepts, I want to understand how each system feature *actually* works. Building a terminal seemed like a good way to learn, but I wanted to go deeper.
-
-But honestly, creating a standard terminal is boring. So I built a **complete language ecosystem** (Shell + Transpiler + Library) for fun and to practice what I've learned in **Rust** and **Low-Level Memory Management**.
-
-I'm hoping to keep improving and get better as a **Systems Programmer** through projects like this.
+> A **complete language ecosystem** built in Rust: custom shell + transpiler + compiler + standard library.
+> Think of it as building your own programming language from scratch.
 
 ---
 
-## ⚙️ Architecture
-* Lexer & Parser: Custom-built tokenizer that handles state management (e.g., handling spaces inside string literals vs. code blocks).
-* Transpilation: Maps abstract syntax to optimized C code, leveraging GCC for binary generation.
-* Process Management: Uses Rust's std::process to spawn child processes for compilation and system commands.
-* Memory Safety: While MommyLang allows raw pointers (box), the compiler (Rust) ensures the transpiler itself is memory-safe.
-* C and Rust Combination: Using Rust to translate my eso lang into C.
+## 📋 Quick Overview
+
+**What is MommySuite?**
+- 🔤 **Custom Language** - MommyLang: A playful domain-specific language
+- 🐚 **Interactive Shell** - 20+ commands for file/system operations
+- 🔨 **Full Compiler** - Transpiles to C, compiles with GCC
+- 📚 **Standard Library** - Shared utilities for all components
+- ~2650 lines of Rust, modular architecture, production-quality error handling
+
+**The Three Components:**
+```
+MommySuite
+├── mommy_lib (1500 lines)      → Shared language logic
+├── mommy_shell (800 lines)     → Interactive terminal UI
+└── mommy_lang (350 lines)      → Compiler/transpiler
+```
+
+---
+
+## 🚀 Quick Start
+
+```bash
+# Clone and build
+cargo build --release
+
+# Run the shell
+./target/release/mommy_shell.exe
+
+# Or compile a .mommy file directly
+./target/release/mommy_lang.exe path/to/program.mommy
+```
+
+**Try this in the shell:**
+```
+> walkwithme sandbox
+> runthis palindrome.mommy
+```
+
+---
+
+## 🤔 Why I Built This
+
+As a student learning systems concepts, I wanted to **understand how things actually work** at a deep level—not just follow tutorials.
+
+Building just a shell was boring. So I went all-in: created a **complete language ecosystem** combining:
+- Compiler design (lexing, parsing, code generation)
+- Systems programming (process spawning, file I/O, memory management)
+- Software architecture (modular design, error handling)
+- User experience (narrative-driven interface)
+
+**Goal:** Become a better **Systems Programmer** through deep, hands-on learning.
+
+---
+
+## 📖 Table of Contents
+
+1. [Architecture Overview](#-architecture-overview)
+2. [How to Use](#-how-to-use--mommyshell-commands)
+3. [MommyLang Syntax](#-mommylang-syntax)
+4. [Development Phases](#-development-phases)
+5. [Project Structure](#-project-structure)
+
+---
+
+## ⚙️ Architecture Overview
+
+### **High-Level Design**
+
+```
+┌─────────────────────────────────────────┐
+│         MommySuite Ecosystem            │
+├─────────────────────────────────────────┤
+│                                         │
+│  mommy_lang (Compiler)                  │
+│  ├─ Lexer → Parser → Code Gen → GCC     │
+│  └─ Converts .mommy files to .exe       │
+│                                         │
+│  mommy_shell (Terminal UI)              │
+│  ├─ 20+ commands (file, dir, exec)      │
+│  └─ Interactive prompt with personality │
+│                                         │
+│  mommy_lib (Shared Library)             │
+│  ├─ Language core (lexer, parser, etc)  │
+│  ├─ Error handling (25+ error types)    │
+│  ├─ Configuration persistence           │
+│  └─ Unified UI formatting               │
+│                                         │
+└─────────────────────────────────────────┘
+```
+
+### **Component Details**
+
+| Component | Purpose | Key Files |
+|-----------|---------|-----------|
+| **mommy_lib** | Language logic + utilities | `syntax_lexer.rs`, `declaration.rs`, `alu.rs`, `loops.rs`, `conditions.rs`, `io.rs`, `responses.rs`, `shell_format.rs`, `config.rs` |
+| **mommy_shell** | User-facing terminal | `main.rs`, `file_ops.rs`, `dir_ops.rs`, `exec_ops.rs`, `config_ops.rs`, `editor_ops.rs`, `help_ops.rs`, `windows_ops.rs` |
+| **mommy_lang** | Compiler/transpiler | Single `main.rs` with compilation pipeline |
+
+### **Key Design Principles**
+
+- ✅ **Modular**: Each component has one clear responsibility
+- ✅ **Shared Library**: `mommy_lib` used by both shell and compiler (no duplication)
+- ✅ **Narrative UI**: All output maintains consistent "mommy" personality
+- ✅ **Error-Aware**: 25+ distinct error types with helpful messages
+- ✅ **Persistent**: Settings saved to `mommy_conf.memory` across sessions
+- ✅ **Well-Organized**: ~2650 lines across 22 focused files
 
 ![Hello World!](readme_assets/hello-world.gif)
 
-## ⚠️ DISCLAIMER
-**This project is for EDUCATIONAL PURPOSES ONLY.**
-* 🎓 Created to practice system-level concepts (Processes, Memory, Pointers).
-* 🚫 Not intended for actual production use.
-* 🤪 The naming convention is a "creative constraint" used purely for satire and entertainment.
-* 🔨 This project is still under active development.
+---
 
-> **💥 SAFETY WARNING**
-> This shell has **real system access**. It can:
-> 1. Delete files in the current directory (even System32, so **do not use admin rights** ❌).
-> 2. Create new files and folders.
-> 3. Run basic Windows/Linux process commands.
+## 🎨 Shell UI & Features
 
-## 🐚 Environment (MommyShell)
+### **Unified Formatting System** (`shell_format.rs`)
 
-### Basic Navigation
-| MommyShell Command | Standard Equivalent | Function |
-| :--- | :--- | :--- |
-| **`tellme`** | `help` | List available commands. |
-| **`mayileave`** | `exit` | Exit the terminal. |
-| **`iamhere`** | `pwd` | Locate current directory. |
-| **`mommy?`** | `ls` / `dir` | List files in current directory. |
-| **`walkwithme <dir>`** | `cd <dir>` | Move to another directory. |
-| **`goback`** | `cd ..` | Return to previous directory. |
+All shell output uses consistent, narrative-driven formatting:
 
-### File & System Management
-| MommyShell Command | Standard Equivalent | Function |
-| :--- | :--- | :--- |
-| **`canihave <file>`** | `touch` | Create a new file. |
-| **`takethe <file>`** | `del` / `rm` | Delete a file. |
-| **`letusplayhouse <dir>`** | `mkdir` | Create a directory. |
-| **`removethehouse <dir>`** | `rmdir` | Delete a directory. |
-| **`openthis <file>`** | `start` / `open` | Open a file in default app. |
-| **`readthis <file>`** | `cat` / `type` | Read file contents to console. |
-| **`doxxme`** | `ipconfig` | Show network configuration. |
-| **`callmeplease <ip>`** | `ping` | Ping a device. |
+```
+════════════════════════════════════════════════════════════════
+  │ Content here
+  │ Multiple lines supported
+════════════════════════════════════════════════════════════════
+```
 
-### Developer Tools (Advanced)
-| Command | Function | Description |
-| :--- | :--- | :--- |
-| **`runthis <file>`** | **Compile & Run** | Transpiles your `.mommy` file to C, compiles with GCC, and executes it. |
-| **`startcoding`** | **Enter Lite_IDE** | Launches the internal code editor for writing MommyLang scripts. |
+**Functions:**
+- `print_wrapper()` - Wraps messages with decorative borders
+- `print_line()` - Indented output with consistent formatting
+- `print_prompt()` - User prompt display (e.g., `> Harold`)
+- `read_prompted_line_with_error()` - Safe user input handling
 
-## 💬 MOMMYLANG SYNTAX SPECIFICATION
+### **Data Persistence** (`mommy_conf.memory`)
 
-## 1. Core Keywords (The "Vocabulary")
-These words are reserved by the parser and define the structure of the language.
-
-| Keyword      | Function                  | Source File      |
-|:-------------|:--------------------------|:-----------------|
-| `mayihave`   | Variable Declaration      | `declaration.rs` |
-| `group`      | Array Declaration         | `declaration.rs` |
-| `replace`    | Assignment (Var & Array)  | `declaration.rs` |
-| `in`         | Index / Container Marker  | `declaration.rs` |
-| `as`         | Type Definition Marker    | `declaration.rs` |
-| `with`       | Value Assignment Marker   | `declaration.rs` |
-| `address`    | Pointer Reference (`&`)   | `declaration.rs` |
-| `inside`     | Pointer Dereference (`*`) | `declaration.rs` |
-| `punishme`   | Loop (Count / Infinite)   | `loops.rs`       |
-| `punishmeif` | Loop Conditional          | `loops.rs`       |
-| `satisfied`  | Break Loop                | `loops.rs`       |
-| `done`       | End Block (`}`)           | `loops.rs`       |
-| `ask`        | Condition Start (`if`)    | `conditions.rs`  |
-| `or`         | Condition Else (`else`)   | `conditions.rs`  |
-| `leave`      | End Program (`return 0`)  | `main.rs`        |
-| `say`        | Print Output              | `io.rs`          |
+Your settings are saved and persist across sessions:
+- ✓ User's chosen name
+- ✓ Preferred code output directory
+- ✓ Shell customization preferences
 
 ---
 
-## 2. Grammar Patterns
+## 🐚 How to Use: MommyShell Commands
 
-### A. Variables (The "Box")
-**Declaration:**
-`mayihave <VALUE> in <NAME> as <TYPE>`
-* **Logic:** "Put 10 inside the box named 'age'."
-* **Example:** `mayihave 10 in age as int`
-* **Supported Types:** `int`, `float`, `char`, `String` (char*), `box` (int*), `ascii` (special character-array mode)
+### **Basic Navigation**
 
-**Assignment:**
-`replace <NAME> with <VALUE>`
-* **Example:** `replace age with 20`
+| Command | Equivalent | What it does |
+|---------|-----------|--------------|
+| `tellme` | `help` | List all available commands |
+| `mayileave` | `exit` | Exit the shell |
+| `iamhere` | `pwd` | Show current directory |
+| `mommy?` | `ls` / `dir` | List files in current directory |
+| `walkwithme <dir>` | `cd <dir>` | Navigate to a directory |
+| `goback` | `cd ..` | Go up one directory |
 
-### B. Pointers (The "Finger")
-**Get Address:**
-`replace <PTR_NAME> with <VAR_NAME> address`
-* **C Output:** `ptr = &var;`
+### **File Operations**
 
-**Write to Address (Dereference):**
-`replace <PTR_NAME> with <VALUE> inside`
-* **Safety:** Includes automatic `NULL` check.
-* **C Output:** `if(ptr!=NULL) *ptr = value;`
+| Command | Equivalent | What it does |
+|---------|-----------|--------------|
+| `canihave <file>` | `touch` | Create a new file |
+| `takethe <file>` | `rm` / `del` | Delete a file |
+| `readthis <file>` | `cat` / `type` | Display file contents |
+| `openthis <file>` | `start` / `open` | Open file in default app |
 
-### C. Arrays (The "Memory")
-**Declaration:**
-`group <SIZE> in <NAME> as <TYPE>`
-* **Example:** `group 5 in hello as ascii`
-* **Metadata:** Stored as `"array:<type>:<size>"`.
+### **Directory Operations**
 
-**Write to Slot:**
-`replace <ARRAY> in <INDEX> with <VALUE>`
-* **Example:** `replace hello in 0 with 72`
+| Command | Equivalent | What it does |
+|---------|-----------|--------------|
+| `letusplayhouse <dir>` | `mkdir` | Create a new directory |
+| `removethehouse <dir>` | `rmdir` | Delete a directory |
 
-**Read from Slot:**
-`replace <VAR> with <ARRAY> in <INDEX>`
-* **Example:** `replace temp with hello in i`
+### **System Operations**
 
-### D. Input/Output (The "Voice")
-**Scalar Print:**
-`say <NAME>`
-* **Logic:** Detects type from symbol table and prints with `\n`.
+| Command | Equivalent | What it does |
+|---------|-----------|--------------|
+| `doxxme` | `ipconfig` | Show network configuration |
+| `callmeplease <ip>` | `ping` | Ping a device/domain |
 
-**Array Peek (Specific Index):**
-`say <ARRAY> in <INDEX>`
-* **Example:** `say hello in 0` (Prints 'H')
+### **Developer Tools** (Advanced)
 
-**Array Dump (Wildcard Operator):**
-`say <ARRAY> in ?`
-* **Logic:** If type is `ascii`, generates a `for` loop to print the full string.
-* **Example:** `say hello in ?` (Prints "HELLO")
+| Command | What it does |
+|---------|--------------|
+| `runthis <file>` | Compile & execute `.mommy` file (transpile → GCC → run) |
+| `startcoding` | Open code editor for writing MommyLang scripts |
+| `changeoutput <dir>` | Set directory for compiled files |
+| `clear` | Clear the screen |
 
-### E. Math (The "Pain")
-**Syntax:**
-`<OPERATION> <TARGET> with <VALUE>`
-* **Operations:** `add`, `subtract`, `multiply`, `divide`, `mod`
-* **Example:** `add temp with 1`
+---
 
-### F. Control Flow (The "Discipline")
-**Conditions:**
-```text
-ask if <CONDITION>
-    ...
+## 💬 MommyLang Syntax Guide
+
+### **1. Core Keywords**
+
+| Keyword | Purpose | Example |
+|---------|---------|---------|
+| `mayihave` | Declare variable | `mayihave 10 in age as int` |
+| `group` | Declare array | `group 5 in arr as int` |
+| `replace` | Assign value | `replace age with 20` |
+| `in` | Array index/container marker | `replace arr in 0 with 42` |
+| `as` | Type definition | `mayihave 10 in x as int` |
+| `with` | Value assignment | `replace x with 15` |
+| `address` | Get memory address (`&`) | `replace ptr with x address` |
+| `inside` | Dereference pointer (`*`) | `replace ptr with 5 inside` |
+| `punishme` | Loop (for) | `punishme 10` |
+| `punishmeif` | Conditional loop (while) | `punishmeif i < 10` |
+| `ask` | Condition (if) | `ask if x > 5` |
+| `or` | Else branch | `or` |
+| `satisfied` | Break loop | `satisfied` |
+| `done` | End block (`}`) | `done` |
+| `say` | Print output | `say hello` |
+| `leave` | Exit program | `leave` |
+
+### **2. Syntax Examples**
+
+#### **Variables** ("The Box")
+```
+mayihave 10 in age as int
+replace age with 20
+say age
+```
+
+#### **Arrays** ("The Memory")
+```
+group 5 in scores as int
+replace scores in 0 with 95
+say scores in 0
+```
+
+#### **Pointers** ("The Finger")
+```
+mayihave 10 in x as int
+replace ptr with x address
+replace ptr with 5 inside
+```
+
+#### **Loops** ("The Discipline")
+```
+punishme 10
+  say "hello"
+done
+
+punishmeif i < 10
+  add i with 1
+done
+```
+
+#### **Conditionals** ("The Rules")
+```
+ask if age > 18
+  say "adult"
 or
-    ...
+  say "minor"
 done
+```
 
-punishme <COUNT>
-    ...
-    ask if <CONDITION>
-        satisfied  <-- Break
-    done
-done
+#### **Arithmetic** ("The Pain")
+```
+mayihave 5 in x as int
+add x with 3
+subtract x with 1
+multiply x with 2
+divide x with 2
+mod x with 3
+```
 
-punishmeif <CONDITION>
-    say "hello"
-done
+---
+
+## ⚠️ Important Notes
+
+### **Disclaimer**
+**This project is for EDUCATIONAL PURPOSES ONLY.**
+- 🎓 Created to practice system-level concepts (Processes, Memory, Pointers)
+- 🚫 Not intended for production use
+- 🤪 Naming convention is a "creative constraint" for entertainment
+- 🔨 Still in active development
+
+### **Safety Warning** 💥
+
+**This shell has REAL system access. Be careful!**
+
+It can:
+1. ❌ Delete files in the current directory (even System32)
+   - **DO NOT run with admin rights**
+2. Create new files and folders
+3. Execute system commands (Windows/Linux)
+
+Always double-check commands before running!
+
+---
+
+---
+
+## 📈 Development Phases
+
+### **Phase 1: Core Language (✅ COMPLETE)**
+- [x] Variable declarations (int, float, char, String)
+- [x] Arrays (group keyword)
+- [x] Arithmetic operations (add, subtract, multiply, divide, mod)
+- [x] I/O operations (say/print)
+- [x] Conditionals (ask/if, or/else)
+- [x] Basic loops (punishme/for, punishmeif/while)
+- [x] Program control (leave/return)
+- [x] Basic shell with file/directory operations
+
+### **Phase 2: Discipline Update (🔧 IN PROGRESS)**
+- [x] Modular architecture refactor
+- [x] Unified shell formatting system (`shell_format.rs`)
+- [x] Data persistence (`mommy_conf.memory`)
+- [x] Constants module (100+ named constants)
+- [x] Pointer support (address, inside keywords)
+- [ ] Heap allocation (ibegyou keyword)
+- [ ] Standard input (listen keyword)
+- [ ] Package system (please use keyword)
+- [ ] Enhanced error messages
+- [ ] Security & sandboxing
+
+### **Phase 3: Stockholm Update (📋 PLANNED)**
+- [ ] Custom IDE editor (syntax highlighting, real-time editing)
+- [ ] Multi-file project support
+- [ ] Advanced debugging features
+- [ ] Performance optimizations
+- [ ] Terminal UI improvements
+
+### **Phase 4: OS Features (🚀 FUTURE)**
+- [ ] MommyOS kernel concepts
+- [ ] Process management
+- [ ] Memory allocation tracking
+- [ ] Custom standard library expansion
+
+---
+
+## 📊 Project Statistics
+
+| Metric | Value |
+|--------|-------|
+| **Total Lines (Rust)** | ~2650 |
+| **Core Library (mommy_lib)** | 14 modules |
+| **Shell Modules (mommy_shell)** | 8 modules |
+| **Language Keywords** | 25+ |
+| **Shell Commands** | 20+ |
+| **Error Types** | 25+ |
+| **Example Programs** | 8+ |
+
+---
+
+## 🏗️ Recent Refactoring (Phase 2)
+
+### **What Changed**
+- **Modularization**: Split monolithic shell code into focused modules (`file_ops.rs`, `dir_ops.rs`, etc.)
+- **Unified Formatting**: Introduced `shell_format.rs` library for consistent narrative-driven output
+- **Data Persistence**: Configuration now saved to `mommy_conf.memory` for cross-session state
+- **Constants Management**: Extracted 100+ magic numbers into named constants (`constants.rs`)
+- **Cleaner Architecture**: Each component has a single responsibility
+
+### **Why It Matters**
+- **Maintainability**: Easier to find and modify related functionality
+- **Reusability**: `shell_format` used by all shell operations and compiler
+- **Scalability**: Foundation for Phase 3 (IDE) and Phase 4 (OS features)
+- **Testing**: Smaller modules are easier to test independently
+
+---
+
+## 🤝 Contributing & Development
+
+This is an **educational project** demonstrating systems programming concepts in Rust.
+
+### **Architecture Principles**
+- **Single Responsibility**: Each module handles one concern
+- **Shared Library Pattern**: `mommy_lib` provides abstractions to `mommy_shell` and `mommy_lang`
+- **Narrative Design**: All user-facing output maintains consistent "mommy" personality
+- **Error Context**: Errors include line numbers, suggestions, and formatted messages
+
+### **Code Organization**
+```
+MommySuite/
+├── mommy_lib/          # Core language & utilities
+│   └── src/
+│       ├── syntax_lexer.rs      # Tokenization
+│       ├── declaration.rs       # Variable/array/pointer management
+│       ├── alu.rs               # Arithmetic operations
+│       ├── io.rs                # Input/output
+│       ├── loops.rs/conditions.rs # Control flow
+│       ├── responses.rs         # Error & UI messages
+│       ├── shell_format.rs      # Unified formatting (NEW)
+│       ├── config.rs            # Settings persistence
+│       └── [other modules...]
+├── mommy_shell/        # User interface (Terminal)
+│   └── src/
+│       ├── main.rs              # CLI entry point
+│       ├── file_ops.rs          # File management
+│       ├── dir_ops.rs           # Directory navigation
+│       ├── exec_ops.rs          # Program execution
+│       └── [other modules...]
+└── mommy_lang/         # Compiler/Transpiler
+    └── src/
+        └── main.rs              # Compilation pipeline
+```
+
+---
+
+## 📝 License & Attribution
+
+Created as an educational exploration of **systems programming** in Rust.
+Made by "HiveMind" to showcase learning and growth as a systems programmer.
+
+**⚠️ Not for production use.** This project is for learning purposes only.
