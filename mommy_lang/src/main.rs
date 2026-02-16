@@ -54,6 +54,7 @@ use mommy_lib::responses;
 use mommy_lib::constants;
 use mommy_lib::lang_enums::ScopeType;
 use mommy_lib::packages;
+use mommy_lib::shell_format::{print_line, eprint_line};
 
 
 
@@ -220,7 +221,7 @@ fn transpile_code_to_c(config: &Config) -> Result<(), String> {
     // this should be dynamic as we want to make the user add modules/packages
     let include = packages::CStandardPackages::InputOutput.to_string();
     if include.trim().is_empty() {
-        eprintln!("{}", responses::MommyLangError::UnknownPackage);
+        eprint_line(responses::MommyLangError::UnknownPackage);
     } else {
         writeln!(output_file, "{}", include).unwrap();
     }
@@ -266,38 +267,38 @@ fn main() {
     let config = match Config::new(&args){ // Prepare the file
         Ok(cfg) => cfg,
         Err(e) => {
-            eprintln!("{}", e);
+            eprint_line(e);
             std::process::exit(1);
         }
     };
 
 
     if let Err(e) = transpile_code_to_c(&config){ //Convert mommylang to C
-        println!("{}", responses::MommyLangError::ErrorBegins);
-        eprintln!("{}", e);
+        print_line(responses::MommyLangError::ErrorBegins);
+        eprint_line(e);
         show_c_conversion_error(&config); // show fragmented c code
-        eprintln!("{}", responses::MommyLangError::ConvertLangFailed);
-        println!("{}", responses::MommyLangError::ErrorEnds);
+        eprint_line(responses::MommyLangError::ConvertLangFailed);
+        print_line(responses::MommyLangError::ErrorEnds);
         std::process::exit(1);
     }
 
     if let Err(e) = compile_to_gcc(&config){ //use GCC to create exe file for the converted C
-        println!("{}", responses::MommyLangError::ErrorBegins);
-        eprintln!("{}", responses::MommyLangError::GCCError);
-        eprintln!("{}", e);
-        println!("{}", responses::MommyLangError::ErrorEnds);
+        print_line(responses::MommyLangError::ErrorBegins);
+        eprint_line(responses::MommyLangError::GCCError);
+        eprint_line(e);
+        print_line(responses::MommyLangError::ErrorEnds);
         std::process::exit(1);
     }
 
-    println!("{}", responses::MommyLangStatus::CodeOutputBegins);
+    print_line(responses::MommyLangStatus::CodeOutputBegins);
     if let Err(e) = run_mommy_file(&config){ // Run the exe file
-        println!("{}", responses::MommyLangError::ErrorBegins);
-        eprintln!("{}", responses::MommyLangError::RuntimeError);
-        eprintln!("{}", e);
-        println!("{}", responses::MommyLangError::ErrorEnds);
+        print_line(responses::MommyLangError::ErrorBegins);
+        eprint_line(responses::MommyLangError::RuntimeError);
+        eprint_line(e);
+        print_line(responses::MommyLangError::ErrorEnds);
         std::process::exit(1);
     }
-    println!("{}", responses::MommyLangStatus::CodeOutputEnds);
+    print_line(responses::MommyLangStatus::CodeOutputEnds);
 }
 
 fn run_mommy_file(config: &Config) -> Result<(), String> {
@@ -338,8 +339,8 @@ fn compile_to_gcc(config: &Config) -> Result<(), String>{
 
 fn show_c_conversion_error(log: &Config){
     let contents = fs::read_to_string(&log.c_path).expect(&responses::MommyLangError::CannotReadFile.to_string()); // temporary, replace it with legit error
-    println!("{}", responses::MommyLangStatus::ConversionErrorStart);
+    print_line(responses::MommyLangStatus::ConversionErrorStart);
     println!("{}", contents);
-    println!("{}", responses::MommyLangStatus::ConversionErrorEnds);
+    print_line(responses::MommyLangStatus::ConversionErrorEnds);
     let _ = fs::remove_file(&log.c_path); // Remove the file if the process of compiling it into C fails. Deleting the file manually is tiring.
 }

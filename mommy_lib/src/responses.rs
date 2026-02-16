@@ -131,6 +131,13 @@ pub enum MommyUI {
     GenericObedience,
     NewLine,
     Clear,
+    RejectName,
+    SelfExit,
+    AcceptNewName,
+    BrainError,
+    MommyAcknowledge,
+    MommyDoubt,
+    TerminateUser,
 }
 
 
@@ -269,6 +276,13 @@ impl fmt::Display for MommyUI {
             Self::AskName => write!(f, "Do you know who you are?"),
             Self::ConfirmName => write!(f, "Tell me your name. Don't lie."),
             Self::GenericObedience => write!(f, "Good boy. Always listen to your mommy."),
+            Self::RejectName => write!(f, "That name is not acceptable. You are not that. Try again."),
+            Self::SelfExit => write!(f, "You are not my child."),
+            Self::TerminateUser => write!(f, "BLAM!........."),
+            Self::AcceptNewName => write!(f, "I am sorry sweetie, You are right, you are:"),
+            Self::BrainError => write!(f, "I don't understand."),
+            Self::MommyAcknowledge => write!(f, "Welcome back sweetie"),
+            Self::MommyDoubt => write!(f, "How do you know my real name?"),
 
             Self::ChaosDidNotHear => write!(f, "I didn't hear you. Speak up."),
             Self::ChaosWrongCommand => write!(f, "You are repeating yourself. I hate repetition."),

@@ -150,6 +150,16 @@ pub const SHELL_DIR_PREV: &str = "..";
 pub const SHELL_PATH_PREFIX: &str = "\\\\?\\";
 pub const SHELL_EMPTY: &str = "";
 
+pub const SEPARATOR: &str = "────────────────────────────────────────────────────────────────";
+pub const SEPARATOR_THICK: &str = "════════════════════════════════════════════════════════════════";
+pub const SEPARATOR_DOUBLE: &str = "\n────────────────────────────────────────────────────────────────\n";
+
+// Spacing (NEW)
+pub const SPACE_SECTION: &str = "\n";      // Between major sections
+pub const SPACE_SUBSECTION: &str = "\n";     // Between related items
+pub const SPACE_PROMPT: &str = "> ";       // Before user input
+pub const INDENT_OUTPUT: &str = "  │ ";      // For multi-line output
+
 pub const SHELL_CMD_SAVE: &str = "SAVE";
 pub const SHELL_CMD_EXIT: &str = "EXIT";
 pub const SHELL_CMD_CLEAR: &str = "CLEAR";
@@ -157,7 +167,6 @@ pub const SHELL_CMD_CLEAR: &str = "CLEAR";
 pub const IDX_STARTING_COMMAND: usize = 0;
 
 
-pub const SEPARATOR: &str = "----------------------------------------------------------------";
 
 
 pub const SHELL_BASIC_COMMANDS: &str = r#"
@@ -190,3 +199,13 @@ pub const SHELL_ADVANCE_COMMANDS: &str = r#"
      2. changeoutput <dir_name>     ->    Change Code Dir(sandbox default)
     ---------------
     "#;
+
+pub const LETTER_SHELL_YES: &str = "Y";
+pub const LETTER_SHELL_NO: &str = "N";
+pub const LETTER_SHELL_T: &str = "T";
+
+pub const SHELL_DBG_FILE: &str = "discipline-update-test.mommy";
+
+pub const SHELL_DF_USER: &str = "Harold"; // DF means default
+pub const SHELL_DF_PASS: &str = "Valeria";
+pub const SHELL_DF_ANGERYNESS: usize = 2; 

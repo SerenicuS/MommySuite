@@ -5,30 +5,27 @@ use crate::constants;
 
 pub struct MommySettings {
     pub output_directory: String,
-    // Secret memory: Where is the notebook?
+    pub user_name: String,
     config_file_path: PathBuf,
 }
 
 impl MommySettings {
-    // 1. Load requires the ROOT (Home Base)
-    pub fn load(root: &Path) -> Self {
-        // Construct the absolute path: C:\Project\shell_properties\mommy_conf.memory
+     pub fn load(root: &Path) -> Self {
         let config_path = root.join("shell_properties").join("mommy_conf.memory");
-
-        // Try to read
         let content = fs::read_to_string(&config_path).unwrap_or_default();
 
-        // Default settings
         let mut settings = Self {
-            output_directory: constants::DIR_OUTPUT.to_string(), // default "sandbox"
-            config_file_path: config_path, // Remember the absolute path!
+            output_directory: constants::DIR_OUTPUT.to_string(),
+            user_name: String::new(),
+            config_file_path: config_path,
         };
 
-        // Parse (simple key=value)
         for line in content.lines() {
             if let Some((key, value)) = line.split_once('=') {
-                if key.trim() == "output" {
-                    settings.output_directory = value.trim().to_string();
+                match key.trim() {
+                    "output" => settings.output_directory = value.trim().to_string(),
+                    "user" => settings.user_name = value.trim().to_string(),
+                    _ => {}
                 }
             }
         }
@@ -36,15 +33,42 @@ impl MommySettings {
         settings
     }
 
-    // 2. Save uses the Absolute Path (Safe from 'cd')
-    pub fn save(&self) -> io::Result<()> {
-        let data = format!("output={}", self.output_directory);
+    pub fn save_path(&self) -> io::Result<()> {
+        let data = format!(
+            "output={}\nuser={}",
+            self.output_directory, self.user_name
+        );
 
-        // Ensure folder exists
         if let Some(parent) = self.config_file_path.parent() {
             let _ = fs::create_dir_all(parent);
         }
 
         fs::write(&self.config_file_path, data)
+    }
+    
+    pub fn save_user(&self, new_user: &str) -> io::Result<()> {
+        let content = fs::read_to_string(&self.config_file_path).unwrap_or_default();
+
+        let mut updated = String::new();
+        let mut user_found = false;
+
+        for line in content.lines() {
+            if let Some((key, _)) = line.split_once('=') {
+                if key.trim() == "user" {
+                    updated.push_str(&format!("user={}\n", new_user));
+                    user_found = true;
+                } else {
+                    updated.push_str(&format!("{}\n", line));
+                }
+            } else {
+                updated.push_str(&format!("{}\n", line));
+            }
+        }
+
+        if !user_found {
+            updated.push_str(&format!("user={}\n", new_user));
+        }
+
+        fs::write(&self.config_file_path, updated.trim())
     }
 }

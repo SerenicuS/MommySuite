@@ -11,3 +11,4 @@ pub mod shell_commands;
 pub mod lang_enums;
 pub mod packages;
 pub mod config;
+pub mod shell_format;
