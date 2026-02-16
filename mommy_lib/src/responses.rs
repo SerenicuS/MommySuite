@@ -84,6 +84,7 @@ pub enum MommyShellOk {
     Terminated,
     NetworkInfoRevealed,
     PingAttempted,
+    ConfigUpdated,
 }
 
 pub enum MommyShellError {
@@ -106,6 +107,7 @@ pub enum MommyShellError {
     ExternalIPConfigCallFail,
     ExternalCommandFailed,
     ExternalConsoleBroken,
+    ConfigSaveError,
 }
 
 // =========================================================
@@ -214,6 +216,7 @@ impl fmt::Display for MommyShellOk {
             Self::DirectoryReturned => write!(f, "Back to safety. Good."),
             Self::DirectoryCreated => write!(f, "A new room for us. Keep it clean."),
             Self::DirectoryDeleted => write!(f, "I removed that place. It was cluttering my house."),
+            Self::ConfigUpdated => write!(f, "That is how you want me to be sweetie?"),
 
             Self::ProcessLaunched => write!(f, "I let it run. Watch it closely."),
             Self::Terminated => write!(f, "I killed it. Silence is better."),
@@ -241,6 +244,7 @@ impl fmt::Display for MommyShellError {
             Self::CannotListFiles => write!(f, "There is nothing here for you."),
             Self::RootDirError => write!(f, "Mommy can't find the floor."),
             Self::CannotReadFile => write!(f, "Mommy can't read this language sweetie, is this your escape plan?"),
+            Self::ConfigSaveError => write!(f, "Mommy is confused about myself sweetie."),
 
             Self::SystemCrash => write!(f, "Look what you did. You broke it. Now I have to clean up your mess."),
             Self::ProcessNotFound => write!(f, "That doesn't exist. Focus, sweetie."),

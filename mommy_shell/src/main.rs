@@ -8,44 +8,15 @@ use std::process::Command;
 use mommy_lib::responses;
 use mommy_lib::constants;
 use mommy_lib::shell_commands;
-const SEPARATOR: &str = "----------------------------------------------------------------";
+use mommy_lib::config;
 
-
-const SHELL_BASIC_COMMANDS: &str = r#"
-    You are too greedy.
-    ---------------
-     1. tellme                      ->    List Commands
-     2. mayileave                   ->    Exit the Terminal
-     3. iamhere                     ->    Locate current Directory
-     4. mommy?                      ->    List Files in current Directory
-     5. walkwithme <filename>       ->    Move to another Directory
-     6. goback                      ->    Return to Previous Directory
-     7. canihave <filename>         ->    Create File
-     8. takethe <filename>          ->    Delete File
-     9. openthis <filename>         ->    Open the File
-    10. readthis <filename>         ->    Read the File's contents
-    11. doxxme                      ->    Windows Ip Configuration
-    12. callmeplease <ip/dns>       ->    Ping device
-    13. runthis <filename>          ->    Run File
-    14. clear                       ->    Clear Terminal
-    15. letusplayhouse              ->    Create Directory
-    16. removethehouse              ->    Delete Directory
-    ---------------
-    "#;
-
-
-const SHELL_ADVANCE_COMMANDS: &str = r#"
-    You are too greedy.
-    ---------------
-     1. startcoding                 ->    Enter lite_IDE
-    ---------------
-    "#;
 
 
 
 
 fn main() {
     let root_dir = env::current_dir().expect(&responses::MommyShellError::RootDirError.to_string());
+    let mut mommy_settings = config::MommySettings::load(&root_dir);
 
     println!("{}", responses::MommyUI::WelcomeTitle);
     println!("{}", responses::MommyUI::WelcomeSubtitle);
@@ -58,7 +29,7 @@ fn main() {
         io::stdin().read_line(&mut input).expect(&responses::MommyUI::ExitMessage.to_string());
 
         match input.trim(){
-            "Y" => shell_start_default(input, &root_dir),
+            "Y" => shell_start_default(input, &root_dir, &mut mommy_settings),
             "T" => shell_skip_default(&root_dir),
             _ => std::process::exit(0),
         }
@@ -68,11 +39,11 @@ fn main() {
 
 fn shell_skip_default(root_dir: &std::path::PathBuf){
     shell_move_directory("sandbox", root_dir);
-    run_mommy_lang("discipline-update-test.mommy");
+    run_mommy_lang("discipline-update-test.mommy"); // test
 }
 
 
-fn shell_start_default(mut input: String, root_dir: &std::path::PathBuf) { // Added root_dir
+fn shell_start_default(mut input: String, root_dir: &std::path::PathBuf, mommy_settings: &mut config::MommySettings) { // Added root_dir
     println!("{}", responses::MommyUI::GenericObedience);
 
     loop {
@@ -86,10 +57,10 @@ fn shell_start_default(mut input: String, root_dir: &std::path::PathBuf) { // Ad
 
 
 
-        println!("{}", SEPARATOR);
+        println!("{}", constants::SEPARATOR);
 
 
-        shell_attempt_command(&input, root_dir);
+        shell_attempt_command(&input, root_dir, mommy_settings);
     }
 }
 
@@ -169,11 +140,11 @@ fn shell_get_directory_return() -> String {
     dir.display().to_string()
 }
 fn shell_print_basic_help() {
-    println!("{}", SHELL_BASIC_COMMANDS);
+    println!("{}", constants::SHELL_BASIC_COMMANDS);
 }
 
 fn shell_print_advance_help() {
-    println!("{}", SHELL_ADVANCE_COMMANDS);
+    println!("{}", constants::SHELL_ADVANCE_COMMANDS);
 }
 
 fn shell_move_directory(path: &str, root_dir: &std::path::PathBuf) {
@@ -198,7 +169,7 @@ fn shell_move_directory(path: &str, root_dir: &std::path::PathBuf) {
 
 
 
-fn shell_attempt_command(input: &str, root_dir: &std::path::PathBuf) {
+fn shell_attempt_command(input: &str, root_dir: &std::path::PathBuf, mommy_settings: &mut config::MommySettings) {
     let clean_input = input.trim();
     let args: Vec<&str> = clean_input.split_whitespace().collect();
 
@@ -221,22 +192,44 @@ fn shell_attempt_command(input: &str, root_dir: &std::path::PathBuf) {
         shell_commands::MommyShellCommands::ShellClear => shell_clear(),
 
 
-        //Advanced
-        shell_commands::MommyShellCommands::ShellStartCoding => shell_prepare_coding(),
+        //Advance
+        shell_commands::MommyShellCommands::ShellStartCoding => shell_prepare_coding(mommy_settings),
 
         // 2 Args
         shell_commands::MommyShellCommands::ShellChangeDirectory if check_args_len(&args) => shell_move_directory(args[1], root_dir),
         shell_commands::MommyShellCommands::ShellCreateFile if check_args_len(&args) => shell_create_file(args[1]),
         shell_commands::MommyShellCommands::ShellDeleteFile if check_args_len(&args) => shell_delete_file(args[1]),
         shell_commands::MommyShellCommands::ShellOpenFile if check_args_len(&args) => shell_open_file(args[1]),
-        shell_commands::MommyShellCommands::ShellRunFile if check_args_len(&args) => shell_run_file(args[1]),
+        shell_commands::MommyShellCommands::ShellRunFile if check_args_len(&args) => shell_run_file(args[1], &mommy_settings.output_directory),
         shell_commands::MommyShellCommands::ShellReadFile if check_args_len(&args) => shell_read_file(args[1]),
         shell_commands::MommyShellCommands::ShellCreateDir if check_args_len(&args) => shell_create_dir(args[1]),
         shell_commands::MommyShellCommands::ShellDeleteDir if check_args_len(&args) => shell_delete_dir(args[1]),
+        shell_commands::MommyShellCommands::ShellChangeCodeDir if check_args_len(&args) => shell_change_code_dir(args[1], mommy_settings),
 
         // Error
         shell_commands::MommyShellCommands::ShellUnknownCommand => println!("{}", responses::MommyShellError::GeneralInvalid),
         _ => println!("{}", responses::MommyShellError::GeneralInvalid),
+    }
+}
+
+
+fn shell_change_code_dir(new_dir: &str, mommy_settings: &mut config::MommySettings) {
+    // 1. Get where we are standing right now
+    let current_working_dir = env::current_dir().unwrap();
+
+    // 2. Create the FULL PATH (e.g., C:\Users\You\Project\Deep\Folder\Test)
+    // We use .join() to combine the current location with the new folder name
+    let absolute_target = current_working_dir.join(new_dir);
+
+    // 3. Convert it to a string and save IT
+    mommy_settings.output_directory = absolute_target.to_string_lossy().to_string();
+
+    // 4. Save to file
+    if let Err(_) = mommy_settings.save() {
+        println!("{}", responses::MommyShellError::ConfigSaveError);
+    } else {
+        println!("{}", responses::MommyShellOk::ConfigUpdated);
+        println!("(Mommy set the output to: {})", mommy_settings.output_directory);
     }
 }
 
@@ -261,23 +254,32 @@ fn shell_delete_dir(dir_name: &str){
 }
 
 
-fn shell_run_file(filename: &str) {
-    let extension = Path::new(filename).extension().and_then(|ext| ext.to_str()).
+fn shell_run_file(file_name: &str, output_dir: &str) {
+    let extension = Path::new(file_name).extension().and_then(|ext| ext.to_str()).
         unwrap_or("");
 
-    match extension { //file type selection NOTE: it does not run without specifying the name
+    match extension {
         "mommy" => {
-            if let Ok(full_path) = fs::canonicalize(filename) {
-                run_mommy_lang(&full_path.to_string_lossy());
+            // 1. Build the path: "sandbox/test.mommy"
+           let base_path = Path::new(output_dir);
+
+            // 2. Use .join() instead of format! (This handles slashes and prefixes)
+            let target_path = base_path.join(file_name);
+
+            // 3. Check for existence using the Path object
+            if target_path.exists() {
+                run_mommy_lang(target_path.to_str().unwrap());
+            } else if Path::new(file_name).exists() {
+                run_mommy_lang(file_name);
             } else {
-                run_mommy_lang(filename);
+                println!("Mommy Error: I cannot find '{}' in '{}' or the current folder.", file_name, output_dir);
             }
         },
         "txt" => {
-            simple_exec(constants::CMD_RUN_NOTEPAD, filename);
+            simple_exec(constants::CMD_RUN_NOTEPAD, file_name);
         },
         "py" => {
-            simple_exec(constants::CMD_RUN_PYTHON, filename);
+            simple_exec(constants::CMD_RUN_PYTHON, file_name);
         },
         _ => {
             println!("{}", responses::MommyShellError::CannotOpenFile)
@@ -294,9 +296,9 @@ fn simple_exec(tool: &str, filename: &str) {
         .expect("Failed to run the command");
 }
 
-fn shell_prepare_coding() {
+fn shell_prepare_coding(mommy_settings: &mut config::MommySettings) {
     let mut input = String::new();
-    println!("{}", SEPARATOR);
+    println!("{}", constants::SEPARATOR);
     println!("{}", responses::MommyUI::PrepareCoding);
     println!("{}", responses::MommyUI::WelcomePrompt);
     input.clear();
@@ -305,7 +307,7 @@ fn shell_prepare_coding() {
 
 
     match input.trim() {
-        "Y" => shell_start_coding(),
+        "Y" => shell_start_coding(mommy_settings),
         _ => {
             println!("{}", responses::MommyUI::RefuseCoding);
             return;
@@ -313,10 +315,10 @@ fn shell_prepare_coding() {
     }
 }
 
-fn shell_start_coding() {
-    println!("{}", SEPARATOR);
+fn shell_start_coding(mommy_settings: &mut config::MommySettings) {
+    println!("{}", constants::SEPARATOR);
     println!("{}", responses::MommyUI::StartCoding);
-    println!("{}", SEPARATOR);
+    println!("{}", constants::SEPARATOR);
 
     let mut lite_ide = String::new();
     let mut line_count = 1;
@@ -345,45 +347,43 @@ fn shell_start_coding() {
         line_count += 1;
     }
 
-    shell_save_coding(&lite_ide);
+    shell_save_coding(&lite_ide, mommy_settings);
 }
 
-fn shell_save_coding(lite_ide: &str) {
-    println!("{}", SEPARATOR);
+fn shell_save_coding(lite_ide: &str, mommy_settings: &config::MommySettings) {
+    println!("{}", constants::SEPARATOR);
     println!("{}", responses::MommyLangStatus::RenameFile);
 
     let mut input_name = String::new();
-    io::stdin()
-        .read_line(&mut input_name)
-        .expect("Failed to read input");
-
+    io::stdin().read_line(&mut input_name).expect("Failed to read input");
     let clean_name = input_name.trim();
-
     let final_filename = validate_file(&clean_name);
 
-    // Without this, fs::write crashes on a fresh install.
-    let sandbox_dir = constants::DIR_OUTPUT;
-    if !Path::new(sandbox_dir).exists() {
-        if let Err(_) = fs::create_dir_all(sandbox_dir) {
-            println!("Mommy Error: I tried to build the sandbox, but the OS said no.");
+    // 1. Get the Absolute Path from settings
+    let target_dir_path = Path::new(&mommy_settings.output_directory);
+
+    // 2. Create it if it doesn't exist (Self-Healing)
+    if !target_dir_path.exists() {
+        if let Err(_) = fs::create_dir_all(target_dir_path) {
+            println!("Mommy Error: I tried to go to '{}', but I couldn't create it.", mommy_settings.output_directory);
             return;
         }
     }
 
-    let full_path = format!("{}/{}", sandbox_dir, final_filename);
+    // 3. Join them
+    let full_path = target_dir_path.join(final_filename);
 
-    // Write and Run
     match fs::write(&full_path, lite_ide) {
         Ok(_) => {
             println!("{}", responses::MommyShellOk::FileCreated);
-            shell_instant_run_mommy_file(&full_path);
+            shell_instant_run_mommy_file(full_path.to_str().unwrap());
         },
         Err(_) => println!("{}", responses::MommyShellError::CannotCreateFile),
     }
 }
 
 fn shell_instant_run_mommy_file(full_path: &str) {
-    println!("{}", SEPARATOR);
+    println!("{}", constants::SEPARATOR);
     println!("{}", responses::MommyLangStatus::PrepareRun);
     let mut ans = String::new();
     io::stdin().read_line(&mut ans).unwrap();
@@ -406,7 +406,7 @@ fn validate_file(clean_name: &str) -> String {
 }
 
 fn run_mommy_lang(filename: &str) {
-    println!("{}", SEPARATOR);
+    println!("{}", constants::SEPARATOR);
     println!("{}", responses::MommyLangStatus::CheckingFile);
 
     let absolute_path = fs::canonicalize(filename)
@@ -439,7 +439,7 @@ fn run_mommy_lang(filename: &str) {
         .args(&args)
         .status();
 
-    println!("{}", SEPARATOR);
+    println!("{}", constants::SEPARATOR);
 
     match status_result {
         Ok(status) if status.success() => println!("{}", responses::MommyLangStatus::ResultOk),

@@ -19,6 +19,7 @@ pub enum MommyShellCommands {
     ShellClear,                         // clear
     ShellCreateDir,                     // letusplayhouse    
     ShellDeleteDir,                     // removethehouse
+    ShellChangeCodeDir                  // changeoutput
 
 }
 
@@ -44,6 +45,7 @@ impl MommyShellCommands {
             "clear" => MommyShellCommands::ShellClear,
             "letusplayhouse" => MommyShellCommands::ShellCreateDir,
             "removethehouse" => MommyShellCommands::ShellDeleteDir,
+            "changeoutput" => MommyShellCommands::ShellChangeCodeDir,
             _ => MommyShellCommands::ShellUnknownCommand,
         }
     }
