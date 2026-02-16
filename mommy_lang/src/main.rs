@@ -5,6 +5,10 @@
 //!
 //! ---
 //!
+//!  Started: Jan 26, 2026
+//!  Amount of Time Spent(Too late to track): 3 hours.
+//!  Current: February 16, 2026
+//!
 //! ## 🛠️ Development Roadmap
 //!
 //! ### Phase 2: The Discipline Update (Current)
