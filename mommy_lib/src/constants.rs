@@ -149,6 +149,7 @@ pub const SHELL_DIR_CURR: &str = ".";
 pub const SHELL_DIR_PREV: &str = "..";
 pub const SHELL_PATH_PREFIX: &str = "\\\\?\\";
 pub const SHELL_EMPTY: &str = "";
+pub const VALERIA_ANGRY_METER_LIMIT: usize = 3;
 
 pub const SEPARATOR: &str = "────────────────────────────────────────────────────────────────";
 pub const SEPARATOR_THICK: &str = "════════════════════════════════════════════════════════════════";

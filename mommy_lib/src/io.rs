@@ -57,6 +57,12 @@ fn say_array(
     if index == constants::KW_ALL {
         if max_size == 0 { return Err(MommyLangError::AccessViolation); }
         return match inner_type {
+            t if t == constants::TYPE_ASCII =>
+                Ok(format!("for (int i = 0; i < {}; i++) {{ printf(\"%c\", {}[i]); }} printf(\"\\n\");", max_size, name)),
+            t if t == constants::TYPE_FLOAT =>
+                Ok(format!("for (int i = 0; i < {}; i++) {{ printf(\"%f \", {}[i]); }} printf(\"\\n\");", max_size, name)),
+            t if t == constants::C_TYPE_CHAR_PTR || t == constants::TYPE_STRING =>
+                Ok(format!("for (int i = 0; i < {}; i++) {{ printf(\"%s \", {}[i]); }} printf(\"\\n\");", max_size, name)),
             _ => Ok(format!("for (int i = 0; i < {}; i++) {{ printf(\"%d \", {}[i]); }} printf(\"\\n\");", max_size, name)),
         };
     }

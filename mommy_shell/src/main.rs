@@ -72,7 +72,7 @@ fn shell_ask_user(root_dir: &std::path::PathBuf, mommy_settings: &mut config::Mo
             &responses::MommyUI::ExitMessage.to_string(),
         );
 
-        if anger_level > 3 {
+        if anger_level > constants::VALERIA_ANGRY_METER_LIMIT {
             print_wrapper([
                 responses::MommyUI::SelfExit.to_string(),
                 responses::MommyUI::TerminateUser.to_string(),
