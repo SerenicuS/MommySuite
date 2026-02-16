@@ -62,10 +62,12 @@ Building just a shell was boring. So I went all-in: created a **complete languag
 ## 📖 Table of Contents
 
 1. [Architecture Overview](#-architecture-overview)
-2. [How to Use](#-how-to-use--mommyshell-commands)
-3. [MommyLang Syntax](#-mommylang-syntax)
-4. [Development Phases](#-development-phases)
-5. [Project Structure](#-project-structure)
+2. [Shell UI & Features](#-shell-ui--features)
+3. [How to Use](#-how-to-use-mommyshell-commands)
+4. [MommyLang Syntax Guide](#-mommylang-syntax-guide)
+5. [Important Notes](#-important-notes)
+6. [Development Phases](#-development-phases)
+7. [Project Statistics](#-project-statistics)
 
 ---
 
@@ -97,11 +99,11 @@ Building just a shell was boring. So I went all-in: created a **complete languag
 
 ### **Component Details**
 
-| Component | Purpose | Key Files |
-|-----------|---------|-----------|
-| **mommy_lib** | Language logic + utilities | `syntax_lexer.rs`, `declaration.rs`, `alu.rs`, `loops.rs`, `conditions.rs`, `io.rs`, `responses.rs`, `shell_format.rs`, `config.rs` |
-| **mommy_shell** | User-facing terminal | `main.rs`, `file_ops.rs`, `dir_ops.rs`, `exec_ops.rs`, `config_ops.rs`, `editor_ops.rs`, `help_ops.rs`, `windows_ops.rs` |
-| **mommy_lang** | Compiler/transpiler | Single `main.rs` with compilation pipeline |
+| Component       | Purpose                    | Key Files                                                                                                                           |
+|-----------------|----------------------------|-------------------------------------------------------------------------------------------------------------------------------------|
+| **mommy_lib**   | Language logic + utilities | `syntax_lexer.rs`, `declaration.rs`, `alu.rs`, `loops.rs`, `conditions.rs`, `io.rs`, `responses.rs`, `shell_format.rs`, `config.rs` |
+| **mommy_shell** | User-facing terminal       | `main.rs`, `file_ops.rs`, `dir_ops.rs`, `exec_ops.rs`, `config_ops.rs`, `editor_ops.rs`, `help_ops.rs`, `windows_ops.rs`            |
+| **mommy_lang**  | Compiler/transpiler        | Single `main.rs` with compilation pipeline                                                                                          |
 
 ### **Key Design Principles**
 
@@ -112,7 +114,7 @@ Building just a shell was boring. So I went all-in: created a **complete languag
 - ✅ **Persistent**: Settings saved to `mommy_conf.memory` across sessions
 - ✅ **Well-Organized**: ~2650 lines across 22 focused files
 
-![Hello World!](readme_assets/hello-world.gif)
+![Hello World!](./readme_assets/hello-world.gif)
 
 ---
 
@@ -148,46 +150,46 @@ Your settings are saved and persist across sessions:
 
 ### **Basic Navigation**
 
-| Command | Equivalent | What it does |
-|---------|-----------|--------------|
-| `tellme` | `help` | List all available commands |
-| `mayileave` | `exit` | Exit the shell |
-| `iamhere` | `pwd` | Show current directory |
-| `mommy?` | `ls` / `dir` | List files in current directory |
-| `walkwithme <dir>` | `cd <dir>` | Navigate to a directory |
-| `goback` | `cd ..` | Go up one directory |
+| Command            | Equivalent   | What it does                    |
+|--------------------|--------------|---------------------------------|
+| `tellme`           | `help`       | List all available commands     |
+| `mayileave`        | `exit`       | Exit the shell                  |
+| `iamhere`          | `pwd`        | Show current directory          |
+| `mommy?`           | `ls` / `dir` | List files in current directory |
+| `walkwithme <dir>` | `cd <dir>`   | Navigate to a directory         |
+| `goback`           | `cd ..`      | Go up one directory             |
 
 ### **File Operations**
 
-| Command | Equivalent | What it does |
-|---------|-----------|--------------|
-| `canihave <file>` | `touch` | Create a new file |
-| `takethe <file>` | `rm` / `del` | Delete a file |
-| `readthis <file>` | `cat` / `type` | Display file contents |
+| Command           | Equivalent       | What it does             |
+|-------------------|------------------|--------------------------|
+| `canihave <file>` | `touch`          | Create a new file        |
+| `takethe <file>`  | `rm` / `del`     | Delete a file            |
+| `readthis <file>` | `cat` / `type`   | Display file contents    |
 | `openthis <file>` | `start` / `open` | Open file in default app |
 
 ### **Directory Operations**
 
-| Command | Equivalent | What it does |
-|---------|-----------|--------------|
-| `letusplayhouse <dir>` | `mkdir` | Create a new directory |
-| `removethehouse <dir>` | `rmdir` | Delete a directory |
+| Command                | Equivalent | What it does           |
+|------------------------|------------|------------------------|
+| `letusplayhouse <dir>` | `mkdir`    | Create a new directory |
+| `removethehouse <dir>` | `rmdir`    | Delete a directory     |
 
 ### **System Operations**
 
-| Command | Equivalent | What it does |
-|---------|-----------|--------------|
-| `doxxme` | `ipconfig` | Show network configuration |
-| `callmeplease <ip>` | `ping` | Ping a device/domain |
+| Command             | Equivalent | What it does               |
+|---------------------|------------|----------------------------|
+| `doxxme`            | `ipconfig` | Show network configuration |
+| `callmeplease <ip>` | `ping`     | Ping a device/domain       |
 
 ### **Developer Tools** (Advanced)
 
-| Command | What it does |
-|---------|--------------|
-| `runthis <file>` | Compile & execute `.mommy` file (transpile → GCC → run) |
-| `startcoding` | Open code editor for writing MommyLang scripts |
-| `changeoutput <dir>` | Set directory for compiled files |
-| `clear` | Clear the screen |
+| Command              | What it does                                            |
+|----------------------|---------------------------------------------------------|
+| `runthis <file>`     | Compile & execute `.mommy` file (transpile → GCC → run) |
+| `startcoding`        | Open code editor for writing MommyLang scripts          |
+| `changeoutput <dir>` | Set directory for compiled files                        |
+| `clear`              | Clear the screen                                        |
 
 ---
 
@@ -195,24 +197,24 @@ Your settings are saved and persist across sessions:
 
 ### **1. Core Keywords**
 
-| Keyword | Purpose | Example |
-|---------|---------|---------|
-| `mayihave` | Declare variable | `mayihave 10 in age as int` |
-| `group` | Declare array | `group 5 in arr as int` |
-| `replace` | Assign value | `replace age with 20` |
-| `in` | Array index/container marker | `replace arr in 0 with 42` |
-| `as` | Type definition | `mayihave 10 in x as int` |
-| `with` | Value assignment | `replace x with 15` |
-| `address` | Get memory address (`&`) | `replace ptr with x address` |
-| `inside` | Dereference pointer (`*`) | `replace ptr with 5 inside` |
-| `punishme` | Loop (for) | `punishme 10` |
-| `punishmeif` | Conditional loop (while) | `punishmeif i < 10` |
-| `ask` | Condition (if) | `ask if x > 5` |
-| `or` | Else branch | `or` |
-| `satisfied` | Break loop | `satisfied` |
-| `done` | End block (`}`) | `done` |
-| `say` | Print output | `say hello` |
-| `leave` | Exit program | `leave` |
+| Keyword      | Purpose                      | Example                      |
+|--------------|------------------------------|------------------------------|
+| `mayihave`   | Declare variable             | `mayihave 10 in age as int`  |
+| `group`      | Declare array                | `group 5 in arr as int`      |
+| `replace`    | Assign value                 | `replace age with 20`        |
+| `in`         | Array index/container marker | `replace arr in 0 with 42`   |
+| `as`         | Type definition              | `mayihave 10 in x as int`    |
+| `with`       | Value assignment             | `replace x with 15`          |
+| `address`    | Get memory address (`&`)     | `replace ptr with x address` |
+| `inside`     | Dereference pointer (`*`)    | `replace ptr with 5 inside`  |
+| `punishme`   | Loop (for)                   | `punishme 10`                |
+| `punishmeif` | Conditional loop (while)     | `punishmeif i < 10`          |
+| `ask`        | Condition (if)               | `ask if x > 5`               |
+| `or`         | Else branch                  | `or`                         |
+| `satisfied`  | Break loop                   | `satisfied`                  |
+| `done`       | End block (`}`)              | `done`                       |
+| `say`        | Print output                 | `say hello`                  |
+| `leave`      | Exit program                 | `leave`                      |
 
 ### **2. Syntax Examples**
 
@@ -335,15 +337,15 @@ Always double-check commands before running!
 
 ## 📊 Project Statistics
 
-| Metric | Value |
-|--------|-------|
-| **Total Lines (Rust)** | ~2650 |
-| **Core Library (mommy_lib)** | 14 modules |
-| **Shell Modules (mommy_shell)** | 8 modules |
-| **Language Keywords** | 25+ |
-| **Shell Commands** | 20+ |
-| **Error Types** | 25+ |
-| **Example Programs** | 8+ |
+| Metric                          | Value      |
+|---------------------------------|------------|
+| **Total Lines (Rust)**          | ~2650      |
+| **Core Library (mommy_lib)**    | 14 modules |
+| **Shell Modules (mommy_shell)** | 8 modules  |
+| **Language Keywords**           | 25+        |
+| **Shell Commands**              | 20+        |
+| **Error Types**                 | 25+        |
+| **Example Programs**            | 8+         |
 
 ---
 
