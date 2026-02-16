@@ -24,6 +24,7 @@ pub fn shell_override_user(user_name: &str, mommy_settings: &mut config::MommySe
             print_line(format!("{} {}", responses::MommyUI::AcceptNewName, user_name));
         }
         Err(_) => print_line(responses::MommyUI::BrainError),
+
     }
 }
 
