@@ -14,6 +14,8 @@ pub enum MommyLangSyntax {
     Unknown,        // ???
     LoopStartCondition, // punishmeif
     String,         // ascii
+    Malloc,         //ibegyou
+    FreeMalloc,     // takeitback
 }
 
 impl MommyLangSyntax {
@@ -32,6 +34,8 @@ impl MommyLangSyntax {
             "group" => MommyLangSyntax::Array, // => array
             "punishmeif" => MommyLangSyntax::LoopStartCondition,
             "ascii" => MommyLangSyntax::String,
+            "ibegyou" => MommyLangSyntax::Malloc,
+            "takeitback" => MommyLangSyntax::FreeMalloc,
             _ => MommyLangSyntax::Unknown,
         }
     }

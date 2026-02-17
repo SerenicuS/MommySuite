@@ -21,6 +21,8 @@ These words are reserved by the parser and define the structure of the language.
 | `or`         | Condition Else (`else`)   | `conditions.rs`  |
 | `leave`      | End Program (`return 0`)  | `main.rs`        |
 | `say`        | Print Output              | `io.rs`          |
+| `ibegyou`    | Heap Allocation           | `declaration.rs` |
+| `takeitback` | Free Heap Allocation      | `declaration.rs` |
 
 ---
 
@@ -61,7 +63,19 @@ These words are reserved by the parser and define the structure of the language.
 `replace <VAR> with <ARRAY> in <INDEX>`
 * **Example:** `replace temp with hello in i`
 
-### D. Input/Output (The "Voice")
+### D. Heap Memory (The "Plea")
+**Allocate:**
+`ibegyou <SIZE> in <NAME> as <TYPE>`
+* **Logic:** Allocates `<SIZE>` items of `<TYPE>` on the heap.
+* **C Output:** `<TYPE>* <NAME> = (<TYPE>*)malloc(<SIZE> * sizeof(<TYPE>));`
+* **Failure:** Emits a null check and prints an error before returning.
+
+**Free:**
+`takeitback <NAME>`
+* **Logic:** Frees heap memory and nulls the pointer.
+* **C Output:** `free(<NAME>); <NAME> = NULL;`
+
+### E. Input/Output (The "Voice")
 **Scalar Print:**
 `say <NAME>`
 * **Logic:** Detects type from symbol table and prints with `\n`.
@@ -75,13 +89,13 @@ These words are reserved by the parser and define the structure of the language.
 * **Logic:** If type is `ascii`, generates a `for` loop to print the full string.
 * **Example:** `say hello in ?` (Prints "HELLO")
 
-### E. Math (The "Pain")
+### F. Math (The "Pain")
 **Syntax:**
 `<OPERATION> <TARGET> with <VALUE>`
 * **Operations:** `add`, `subtract`, `multiply`, `divide`, `mod`
 * **Example:** `add temp with 1`
 
-### F. Control Flow (The "Discipline")
+### G. Control Flow (The "Discipline")
 **Conditions:**
 ```text
 ask if <CONDITION>
@@ -100,3 +114,4 @@ done
 punishmeif <CONDITION>
     say "hello"
 done
+```

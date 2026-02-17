@@ -46,7 +46,9 @@ fn say_array(
 
     let array_type = symbols.get(name).ok_or(MommyLangError::UndeclaredVariable)?;
 
-    if !array_type.starts_with(constants::KW_ARRAY) && array_type != constants::TYPE_STRING {
+    if !array_type.starts_with(constants::KW_ARRAY) &&
+        array_type != constants::TYPE_STRING &&
+        array_type != constants::KW_POINTER {
         return Err(MommyLangError::TypeMismatch);
     }
 
@@ -68,7 +70,10 @@ fn say_array(
     }
 
     if let Ok(idx_num) = index.parse::<usize>() {
-        if idx_num >= max_size && max_size != constants::SIZE_UNKNOWN {
+        if array_type.starts_with(constants::KW_ARRAY) &&
+           idx_num >= max_size &&
+           max_size != constants::SIZE_UNKNOWN
+        {
             return Err(MommyLangError::AccessViolation);
         }
     }

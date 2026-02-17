@@ -32,6 +32,8 @@ pub const SIZE_UNKNOWN: usize = 0;
 pub const KW_VAR_DEC: &str    = "mayihave"; // Was INDEX_KEYWORD_CREATE_VARIABLE (sort of)
 pub const KW_ARRAY_DEC: &str  = "group";
 pub const KW_ASSIGN: &str     = "replace";  // Was INDEX_KEYWORD_REPLACE (sort of)
+pub const KW_MALLOC: &str     = "ibegyou";     // For dynamic memory allocation
+pub const KW_FREE: &str       = "takeitback";     // For freeing dynamic memory
 
 // Connectors
 pub const KW_IN: &str         = "in";

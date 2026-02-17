@@ -94,6 +94,15 @@ fn parse_line(
             declaration::create_array(&tokens, symbols)
         }
 
+        // --- Dynamic Memory Allocation ---
+
+        mommy_lib::lang_syntax::MommyLangSyntax::Malloc =>{
+             declaration::allocate_heap(&tokens, symbols)
+        }
+        mommy_lib::lang_syntax::MommyLangSyntax::FreeMalloc =>{
+             declaration::deallocate_heap(&tokens, symbols)
+        }
+
         // --- Math (ALU) ---
         mommy_lib::lang_syntax::MommyLangSyntax::Math => {
             if tokens.len() < constants::ARGS_MIN_MATH {
@@ -223,11 +232,17 @@ fn transpile_code_to_c(config: &Config) -> Result<(), String> {
     let mut symbol_table: HashMap<String, String> = HashMap::new();
 
     // this should be dynamic as we want to make the user add modules/packages
-    let include = packages::CStandardPackages::InputOutput.to_string();
-    if include.trim().is_empty() {
+   // 1. Create a dynamic list of packages
+    let mut packages = Vec::new();
+    packages.push(packages::CStandardPackages::InputOutput.to_string());
+    packages.push(packages::CStandardPackages::Utilities.to_string());
+
+    if packages.is_empty() {
         eprint_line(responses::MommyLangError::UnknownPackage);
     } else {
-        writeln!(output_file, "{}", include).unwrap();
+        for pkg in packages {
+            writeln!(output_file, "{}", pkg).map_err(|_| responses::MommyLangError::CannotCreateCFile.to_string())?;
+        }
     }
 
 

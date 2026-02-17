@@ -206,6 +206,8 @@ Your settings are saved and persist across sessions:
 | `with`       | Value assignment             | `replace x with 15`          |
 | `address`    | Get memory address (`&`)     | `replace ptr with x address` |
 | `inside`     | Dereference pointer (`*`)    | `replace ptr with 5 inside`  |
+| `ibegyou`    | Heap allocation              | `ibegyou 5 in var as int`    |
+| `takeitback` | Free heap allocation         | `takeitback var`             |
 | `punishme`   | Loop (for)                   | `punishme 10`                |
 | `punishmeif` | Conditional loop (while)     | `punishmeif i < 10`          |
 | `ask`        | Condition (if)               | `ask if x > 5`               |
@@ -236,6 +238,15 @@ say scores in 0
 mayihave 10 in x as int
 replace ptr with x address
 replace ptr with 5 inside
+```
+
+#### **Heap Memory** ("The Plea")
+```
+ibegyou 5 in var as int
+replace var with 10 inside
+say var in 0
+
+takeitback var
 ```
 
 #### **Loops** ("The Discipline")
@@ -313,7 +324,7 @@ Always double-check commands before running!
 - [x] Data persistence (`mommy_conf.memory`)
 - [x] Constants module (100+ named constants)
 - [x] Pointer support (address, inside keywords)
-- [ ] Heap allocation (ibegyou keyword)
+- [x] Heap allocation (ibegyou keyword)
 - [ ] Standard input (listen keyword)
 - [ ] Package system (please use keyword)
 - [ ] Enhanced error messages

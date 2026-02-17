@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 use crate::responses::MommyLangError;
 use crate::constants;
-
+use crate::constants::IDX_DECL_KEY_AS;
 // ================================================================
 // PUBLIC FUNCTIONS (The Logic)
 // ================================================================
@@ -97,6 +97,59 @@ pub fn create_array(
     Ok(format!("{} {}[{}] = {{0}};", c_type, name, size_str))
 }
 
+pub fn allocate_heap(
+    tokens: &Vec<String>,
+    symbols: &mut HashMap<String, String>
+) -> Result<String, MommyLangError> {
+    // Syntax: ibegyou <SIZE> in <NAME> as <TYPE>
+
+    if tokens.len() < constants::ARGS_MIN_DECL{
+        return Err(MommyLangError::MissingArguments);
+    }
+
+    let size_val = &tokens[constants::IDX_DECL_VALUE];
+    let name = &tokens[constants::IDX_DECL_NAME];
+    let raw_type = &tokens[constants::IDX_DECL_TYPE];
+
+    if tokens[constants::IDX_DECL_KEY_IN] != constants::KW_IN || tokens[IDX_DECL_KEY_AS] != constants::KW_AS {
+        return Err(MommyLangError::SyntaxError);
+    }
+
+    ensure_valid_name(name)?;
+    ensure_var_new(name, symbols)?;
+
+    symbols.insert(name.to_string(), constants::KW_POINTER.to_string());
+
+
+    let c_code = format!(
+        "{0}* {1} = ({0}*)malloc({2} * sizeof({0})); \
+        if ({1} == NULL) {{ \
+        printf(\"Mommy Error: No memory for {1}\\n\"); return 1; }}",
+        raw_type,
+        name,
+        size_val
+    );
+
+
+    Ok(c_code)
+}
+
+pub fn deallocate_heap( tokens: &Vec<String>,
+    symbols: &mut HashMap<String, String>
+) -> Result<String, MommyLangError> {
+    // Syntax: takeitback <NAME>
+    // Example: takeitback ptr
+    // C Output: free(ptr); ptr = NULL;
+    if tokens.len() < constants::ARGS_MIN_LEN{
+        return Err(MommyLangError::MissingArguments);
+    }
+
+    let name = &tokens[constants::IDX_DECL_VALUE];
+
+    ensure_var_exists(name, symbols)?;
+    Ok(format!("free({}); {} = NULL;", name, name))
+}
+
 pub fn replace(
     tokens: &Vec<String>,
     symbols: &mut HashMap<String, String>
@@ -151,12 +204,13 @@ fn replace_array_write(
     ensure_var_exists(name, symbols)?;
     let var_type = symbols.get(name).unwrap();
 
-    // 1. Validate Type: Allow Array or String
-    if !var_type.starts_with(constants::KW_ARRAY) && var_type != constants::TYPE_STRING {
+   if !var_type.starts_with(constants::KW_ARRAY) &&
+        var_type != constants::TYPE_STRING &&
+        var_type != constants::KW_POINTER {
         return Err(MommyLangError::TypeMismatch);
-    }
+   }
 
-    // 2. Conditional Bounds Check
+    // ✅ Only perform Bounds Check if it's a fixed-size 'group'
     if var_type.starts_with(constants::KW_ARRAY) {
         let parts: Vec<&str> = var_type.split(constants::SYM_SPLITTER).collect();
         if let Ok(max_size) = parts[2].parse::<usize>() {
@@ -187,12 +241,12 @@ fn replace_array_read(
 
     let array_type = symbols.get(src_array).unwrap();
 
-    // Check if it's an array OR a String
-    if !array_type.starts_with(constants::KW_ARRAY) && array_type != constants::TYPE_STRING {
+  if !array_type.starts_with(constants::KW_ARRAY) &&
+        array_type != constants::TYPE_STRING &&
+        array_type != constants::KW_POINTER {
         return Err(MommyLangError::TypeMismatch);
     }
 
-    // ONLY perform parts[2] check if it's an actual 'group'
     if array_type.starts_with(constants::KW_ARRAY) {
         let parts: Vec<&str> = array_type.split(constants::SYM_SPLITTER).collect();
         if let Ok(max_size) = parts[2].parse::<usize>() {
@@ -231,15 +285,21 @@ fn replace_scalar_value(
         ensure_var_exists(value, symbols)?;
         return Ok(format!("{} = &{};", name, value));
     }
-    else if last_token == constants::KW_DEREF {
-        // replace p with 10 inside
-        if var_type != constants::KW_POINTER { return Err(MommyLangError::TypeMismatch); }
-
-        // Safety Check
-        return Ok(format!(
-            "if ({0} == NULL) {{ printf(\"Mommy Error: NULL Pointer access on '{0}'\\n\"); return 1; }} *{0} = {1};",
-            name, value
-        ));
+   else if last_token == constants::KW_DEREF {
+        // CASE A: Writing TO a pointer (replace ptr with 10 inside)
+        // logic: *ptr = 10;
+        if var_type == constants::KW_POINTER {
+            // Safety Check
+            return Ok(format!(
+                "if ({0} == NULL) {{ printf(\"Mommy Error: NULL Pointer access on '{0}'\\n\"); return 1; }} *{0} = {1};",
+                name, value
+            ));
+        }
+        // CASE B: Reading FROM a pointer (replace x with ptr inside)
+        // logic: x = *ptr;
+        else {
+            return Ok(format!("{} = *{};", name, value));
+        }
     }
 
     // 3. Normal Assignment
