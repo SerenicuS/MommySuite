@@ -327,6 +327,8 @@ Always double-check commands before running!
 - [x] Heap allocation (ibegyou keyword)
 - [ ] Standard input (listen keyword)
 - [ ] Package system (please use keyword)
+- [ ] Bitwise Operations
+- [ ] Functions
 - [ ] Enhanced error messages
 - [ ] Security & sandboxing
 
