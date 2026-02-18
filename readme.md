@@ -215,6 +215,7 @@ Your settings are saved and persist across sessions:
 | `satisfied`  | Break loop                   | `satisfied`                  |
 | `done`       | End block (`}`)              | `done`                       |
 | `say`        | Print output                 | `say hello`                  |
+| `listen`     | Read input (stdin)           | `listen name upto 32`        |
 | `leave`      | Exit program                 | `leave`                      |
 
 ### **2. Syntax Examples**
@@ -247,6 +248,15 @@ replace var with 10 inside
 say var in 0
 
 takeitback var
+```
+
+#### **Input** ("The Ear")
+```
+mayihave 0 in age as int
+listen age
+
+mayihave "" in name as String
+listen name upto 64
 ```
 
 #### **Loops** ("The Discipline")
@@ -325,10 +335,11 @@ Always double-check commands before running!
 - [x] Constants module (100+ named constants)
 - [x] Pointer support (address, inside keywords)
 - [x] Heap allocation (ibegyou keyword)
-- [ ] Standard input (listen keyword)
+- [x] Standard input (listen keyword)
 - [ ] Package system (please use keyword)
 - [ ] Bitwise Operations
 - [ ] Functions
+- [ ] System Calls
 - [ ] Enhanced error messages
 - [ ] Security & sandboxing
 

@@ -21,6 +21,7 @@ These words are reserved by the parser and define the structure of the language.
 | `or`         | Condition Else (`else`)   | `conditions.rs`  |
 | `leave`      | End Program (`return 0`)  | `main.rs`        |
 | `say`        | Print Output              | `io.rs`          |
+| `listen`     | Read Input (stdin)        | `io.rs`          |
 | `ibegyou`    | Heap Allocation           | `declaration.rs` |
 | `takeitback` | Free Heap Allocation      | `declaration.rs` |
 
@@ -88,6 +89,13 @@ These words are reserved by the parser and define the structure of the language.
 `say <ARRAY> in ?`
 * **Logic:** If type is `ascii`, generates a `for` loop to print the full string.
 * **Example:** `say hello in ?` (Prints "HELLO")
+
+**Read Input (Stdin):**
+`listen <VAR> [upto <SIZE>]`
+* **Logic:** Reads a line from stdin into `<VAR>`.
+* **Types:** `int`, `float`, `String`/`char*`, and `ascii` arrays are supported.
+* **Buffer Size:** Uses `upto <SIZE>` when provided; otherwise uses the declared array size or defaults to 128.
+* **Example:** `listen name upto 64`
 
 ### F. Math (The "Pain")
 **Syntax:**
