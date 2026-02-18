@@ -11,7 +11,7 @@ use std::io::Write;
 use mommy_lib::responses;
 use mommy_lib::constants;
 use mommy_lib::shell_commands;
-use mommy_lib::config;
+use mommy_lib::config::MommySettings;
 use mommy_lib::shell_format::{print_wrapper, print_line, print_prompt, read_prompted_line_with_error};
 
 use crate::file_ops::{shell_create_file, shell_delete_file, shell_open_file, shell_read_file};
@@ -31,7 +31,7 @@ use crate::windows_ops::shell_windows_call;
 
 fn main() {
     let root_dir = env::current_dir().expect(&responses::MommyShellError::RootDirError.to_string());
-    let mut mommy_settings = config::MommySettings::load(&root_dir);
+    let mut mommy_settings = MommySettings::load(&root_dir);
 
     print_wrapper([
         responses::MommyUI::WelcomeTitle.to_string(),
@@ -55,7 +55,7 @@ fn main() {
 // ============================================================================
 
 
-fn shell_ask_user(root_dir: &std::path::PathBuf, mommy_settings: &mut config::MommySettings) {
+fn shell_ask_user(root_dir: &std::path::PathBuf, mommy_settings: &mut MommySettings) {
     print_wrapper([
         responses::MommyUI::AskName.to_string(),
         responses::MommyUI::ConfirmName.to_string(),
@@ -72,41 +72,67 @@ fn shell_ask_user(root_dir: &std::path::PathBuf, mommy_settings: &mut config::Mo
             &responses::MommyUI::ExitMessage.to_string(),
         );
 
-        if anger_level > constants::VALERIA_ANGRY_METER_LIMIT {
-            print_wrapper([
-                responses::MommyUI::SelfExit.to_string(),
-                responses::MommyUI::TerminateUser.to_string(),
-            ]);
-            std::process::exit(0);
-        }
+        check_user_chance(&anger_level);
+
+        if validate_user_input(&anger_level, &user_name) {
+            mind_wipe = true;
+            continue
+        };
 
         if mind_wipe {
             shell_override_user(&user_name, mommy_settings);
+            break
+        };
+
+        if check_default_user(&user_name, mommy_settings) {
             break;
-        } else if user_name.trim() == mommy_settings.user_name || user_name.trim() == constants::SHELL_DF_USER {
-            break;
-        } else if anger_level >= 1 && user_name.trim() == constants::SHELL_DF_PASS {
-            print_wrapper([
-                responses::MommyUI::MommyDoubt.to_string(),
-            ]);
-            mind_wipe = true;
-        } else {
-            anger_level += 1;
-            println!("{}{}", constants::INDENT_OUTPUT, responses::MommyUI::RejectName);
-            continue;
         }
+
+        anger_level += 1;
+        println!("{}{}", constants::INDENT_OUTPUT, responses::MommyUI::RejectName);
+
     }
 
     // Main shell handles the welcome narrative.
     shell_start_default(&root_dir, mommy_settings);
 }
 
+
+fn check_default_user(user_name: &str, mommy_settings:  &MommySettings) -> bool{
+    if user_name.trim() == mommy_settings.user_name || user_name.trim() == constants::SHELL_DF_USER{
+        true
+    }
+    else{
+        false
+    }
+}
+
+fn check_user_chance(anger_level: &usize){
+    if anger_level > &constants::VALERIA_ANGRY_METER_LIMIT{
+        std::process::exit(0);
+    };
+}
+
+fn validate_user_input(anger_level: &usize, pass: &str) -> bool{
+    if anger_level >= &1 && pass.trim() == constants::SHELL_DF_PASS{
+         print_wrapper([
+                responses::MommyUI::MommyDoubt.to_string(),
+            ]);
+        true
+    }
+    else{
+        false
+    }
+}
+
+
+
 fn shell_skip_default(root_dir: &std::path::PathBuf){
-    shell_move_directory("sandbox", root_dir);
+    shell_move_directory(constants::DEF_DIR_OUPUT, root_dir);
     run_mommy_lang(constants::SHELL_DBG_FILE);
 }
 
-fn shell_start_default(root_dir: &std::path::PathBuf, mommy_settings: &mut config::MommySettings) {
+fn shell_start_default(root_dir: &std::path::PathBuf, mommy_settings: &mut MommySettings) {
     print_wrapper([
         responses::MommyUI::GenericObedience.to_string(),
         format!("{}, {}.", responses::MommyUI::MommyAcknowledge, mommy_settings.user_name),
@@ -128,7 +154,7 @@ fn shell_start_default(root_dir: &std::path::PathBuf, mommy_settings: &mut confi
 }
 
 
-fn shell_attempt_command(input: &str, root_dir: &std::path::PathBuf, mommy_settings: &mut config::MommySettings) {
+fn shell_attempt_command(input: &str, root_dir: &std::path::PathBuf, mommy_settings: &mut MommySettings) {
     let clean_input = input.trim();
     let args: Vec<&str> = clean_input.split_whitespace().collect();
 

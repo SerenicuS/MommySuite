@@ -86,8 +86,7 @@ fn main() {
             std::process::exit(1);
         }
     };
-
-
+    
     if let Err(e) = transpile_code_to_c(&config){ //Convert mommylang to C
         print_line(responses::MommyLangError::ErrorBegins);
         eprint_line(e);

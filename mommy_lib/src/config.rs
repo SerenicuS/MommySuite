@@ -15,7 +15,7 @@ impl MommySettings {
         let content = fs::read_to_string(&config_path).unwrap_or_default();
 
         let mut settings = Self {
-            output_directory: constants::DIR_OUTPUT.to_string(),
+            output_directory: constants::DEF_DIR_OUPUT.to_string(),
             user_name: String::new(),
             config_file_path: config_path,
         };

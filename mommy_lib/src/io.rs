@@ -20,8 +20,7 @@ pub fn say(
 
 
     // WAS: tokens.len() >= 4
-    if tokens.len() >= constants::ARGS_MIN_IO_ARRAY
-        && tokens[constants::IDX_IO_KEY_IN] == constants::KW_IN {
+    if tokens.len() >= constants::ARGS_MIN_IO_ARRAY && tokens[constants::IDX_IO_KEY_IN] == constants::KW_IN {
         return say_array(tokens, symbols);
     }
 
@@ -102,10 +101,21 @@ fn say_scalar(
 ) -> Result<String, MommyLangError> {
 
     let name = &tokens[constants::IDX_IO_VALUE];
+
+    // Check if it's a literal integer first
+    if let Ok(_) = name.parse::<i32>() {
+        return Ok(format!("printf(\"%d\\n\", {});", name));
+    }
+
+    // Check if it's a literal float
+    if let Ok(_) = name.parse::<f64>() {
+        return Ok(format!("printf(\"%f\\n\", {});", name));
+    }
+
+    // Otherwise, treat it as a variable name and check symbol table
     let var_type = symbols.get(name).ok_or(MommyLangError::UndeclaredVariable)?;
 
     match var_type.as_str() {
-        // FIX: Add Float Support here
         t if t == constants::TYPE_FLOAT =>
             Ok(format!("printf(\"%f\\n\", {});", name)),
 

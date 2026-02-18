@@ -1,0 +1,7 @@
+makeme listen_and_read
+makeme ask_more
+
+ibegyou 8 in buf as ascii
+listen buf
+say buf in ?
+takeitback buf

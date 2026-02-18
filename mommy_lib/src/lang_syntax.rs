@@ -1,3 +1,15 @@
+//!
+//!
+//! This is the syntax crate of  mommylang.
+//! Note:
+//! 1. If you want to add a new syntax:
+//!   > Add a new variant to the `MommyLangSyntax` enum.
+//!   > Add the corresponding match arm in the mommy_lang/src/compiler.rs file, in the `match syntax` block.
+//!
+//!
+//!
+//!
+//!
 
 pub enum MommyLangSyntax {
     Declaration,    // mayihave

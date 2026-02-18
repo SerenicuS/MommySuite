@@ -1,3 +1,15 @@
+//!
+//!
+//! This is the header crate of  mommylang.
+//!
+//! Language Syntax: "makeme package_name"
+//!
+//! Note:
+//! 1. Limited packages support for now, some packages might be custom-made for mommylang only.
+//!
+//!
+
+
 use crate::package_list;
 use crate::responses::MommyLangError;
 

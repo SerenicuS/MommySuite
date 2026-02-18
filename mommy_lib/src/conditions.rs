@@ -1,26 +1,40 @@
+//!
+//!
+//! This is the condition crate of  mommylang.
+//!
+//! Language Syntax: "ask if var1 comparison_operator var2"
+//!
+//! Note:
+//! 1. It can only do one condition at a time, such as "ask if grade > 90"
+//!
+//! 2. Logical operators (&&, ||) and parentheses are not supported.
+//!
+//! 3. Boolean is not supported as a type, but you can use 0 and 1 to represent false and true lol.
+//!
+//!
+//!
+//!
+//!
+//!
+//!
+//!
 use crate::responses;
 use crate::constants;
 
 pub fn ask(tokens: &Vec<String>) -> Result<String, responses::MommyLangError>{
-    // 1. Check if we have enough words ("ask if x")
+
     if tokens.len() < constants::ARGS_MIN_COND {
         return Err(responses::MommyLangError::MissingArguments);
     }
 
-    // 2. Ensure the user said "if"
-    // Note: tokens[0] is "ask", tokens[1] must be "if"
-    if tokens[1] != constants::KW_IF {
+    if tokens[constants::IDX_COND_IF] != constants::KW_IF  || tokens[constants::INDX_COND_ASK] != constants::KW_ASK {
         return Err(responses::MommyLangError::SyntaxError);
     }
-
-    // 3. Construct the C condition
-    // Join the rest of the tokens (x == 10) with spaces
     let condition = tokens[2..].join(constants::SYM_WHITESPACE);
-
+    
     Ok(format!("if ({}) {{", condition))
 }
 
 pub fn or() -> Result<String, responses::MommyLangError> {
-    // Just return "} else {"
     Ok(constants::KW_ELSE_BLOCK.to_string())
 }

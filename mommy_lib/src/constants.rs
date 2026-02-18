@@ -5,7 +5,7 @@ pub const EXT_SOURCE: &str = ".mommy";
 pub const EXT_C: &str      = ".c";
 pub const EXT_EXE: &str    = ".exe";
 
-pub const DIR_OUTPUT: &str   = "sandbox";
+pub const DEF_DIR_OUPUT: &str   = "sandbox";
 pub const PATH_DEFAULT: &str = "./";
 
 // Compiler Tools
@@ -20,6 +20,7 @@ pub const ARGS_MIN_FILE: usize = 2;
 pub const ARGS_MIN_LEN: usize  = 2;
 pub const NAME_MIN_LEN: usize  = 3; // Was MIN_INDEX_NAME_LEN
 pub const ARGS_MIN_COND: usize = 3;
+
 pub const ARGS_MIN_IO: usize = 2;
 pub const ARGS_MIN_IO_ARRAY: usize = 4;
 pub const SIZE_UNKNOWN: usize = 0;
@@ -34,6 +35,7 @@ pub const KW_ARRAY_DEC: &str  = "group";
 pub const KW_ASSIGN: &str     = "replace";  // Was INDEX_KEYWORD_REPLACE (sort of)
 pub const KW_MALLOC: &str     = "ibegyou";     // For dynamic memory allocation
 pub const KW_FREE: &str       = "takeitback";     // For freeing dynamic memory
+
 
 // Connectors
 pub const KW_IN: &str         = "in";
@@ -52,6 +54,7 @@ pub const KW_POINTER: &str    = "pointer";
 // Loop & Logic Keywords
 pub const KW_IF: &str         = "if";
 pub const KW_ELSE_BLOCK: &str = "}else {";
+pub const KW_ASK: &str        = "ask";
 
 // Types
 pub const TYPE_STRING: &str     = "String";  // Used by io.rs
@@ -142,6 +145,10 @@ pub const IDX_IO_ARR_IDX: usize = 3; // The array index
 // Loops: punishme <COUNT>
 pub const IDX_LOOP_COUNT: usize = 1;
 
+// Conditions: ask if <VAR1> <COMP_OP> <VAR2>
+pub const IDX_COND_IF: usize = 1;
+pub const INDX_COND_ASK: usize = 0;
+
 // ================================================================
 // 5. SHELL CONSTANTS
 // ================================================================
@@ -212,4 +219,5 @@ pub const SHELL_DBG_FILE: &str = "discipline-update-test.mommy";
 
 pub const SHELL_DF_USER: &str = "Harold"; // DF means default
 pub const SHELL_DF_PASS: &str = "Valeria";
-pub const SHELL_DF_ANGERYNESS: usize = 2; 
+pub const SHELL_DF_ANGER_MAX: usize = 2;
+
