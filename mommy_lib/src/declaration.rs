@@ -117,14 +117,24 @@ pub fn allocate_heap(
     ensure_valid_name(name)?;
     ensure_var_new(name, symbols)?;
 
-    symbols.insert(name.to_string(), constants::KW_POINTER.to_string());
+    let c_type = match raw_type.as_str() {
+        constants::TYPE_ASCII => constants::TYPE_INT,
+        _ => get_c_type(raw_type),
+    };
 
+    if raw_type == constants::TYPE_ASCII {
+        // TODO: Consider how heap-ascii should interact with replace/deref semantics.
+        let meta = format!("{}:{}:{}", constants::KW_ARRAY, raw_type, size_val);
+        symbols.insert(name.to_string(), meta);
+    } else {
+        symbols.insert(name.to_string(), constants::KW_POINTER.to_string());
+    }
 
     let c_code = format!(
         "{0}* {1} = ({0}*)malloc({2} * sizeof({0})); \
         if ({1} == NULL) {{ \
         printf(\"Mommy Error: No memory for {1}\\n\"); return 1; }}",
-        raw_type,
+        c_type,
         name,
         size_val
     );
@@ -209,7 +219,6 @@ fn replace_array_write(
         return Err(MommyLangError::TypeMismatch);
    }
 
-    // ✅ Only perform Bounds Check if it's a fixed-size 'group'
     if var_type.starts_with(constants::KW_ARRAY) {
         let parts: Vec<&str> = var_type.split(constants::SYM_SPLITTER).collect();
         if let Ok(max_size) = parts[2].parse::<usize>() {

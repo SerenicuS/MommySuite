@@ -179,12 +179,16 @@ pub fn listen(
                 "{{ char _temp_ascii[{}]; \
                    if(fgets(_temp_ascii, {}, stdin)) {{ \
                        for(int i=0; i<{}; i++) {{ \
-                           if(_temp_ascii[i] == '\\0' || _temp_ascii[i] == '\\n') {{ {}[i] = 0; break; }} \
+                           if(_temp_ascii[i] == '\\0' || _temp_ascii[i] == '\\n') {{ \
+                               {}[i] = 0; \
+                               for(int j=i+1; j<{}; j++) {{ {}[j] = 0; }} \
+                               break; \
+                           }} \
                            {}[i] = (int)_temp_ascii[i]; \
                        }} \
                    }} \
                 }}",
-                buffer_size, buffer_size, buffer_size, name, name
+                buffer_size, buffer_size, buffer_size, name, buffer_size, name, name
             ))
         },
 

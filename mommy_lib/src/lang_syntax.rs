@@ -17,6 +17,7 @@ pub enum MommyLangSyntax {
     Malloc,         //ibegyou
     FreeMalloc,     // takeitback
     ReadInput,      // listen
+    IncludeLib,     // makeme
 }
 
 impl MommyLangSyntax {
@@ -38,6 +39,7 @@ impl MommyLangSyntax {
             "ibegyou" => MommyLangSyntax::Malloc,
             "takeitback" => MommyLangSyntax::FreeMalloc,
             "listen" => MommyLangSyntax::ReadInput,
+            "makeme" => MommyLangSyntax::IncludeLib,
             _ => MommyLangSyntax::Unknown,
         }
     }

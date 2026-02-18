@@ -1,3 +1,6 @@
+makeme listen_and_read
+makeme ask_more
+
 say "========================================"
 say "      MOMMYLANG GRAND TEST SUITE v0.2   "
 say "========================================"

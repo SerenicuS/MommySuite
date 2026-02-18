@@ -1,3 +1,6 @@
+makeme ask_more
+makeme listen_and_read
+
 say "--- The Shell Game (Heap Swap) ---"
 
 ibegyou 1 in cup_a as int
