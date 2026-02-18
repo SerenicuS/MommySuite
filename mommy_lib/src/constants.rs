@@ -39,6 +39,7 @@ pub const KW_FREE: &str       = "takeitback";     // For freeing dynamic memory
 pub const KW_IN: &str         = "in";
 pub const KW_AS: &str         = "as";
 pub const KW_WITH: &str       = "with";
+pub const KW_UPTO: &str       = "upto";
 
 // Pointers & Types
 pub const KW_BOX: &str        = "box";     // Pointer type

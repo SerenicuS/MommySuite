@@ -6,8 +6,8 @@
 //! ---
 //!
 //!  Started: Jan 26, 2026
-//!  Amount of Time Spent(Too late to track): 3(H), 26(M).
-//!  Current: February 16, 2026
+//!  Amount of Time Spent(Too late to track): 6(H), 22(M).
+//!  Current: February 17, 2026
 //!
 //! ## 🛠️ Development Roadmap
 //!
@@ -15,9 +15,10 @@
 //! Focused on memory safety, data structures, and stricter control.
 //! - [x] **Step 0:** Refactor magic numbers to `constants` module.
 //! - [x] **Step 1:** Data Structures - Stack Arrays (`group`).
-//! - [ ] **Step 2:** Memory Management - Heap Allocation (`ibegyou`). **[CURRENT WORK]**
-//! - [ ] **Step 3:** Input Handling - Stdin Wrapper (`listen`).
+//! - [x] **Step 2:** Memory Management - Heap Allocation (`ibegyou`).
+//! - [x] **Step 3:** Input Handling - Stdin Wrapper (`listen`).**[CURRENT WORK]**
 //! - [ ] **Step 4:** Package System - Modules (`please use`).
+//! - [ ] **Step 4:** Sys Calls - OS Interaction (`??`).
 //! - [ ] **Step 5:** Security - Permissions & Sandboxing.
 //!
 //! ### Phase 3: The Stockholm Update
@@ -124,7 +125,11 @@ fn parse_line(
         // --- I/O ---
         mommy_lib::lang_syntax::MommyLangSyntax::IO => {
             io::say(&tokens, symbols)
-        },
+        }
+
+        mommy_lib::lang_syntax::MommyLangSyntax::ReadInput =>{
+            io::listen(&tokens, symbols)
+        }
 
         // --- Loops ---
         mommy_lib::lang_syntax::MommyLangSyntax::LoopStartBasic => { // "punishme"
@@ -232,7 +237,7 @@ fn transpile_code_to_c(config: &Config) -> Result<(), String> {
     let mut symbol_table: HashMap<String, String> = HashMap::new();
 
     // this should be dynamic as we want to make the user add modules/packages
-   // 1. Create a dynamic list of packages
+    // 1. Create a dynamic list of packages
     let mut packages = Vec::new();
     packages.push(packages::CStandardPackages::InputOutput.to_string());
     packages.push(packages::CStandardPackages::Utilities.to_string());

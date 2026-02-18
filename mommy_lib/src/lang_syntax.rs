@@ -16,6 +16,7 @@ pub enum MommyLangSyntax {
     String,         // ascii
     Malloc,         //ibegyou
     FreeMalloc,     // takeitback
+    ReadInput,      // listen
 }
 
 impl MommyLangSyntax {
@@ -36,6 +37,7 @@ impl MommyLangSyntax {
             "ascii" => MommyLangSyntax::String,
             "ibegyou" => MommyLangSyntax::Malloc,
             "takeitback" => MommyLangSyntax::FreeMalloc,
+            "listen" => MommyLangSyntax::ReadInput,
             _ => MommyLangSyntax::Unknown,
         }
     }

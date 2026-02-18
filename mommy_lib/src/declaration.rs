@@ -1,7 +1,6 @@
 use std::collections::HashMap;
 use crate::responses::MommyLangError;
 use crate::constants;
-use crate::constants::IDX_DECL_KEY_AS;
 // ================================================================
 // PUBLIC FUNCTIONS (The Logic)
 // ================================================================
@@ -111,7 +110,7 @@ pub fn allocate_heap(
     let name = &tokens[constants::IDX_DECL_NAME];
     let raw_type = &tokens[constants::IDX_DECL_TYPE];
 
-    if tokens[constants::IDX_DECL_KEY_IN] != constants::KW_IN || tokens[IDX_DECL_KEY_AS] != constants::KW_AS {
+    if tokens[constants::IDX_DECL_KEY_IN] != constants::KW_IN || tokens[constants::IDX_DECL_KEY_AS] != constants::KW_AS {
         return Err(MommyLangError::SyntaxError);
     }
 
