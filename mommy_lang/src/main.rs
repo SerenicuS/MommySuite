@@ -13,18 +13,34 @@
 //!
 //! ### Phase 2: The Discipline Update (Current)
 //! Focused on memory safety, data structures, and stricter control.
-//! - [x] **Step 0:** Refactor magic numbers to `constants` module.
-//! - [x] **Step 1:** Data Structures - Stack Arrays (`group`).
-//! - [x] **Step 2:** Memory Management - Heap Allocation (`ibegyou`).
-//! - [x] **Step 3:** Input Handling - Stdin Wrapper (`listen`).**[CURRENT WORK]**
-//! - [ ] **Step 4:** Package System - Modules (`please use`).
-//! - [ ] **Step 4:** Sys Calls - OS Interaction (`??`).
-//! - [ ] **Step 5:** Security - Permissions & Sandboxing.
+//! - [x] Modular architecture refactor
+//! - [x] Unified shell formatting system (`shell_format.rs`)
+//! - [x] Data persistence (`mommy_conf.memory`)
+//! - [x] Constants module (100+ named constants)
+//! - [x] Pointer support (`address`, `inside`)
+//! - [x] Heap allocation (`ibegyou`)
+//! - [x] Standard input (`listen`)
+//! - [ ] Package system (`please use`)
+//! - [ ] Bitwise operations
+//! - [ ] Functions
+//! - [ ] System calls
+//! - [ ] Enhanced error messages
+//! - [ ] Security & sandboxing
 //!
 //! ### Phase 3: The Stockholm Update
 //! Focused on OS-level features and system dependency.
-//! - [ ] **Step 1:** MommyOS (Kernel/Process Management).
-//! - [ ] **Step 2:** Cleanup (Refactoring & Optimization).
+//! - [ ] Custom IDE editor (syntax highlighting, real-time editing)
+//! - [ ] Multi-file project support
+//! - [ ] Advanced debugging features
+//! - [ ] Performance optimizations
+//! - [ ] Terminal UI improvements
+//! - [ ] Cleanup (refactoring & optimization)
+//!
+//! ### Phase 4: OS Features
+//! - [ ] MommyOS kernel concepts
+//! - [ ] Process management
+//! - [ ] Memory allocation tracking
+//! - [ ] Custom standard library expansion
 //!
 //! ### Bonus Objectives
 //! - [ ] **Mommy's Fingers:** Registry-like assembly manipulation.

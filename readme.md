@@ -333,11 +333,11 @@ Always double-check commands before running!
 - [x] Unified shell formatting system (`shell_format.rs`)
 - [x] Data persistence (`mommy_conf.memory`)
 - [x] Constants module (100+ named constants)
-- [x] Pointer support (address, inside keywords)
-- [x] Heap allocation (ibegyou keyword)
-- [x] Standard input (listen keyword)
-- [ ] Package system (please use keyword)
-- [ ] Bitwise Operations
+- [x] Pointer support (`address`, `inside` keywords)
+- [x] Heap allocation (`ibegyou` keyword)
+- [x] Standard input (`listen` keyword)
+- [ ] Package system (`please use` keyword)
+- [ ] Bitwise operations
 - [ ] Functions
 - [ ] System Calls
 - [ ] Enhanced error messages
@@ -349,6 +349,7 @@ Always double-check commands before running!
 - [ ] Advanced debugging features
 - [ ] Performance optimizations
 - [ ] Terminal UI improvements
+- [ ] Cleanup (refactoring & optimization)
 
 ### **Phase 4: OS Features (🚀 FUTURE)**
 - [ ] MommyOS kernel concepts
