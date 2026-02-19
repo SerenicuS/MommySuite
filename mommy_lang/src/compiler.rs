@@ -130,7 +130,7 @@ pub fn transpile_code_to_c(config: &Config) -> Result<(), String> {
         .map_err(|_| responses::MommyLangError::CannotCreateCFile.to_string())?;
 
     let mut symbol_table: HashMap<String, String> = HashMap::new();
-    let mut includes: Vec<String> = Vec::new();
+    let mut includes: Vec<String> = Vec::new(); // To store packages outside of main
     let mut body_lines: Vec<String> = Vec::new();
 
     for (i, line) in content.lines().enumerate() {

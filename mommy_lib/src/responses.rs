@@ -32,7 +32,7 @@ pub enum MommyLangError {
     UnexpectedSatisfied,
     OrphanElse,
     UnknownPackage,
-
+   
     // Array / Memory Specific (NEW)
     NotAnArray,         // Trying to use "in" on a normal variable
     IndexOutOfBounds,   // Accessing index 10 of size 5
@@ -56,7 +56,8 @@ pub enum MommyLangError {
     // Math (ALU)
     MathOnString,
     DivideByZero,
-
+    NotANumber,
+    
     // UI
     ErrorBegins,
     ErrorEnds,
@@ -184,6 +185,7 @@ impl fmt::Display for MommyLangError {
             // MATH ERRORS
             Self::MathOnString => write!(f, "You cannot do math on words. Stop acting childish."),
             Self::DivideByZero => write!(f, "Divide by zero? Do you WANT to break the universe? Don't be stupid."),
+            Self::NotANumber => write!(f, "That is not a number. Are you trying to trick me with words? Don't waste my time."),
 
             // SYSTEM ERRORS
             Self::StatusNoFile => write!(f, "There is nothing here. Stop wasting my time."),

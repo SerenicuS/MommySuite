@@ -88,6 +88,50 @@ say "Check Index 4 (Expect 100):"
 say numbers in 4
 
 say "========================================"
+say "    SECTION 8: HEAP ALLOCATION (NEW!)   "
+say "========================================"
+
+say "Testing heap-int allocation..."
+ibegyou 5 in heap_nums as int
+
+say "Writing to heap index 0..."
+replace heap_nums in 0 with 777
+
+say "Writing to heap index 4..."
+replace heap_nums in 4 with 888
+
+say "Reading heap index 0 (Expect 777):"
+say heap_nums in 0
+
+say "Reading heap index 4 (Expect 888):"
+say heap_nums in 4
+
+say "Freeing heap memory..."
+takeitback heap_nums
+
+say "Heap test complete!"
+
+say "========================================"
+say "    SECTION 9: HEAP ASCII (NEW!)        "
+say "========================================"
+
+ibegyou 10 in heap_text as ascii
+
+say "Writing ASCII to heap index 0..."
+replace heap_text in 0 with 65
+
+say "Writing ASCII to heap index 5..."
+replace heap_text in 5 with 90
+
+say "Reading heap ASCII index 0 (Expect 65/A):"
+say heap_text in 0
+
+say "Reading heap ASCII index 5 (Expect 90/Z):"
+say heap_text in 5
+
+takeitback heap_text
+
+say "========================================"
 say "         ALL SYSTEMS GO. GOOD JOB.      "
 say "========================================"
 leave

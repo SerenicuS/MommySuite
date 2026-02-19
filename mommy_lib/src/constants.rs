@@ -21,6 +21,8 @@ pub const ARGS_MIN_LEN: usize  = 2;
 pub const NAME_MIN_LEN: usize  = 3; // Was MIN_INDEX_NAME_LEN
 pub const ARGS_MIN_COND: usize = 3;
 
+pub const MAX_ARRAY_SIZE: usize = 100;
+
 pub const ARGS_MIN_IO: usize = 2;
 pub const ARGS_MIN_IO_ARRAY: usize = 4;
 pub const SIZE_UNKNOWN: usize = 0;
@@ -50,6 +52,7 @@ pub const KW_DEREF: &str      = "inside";  // * operator
 pub const KW_NULL: &str       = "null";
 pub const KW_ARRAY: &str      = "array";   // Internal/Type keyword
 pub const KW_POINTER: &str    = "pointer";
+pub const KW_HEAP: &str       = "heap";    // Heap allocation metadata prefix
 
 // Loop & Logic Keywords
 pub const KW_IF: &str         = "if";
@@ -129,6 +132,7 @@ pub const IDX_ARR_KEY_IN: usize     = 2; // "in"
 pub const IDX_ARR_INDEX: usize      = 3;
 pub const IDX_ARR_KEY_WITH: usize   = 4; // "with"
 pub const IDX_ARR_VALUE: usize      = 5;
+pub const IDX_ARR_NAME: usize       = 1;
 
 // Math: add <TARGET> with <SOURCE>
 // Indices: 0   1        2    3
