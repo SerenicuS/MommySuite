@@ -1,25 +1,44 @@
+//!
+//! This is the io crate of mommylang.
+//!
+//! Language syntax:
+//! 1. SAY
+//! - String Literal: "say "string_literal"
+//! - Array Access: "say array_name in index"
+//! - Array wildcard for ASCII: "say array_name in ?"
+//! - Scalar Variable: "say variable_name_or_literal"
+//! 2. LISTEN
+//! -  Listen to variable input: "listen var_name"
+//! -  Listen with size limit: "listen var_name upto size"
+//!
+//! Notes:
+//! 1. Float, integer, and ASCII (unique int for string) types are supported.
+//! 2. For "say", if the variable is undeclared or type-mismatched, an error is returned.
+//! 3. For "listen", if the variable is undeclared or not a supported type, an error is returned.
+//!
+//!
+//!
+//!
 use std::collections::HashMap;
 use crate::responses::MommyLangError;
 use crate::constants;
+use crate::validate_syntax;
 
 pub fn say(
     tokens: &Vec<String>,
     symbols: &HashMap<String, String>
 ) -> Result<String, MommyLangError> {
 
-    if tokens.len() < constants::ARGS_MIN_IO {
-        return Err(MommyLangError::MissingArguments)
+    if validate_syntax::is_missing_say_args(tokens.len()) {
+        return Err(MommyLangError::MissingArguments);
     }
 
-    // WAS: tokens[1]
     let message = &tokens[constants::IDX_IO_VALUE];
 
     if message.starts_with("\"") {
         return say_literal(tokens);
     }
 
-
-    // WAS: tokens.len() >= 4
     if tokens.len() >= constants::ARGS_MIN_IO_ARRAY && tokens[constants::IDX_IO_KEY_IN] == constants::KW_IN {
         return say_array(tokens, symbols);
     }
@@ -27,38 +46,42 @@ pub fn say(
     say_scalar(tokens, symbols)
 }
 
+
 fn say_literal(tokens: &Vec<String>) -> Result<String, MommyLangError> {
-    // We join from IDX_IO_VALUE onwards to catch spaces in strings
+    // Syntax: say "string_literal"
     let full_msg = tokens[constants::IDX_IO_VALUE..].join(constants::SYM_WHITESPACE);
     let clean_msg = full_msg.trim_matches('"');
     Ok(format!("printf(\"{}\\n\");", clean_msg))
 }
 
+
+
 fn say_array(
     tokens: &Vec<String>,
     symbols: &HashMap<String, String>
 ) -> Result<String, MommyLangError> {
-
-    // WAS: tokens[1] and tokens[3]
+    // Syntax: "say array_name in index"
     let name = &tokens[constants::IDX_IO_VALUE];
     let index = &tokens[constants::IDX_IO_ARR_IDX];
 
     let array_type = symbols.get(name).ok_or(MommyLangError::UndeclaredVariable)?;
 
-    if !array_type.starts_with(constants::KW_ARRAY) &&
-       !array_type.starts_with(constants::KW_HEAP) &&
-        array_type != constants::TYPE_STRING &&
-        array_type != constants::KW_POINTER {
+    if validate_syntax::is_type_mismatch(array_type) {
         return Err(MommyLangError::TypeMismatch);
     }
 
     let parts: Vec<&str> = array_type.split(constants::SYM_SPLITTER).collect();
-    let inner_type = if parts.len() > 1 { parts[1] } else { constants::TYPE_STRING };
-    let max_size = if parts.len() > 2 { parts[2].parse::<usize>().unwrap_or(0) } else { 0 };
 
-    if index == constants::KW_ALL {
-        if max_size == 0 { return Err(MommyLangError::AccessViolation); }
-        return match inner_type {
+
+    let inner_type = validate_syntax::select_inner_type(parts.len(), parts[constants::IDX_META_DATA_TYPE]);
+    let max_size = validate_syntax::select_max_size(parts.len(), parts[constants::IDX_META_SIZE]);
+
+    if max_size == 0{
+        return Err(MommyLangError::AccessViolation);
+    }
+
+    if validate_syntax::is_kw_all(&index){
+         return match inner_type {
             t if t == constants::TYPE_ASCII =>
                 Ok(format!("for (int i = 0; i < {}; i++) {{ printf(\"%c\", {}[i]); }} printf(\"\\n\");", max_size, name)),
             t if t == constants::TYPE_FLOAT =>
@@ -77,7 +100,6 @@ fn say_array(
             return Err(MommyLangError::AccessViolation);
         }
     }
-
     else if symbols.contains_key(index) {
 
     }
@@ -87,7 +109,7 @@ fn say_array(
     }
 
     match inner_type {
-        "float" => Ok(format!("printf(\"%f\\n\", {}[{}]);", name, index)),
+        constants::TYPE_FLOAT => Ok(format!("printf(\"%f\\n\", {}[{}]);", name, index)),
         t if t == constants::C_TYPE_CHAR_PTR || t == constants::TYPE_STRING =>
             Ok(format!("printf(\"%s\\n\", {}[{}]);", name, index)),
         t if t == constants::TYPE_ASCII =>
@@ -103,17 +125,14 @@ fn say_scalar(
 
     let name = &tokens[constants::IDX_IO_VALUE];
 
-    // Check if it's a literal integer first
     if let Ok(_) = name.parse::<i32>() {
         return Ok(format!("printf(\"%d\\n\", {});", name));
     }
 
-    // Check if it's a literal float
     if let Ok(_) = name.parse::<f64>() {
         return Ok(format!("printf(\"%f\\n\", {});", name));
     }
 
-    // Otherwise, treat it as a variable name and check symbol table
     let var_type = symbols.get(name).ok_or(MommyLangError::UndeclaredVariable)?;
 
     match var_type.as_str() {
@@ -137,28 +156,22 @@ pub fn listen(
     tokens: &Vec<String>,
     symbols: &HashMap<String, String>
 ) -> Result<String, MommyLangError> {
-
     // Syntax: listen <var> [upto <size>]
-    if tokens.len() < constants::ARGS_MIN_IO {
+
+    if validate_syntax::is_missing_say_args(tokens.len()) {
         return Err(MommyLangError::MissingArguments);
     }
 
-    let name = &tokens[constants::IDX_IO_VALUE]; // tokens[1]
+    let name = &tokens[constants::IDX_IO_VALUE];
     let var_type = symbols.get(name).ok_or(MommyLangError::UndeclaredVariable)?;
 
-    // 1. Determine the "Safety Limit" (Buffer Size)
-    // If they said "upto 50", use 50. Otherwise, try to find the array size.
     let buffer_size = if tokens.len() >= constants::ARGS_MIN_IO_ARRAY && tokens[2] == constants::KW_UPTO {
         tokens[3].clone()
     } else {
-        // Helper: Extract size from "array|ascii|6" or default to 128
         get_size_from_type(var_type, "128")
     };
 
-    // 2. Generate C Code based on the variable type
     match var_type.as_str() {
-        // CASE: Integer (mayihave 0 in age as int)
-        // Logic: Read into temp buffer -> atoi -> store
         t if t == constants::TYPE_INT => {
             Ok(format!(
                 "{{ char _mommy_buf[64]; if(fgets(_mommy_buf, 64, stdin)) {{ {} = atoi(_mommy_buf); }} }}",
@@ -166,7 +179,6 @@ pub fn listen(
             ))
         },
 
-        // CASE: Float (Bonus support)
         t if t == constants::TYPE_FLOAT => {
             Ok(format!(
                 "{{ char _mommy_buf[64]; if(fgets(_mommy_buf, 64, stdin)) {{ {} = atof(_mommy_buf); }} }}",
@@ -174,8 +186,6 @@ pub fn listen(
             ))
         },
 
-        // CASE: String / Char Array (mayihave " " in name as string)
-        // Logic: Standard fgets + strip newline
         t if t.contains(constants::TYPE_STRING) || t.contains(constants::C_TYPE_CHAR_PTR) => {
              Ok(format!(
                 "fgets({}, {}, stdin); {}[strcspn({}, \"\\n\")] = 0;",
@@ -183,8 +193,6 @@ pub fn listen(
             ))
         },
 
-        // CASE: ASCII Array (group 6 in secret as ascii)
-        // Logic: Read to temp char buffer -> Loop -> Cast to int -> Store in int array
         t if t.contains(constants::TYPE_ASCII) => {
             Ok(format!(
                 "{{ char _temp_ascii[{}]; \
@@ -207,7 +215,6 @@ pub fn listen(
     }
 }
 
-// Helper to grab size from "array|type|size" string
 fn get_size_from_type(type_str: &str, default: &str) -> String {
     let parts: Vec<&str> = type_str.split(constants::SYM_SPLITTER).collect();
     if parts.len() > 2 {

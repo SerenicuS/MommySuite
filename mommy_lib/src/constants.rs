@@ -153,6 +153,13 @@ pub const IDX_LOOP_COUNT: usize = 1;
 pub const IDX_COND_IF: usize = 1;
 pub const INDX_COND_ASK: usize = 0;
 
+// Metadata or symbol : type_indicator:data_type:size
+// This is only for heap and array for now
+pub const IDX_META_TYPE_INDICATOR: usize = 0;
+pub const IDX_META_DATA_TYPE: usize = 1;
+pub const IDX_META_SIZE: usize = 2;
+
+
 // ================================================================
 // 5. SHELL CONSTANTS
 // ================================================================

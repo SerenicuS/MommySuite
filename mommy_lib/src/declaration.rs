@@ -29,6 +29,7 @@
 use std::collections::HashMap;
 use crate::responses::MommyLangError;
 use crate::constants;
+use crate::validate_syntax;
 
 // ================================================================
 // PUBLIC FUNCTIONS (The Logic)
@@ -39,7 +40,7 @@ pub fn create_variable(
     symbols: &mut HashMap<String, String>
 ) -> Result<String, MommyLangError> {
 
-    if  is_args_missing_decl(tokens.len()){
+    if  validate_syntax::is_missing_decl_args(tokens.len()){
         return Err(MommyLangError::MissingArguments);
     }
 
@@ -49,15 +50,15 @@ pub fn create_variable(
     let name_index = in_index + 1;
     let type_index = name_index + 2;
 
-    if is_name_and_index_greater_than_len(name_index, type_index, tokens.len()){
+    if validate_syntax::is_name_and_index_greater_than_len(name_index, type_index, tokens.len()){
         return Err(MommyLangError::SyntaxError);
     }
 
     let name = &tokens[name_index];
     let raw_type = &tokens[type_index];
 
-    ensure_valid_name(name)?;
-    ensure_var_new(name, symbols)?;
+    validate_syntax::ensure_valid_name(name)?;
+    validate_syntax::ensure_var_new(name, symbols)?;
 
     let c_type = get_c_type(raw_type);
 
@@ -78,7 +79,7 @@ pub fn create_array(
     symbols: &mut HashMap<String, String>
 ) -> Result<String, MommyLangError> {
 
-    if is_args_missing_decl(tokens.len()){
+    if validate_syntax::is_missing_decl_args(tokens.len()){
         return Err(MommyLangError::MissingArguments);
     }
 
@@ -86,14 +87,14 @@ pub fn create_array(
     let name     = &tokens[constants::IDX_DECL_NAME];
     let raw_type = &tokens[constants::IDX_DECL_TYPE];
 
-    ensure_valid_name(name)?;
-    ensure_var_new(name, symbols)?;
+    validate_syntax::ensure_valid_name(name)?;
+    validate_syntax::ensure_var_new(name, symbols)?;
 
-    if is_invalid_array_tokens(&tokens){
+    if validate_syntax::is_invalid_array_tokens(&tokens){
         return Err(MommyLangError::SyntaxError);
     }
 
-    if is_invalid_array_size(size_str.as_str()){
+    if validate_syntax::is_invalid_array_size(size_str.as_str()){
         return Err(MommyLangError::SyntaxError);
     }
 
@@ -117,7 +118,7 @@ pub fn allocate_heap(
 ) -> Result<String, MommyLangError> {
     // Syntax: ibegyou <SIZE> in <NAME> as <TYPE>
 
-    if is_args_missing_decl(tokens.len()){
+    if validate_syntax::is_missing_decl_args(tokens.len()){
         return Err(MommyLangError::MissingArguments);
     }
 
@@ -125,12 +126,12 @@ pub fn allocate_heap(
     let name = &tokens[constants::IDX_DECL_NAME];
     let raw_type = &tokens[constants::IDX_DECL_TYPE];
 
-    if is_invalid_array_tokens(&tokens){
+    if validate_syntax::is_invalid_array_tokens(&tokens){
         return Err(MommyLangError::SyntaxError);
     }
 
-    ensure_valid_name(name)?;
-    ensure_var_new(name, symbols)?;
+    validate_syntax::ensure_valid_name(name)?;
+    validate_syntax::ensure_var_new(name, symbols)?;
 
     let c_type = match raw_type.as_str() {
         constants::TYPE_ASCII => constants::TYPE_INT,
@@ -158,13 +159,13 @@ pub fn deallocate_heap( tokens: &Vec<String>,
 ) -> Result<String, MommyLangError> {
     // Syntax: takeitback <NAME>
 
-    if is_invalid_dealloc_tokens(&tokens){
+    if validate_syntax::is_invalid_dealloc_tokens(&tokens){
         return Err(MommyLangError::MissingArguments);
     }
 
     let name = &tokens[constants::IDX_DECL_VALUE];
 
-    ensure_var_exists(name, symbols)?;
+    validate_syntax::ensure_var_exists(name, symbols)?;
 
     Ok(format!("free({}); {} = NULL;", name, name))
 }
@@ -217,14 +218,14 @@ fn replace_array_write(
     let index = &tokens[constants::IDX_ARR_INDEX];
     let value = &tokens[constants::IDX_ARR_VALUE];
 
-    ensure_var_exists(name, symbols)?;
+    validate_syntax::ensure_var_exists(name, symbols)?;
     let var_type = symbols.get(name).ok_or(MommyLangError::UndeclaredVariable)?;
 
-    if is_type_mismatch(var_type.as_str()){
+    if validate_syntax::is_type_mismatch(var_type.as_str()){
         return Err(MommyLangError::TypeMismatch);
     }
 
-    if is_accessed_index_invalid(var_type.as_str(), index){
+    if validate_syntax::is_accessed_index_invalid(var_type.as_str(), index){
         return Err(MommyLangError::AccessViolation);
     }
 
@@ -242,11 +243,11 @@ fn replace_array_read(
 
     let array_type = symbols.get(src_array).ok_or(MommyLangError::UndeclaredVariable)?;
 
-    if is_type_mismatch(array_type.as_str()){
+    if validate_syntax::is_type_mismatch(array_type.as_str()){
         return Err(MommyLangError::TypeMismatch);
     }
 
-    if is_accessed_index_invalid(array_type.as_str(), index){
+    if validate_syntax::is_accessed_index_invalid(array_type.as_str(), index){
         return Err(MommyLangError::AccessViolation);
     }
 
@@ -262,23 +263,23 @@ fn replace_scalar_value(
     let name  = &tokens[constants::IDX_ASSIGN_NAME];
     let value = &tokens[constants::IDX_ASSIGN_VALUE];
 
-    if is_keyword_with_missing(&tokens){
+    if validate_syntax::is_keyword_with_missing(&tokens){
         return Err(MommyLangError::SyntaxError);
     }
 
-    ensure_var_exists(name, symbols)?;
+    validate_syntax::ensure_var_exists(name, symbols)?;
 
     let var_type = symbols.get(name).ok_or(MommyLangError::UndeclaredVariable)?;
     let last_token = tokens.last().ok_or(MommyLangError::SyntaxError)?;
 
-    if is_replace_pointer(last_token.as_str()){
-        ensure_var_exists(value, symbols)?;
+    if validate_syntax::is_replace_pointer(last_token.as_str()){
+        validate_syntax::ensure_var_exists(value, symbols)?;
         return Ok(format!("{} = &{};", name, value));
     }
 
 
-    if is_deref_assignment(last_token.as_str()){
-        if is_type_pointer(var_type.as_str()){
+    if validate_syntax::is_deref_assignment(last_token.as_str()){
+        if validate_syntax::is_type_pointer(var_type.as_str()){
              return Ok(format!(
                 "if ({0} == NULL) {{ printf(\"Mommy Error: NULL Pointer access on '{0}'\\n\"); return 1; }} *{0} = {1};",
                 name, value
@@ -289,11 +290,6 @@ fn replace_scalar_value(
 
     Ok(format!("{} = {};", name, value))
 }
-
-
-// ================================================================
-// PRIVATE HELPERS (The Cleanup Crew)
-// ================================================================
 
 fn get_c_type(raw_type: &str) -> &str {
     match raw_type {
@@ -306,47 +302,8 @@ fn get_c_type(raw_type: &str) -> &str {
     }
 }
 
-fn ensure_var_new(name: &str, symbols: &HashMap<String, String>) -> Result<(), MommyLangError> {
-    if symbols.contains_key(name) {
-        Err(MommyLangError::VariableAlreadyExists)
-    } else {
-        Ok(())
-    }
-}
 
-fn ensure_var_exists(name: &str, symbols: &HashMap<String, String>) -> Result<(), MommyLangError> {
-    if !symbols.contains_key(name) {
-        Err(MommyLangError::UndeclaredVariable)
-    } else {
-        Ok(())
-    }
-}
-
-
-fn ensure_valid_name(name: &str) -> Result<(), MommyLangError> {
-    match name {
-        constants::TYPE_INT |
-        constants::C_KW_RETURN |
-        constants::C_KW_VOID |
-        constants::C_KW_CHAR |
-        constants::KW_IF |
-        constants::C_KW_WHILE => Err(MommyLangError::InvalidVariableName),
-
-        _ => Ok(())
-    }
-}
-
-
-
-/// Validate Syntax and provide C null representation
-fn c_null(value: &str) -> String{
-    if value == constants::KW_NULL {
-        return constants::C_NULL.to_string();
-    }
-    value.to_string()
-}
-
-fn insert_symbol(raw_type: &str, name: &str, symbols: &mut HashMap<String, String>) {
+pub fn insert_symbol(raw_type: &str, name: &str, symbols: &mut HashMap<String, String>) {
     if raw_type == constants::KW_BOX {
         symbols.insert(name.to_string(), constants::KW_POINTER.to_string());
     } else {
@@ -354,94 +311,9 @@ fn insert_symbol(raw_type: &str, name: &str, symbols: &mut HashMap<String, Strin
     }
 }
 
-fn is_name_and_index_greater_than_len(name_idx: usize, type_idx: usize, len: usize) -> bool{
-    if name_idx >= len || type_idx >= len {
-        return true
+pub fn c_null(value: &str) -> String{
+    if value == constants::KW_NULL {
+        return constants::C_NULL.to_string();
     }
-    false
-}
-
-fn is_args_missing_decl(args_len: usize) -> bool{
-    if args_len < constants::ARGS_MIN_DECL {
-        return true
-    }
-    false
-}
-
-
-fn is_invalid_array_tokens(tokens: &Vec<String>) -> bool{
-     if tokens[constants::IDX_DECL_KEY_IN] != constants::KW_IN ||
-        tokens[constants::IDX_DECL_KEY_AS] != constants::KW_AS {
-        return true;
-    }
-    false
-}
-
-fn is_invalid_array_size(size_str: &str) -> bool {
-    match size_str.parse::<usize>() {
-        Ok(size) => size > constants::MAX_ARRAY_SIZE,
-        Err(_) => true
-    }
-}
-
-
-fn is_type_mismatch(var_type: &str) -> bool{
-     if !var_type.starts_with(constants::KW_ARRAY) &&
-        !var_type.starts_with(constants::KW_HEAP) &&
-        var_type != constants::TYPE_STRING &&
-        var_type != constants::KW_POINTER {
-        return true
-    }
-    false
-}
-
-fn is_accessed_index_invalid(var_type: &str, index: &str) -> bool{
-    // Check both stack arrays ("array:type:size") and heap allocations ("heap:type:size")
-    if var_type.starts_with(constants::KW_ARRAY) || var_type.starts_with(constants::KW_HEAP) {
-        let parts: Vec<&str> = var_type.split(constants::SYM_SPLITTER).collect();
-        if let Ok(max_size) = parts[2].parse::<usize>() {
-            if let Ok(idx_num) = index.parse::<usize>() {
-                if idx_num >= max_size {
-                   return true
-                }
-            }
-        }
-    }
-    false
-}
-
-fn is_keyword_with_missing(tokens: &Vec<String>) -> bool{
-     if tokens[constants::IDX_ASSIGN_KEY_WITH] != constants::KW_WITH {
-        return true
-    }
-    false
-}
-
-
-fn is_replace_pointer(last_token: &str) -> bool{
-    if last_token == constants::KW_ADDR{
-        return true
-    }
-    false
-}
-
-fn is_type_pointer(var_type: &str) -> bool{
-    if var_type == constants::KW_POINTER {
-        return true
-    }
-    false
-}
-
-fn is_deref_assignment(last_token: &str) -> bool{
-    if last_token == constants::KW_DEREF{
-        return true
-    }
-    false
-}
-
-fn is_invalid_dealloc_tokens(tokens: &Vec<String>) -> bool{
-    if tokens.len() < constants::ARGS_MIN_LEN{
-        return true
-    }
-    false
+    value.to_string()
 }
