@@ -5,6 +5,7 @@ mod editor_ops;
 mod exec_ops;
 mod help_ops;
 mod windows_ops;
+mod editor_common;
 
 use std::{env, io};
 use std::io::Write;
