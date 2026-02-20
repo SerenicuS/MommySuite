@@ -5,7 +5,6 @@ mod editor_ops;
 mod exec_ops;
 mod help_ops;
 mod windows_ops;
-mod editor_common;
 
 use std::{env, io};
 use std::io::Write;
@@ -175,11 +174,11 @@ fn shell_attempt_command(input: &str, root_dir: &std::path::PathBuf, mommy_setti
         shell_commands::MommyShellCommands::ShellShowIPConfig => shell_windows_call("ipconfig"),
         shell_commands::MommyShellCommands::ShellReturnToPrevDirectory => shell_return_to_prev_directory(root_dir),
         shell_commands::MommyShellCommands::ShellClear => shell_clear(),
-        shell_commands::MommyShellCommands::ShellStartCoding => shell_prepare_coding(mommy_settings),
+        shell_commands::MommyShellCommands::ShellStartCoding => shell_prepare_coding(root_dir, mommy_settings),
         shell_commands::MommyShellCommands::ShellChangeDirectory if check_args_len(&args) => shell_move_directory(args[1], root_dir),
         shell_commands::MommyShellCommands::ShellCreateFile if check_args_len(&args) => shell_create_file(args[1]),
         shell_commands::MommyShellCommands::ShellDeleteFile if check_args_len(&args) => shell_delete_file(args[1]),
-        shell_commands::MommyShellCommands::ShellOpenFile if check_args_len(&args) => shell_open_file(args[1]),
+        shell_commands::MommyShellCommands::ShellOpenFile if check_args_len(&args) => shell_open_file(args[1], root_dir),
         shell_commands::MommyShellCommands::ShellRunFile if check_args_len(&args) => shell_run_file(args[1], &mommy_settings.output_directory),
         shell_commands::MommyShellCommands::ShellReadFile if check_args_len(&args) => shell_read_file(args[1]),
         shell_commands::MommyShellCommands::ShellCreateDir if check_args_len(&args) => shell_create_dir(args[1]),

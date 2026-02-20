@@ -6,7 +6,6 @@ use std::process::Command;
 use mommy_lib::responses;
 use mommy_lib::constants;
 use mommy_lib::shell_format::print_line;
-use crate::editor_common::get_editor_path;
 
 pub fn shell_create_file(file_name: &str) {
     match File::create(file_name) {
@@ -40,7 +39,7 @@ pub fn shell_read_file(file_name: &str) {
     }
 }
 
-pub fn shell_open_file(file_name: &str) {
+pub fn shell_open_file(file_name: &str, root_dir: &PathBuf) {
     let dir = shell_get_directory_return();
 
     // Clean up Windows UNC prefix
@@ -60,9 +59,9 @@ pub fn shell_open_file(file_name: &str) {
         return;
     }
 
-    // Launch editor with absolute path
-    let editor_path = get_editor_path();
-
+    // Get editor path from root_dir
+    let editor_path = root_dir.join("mommy_editor").join("mommy_editor.exe");
+    
     // Verify editor exists before attempting to launch
     if !editor_path.exists() {
         eprintln!("ERROR: Editor not found at: {}", editor_path.display());
