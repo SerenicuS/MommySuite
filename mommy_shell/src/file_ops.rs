@@ -1,4 +1,3 @@
-use std::env;
 use std::fs::File;
 use std::io::{BufRead, BufReader};
 use std::path::PathBuf;
@@ -6,6 +5,8 @@ use std::process::Command;
 use mommy_lib::responses;
 use mommy_lib::constants;
 use mommy_lib::shell_format::print_line;
+
+use crate::file_validation;
 
 pub fn shell_create_file(file_name: &str) {
     match File::create(file_name) {
@@ -40,33 +41,25 @@ pub fn shell_read_file(file_name: &str) {
 }
 
 pub fn shell_open_file(file_name: &str, root_dir: &PathBuf) {
-    let dir = shell_get_directory_return();
+    let dir = file_validation::shell_get_directory_return();
 
-    // Clean up Windows UNC prefix
-    let clean_dir = if dir.starts_with("\\\\?\\") {
-        dir[4..].to_string()
-    } else {
-        dir
+    let clean_dir: String = {
+        file_validation::clean_path_with_win_prefix(&dir)
     };
 
-    // Build absolute path
     let mut full_path = PathBuf::from(&clean_dir);
     full_path.push(file_name);
 
-    // Check if file exists
-    if !full_path.exists() {
+    if !file_validation::does_file_exist(&full_path) {
         print_line(responses::MommyShellError::FileNotFound);
-        return;
+        return
     }
 
-    // Get editor path from root_dir
-    let editor_path = root_dir.join("mommy_editor").join("mommy_editor.exe");
-    
-    // Verify editor exists before attempting to launch
-    if !editor_path.exists() {
-        eprintln!("ERROR: Editor not found at: {}", editor_path.display());
-        print_line(responses::MommyShellError::FileNotFound);
-        return;
+    let editor_path = root_dir.join(constants::TXT_EDITOR_DIR).join(constants::TXT_EDITOR_EXE);
+
+    if !file_validation::does_file_exist(&editor_path){
+        print_line(responses::MommyShellError::CannotFindTextEditor);
+        return
     }
 
     match Command::new(&editor_path)
@@ -77,21 +70,12 @@ pub fn shell_open_file(file_name: &str, root_dir: &PathBuf) {
             if status.success() {
                 print_line(responses::MommyShellOk::FileOpened);
             } else {
-                eprintln!("WARNING: Editor exited with error code: {:?}", status.code());
-                print_line(responses::MommyShellError::FileNotFound);
+                print_line(responses::MommyShellError::GeneralTextEditorError);
             }
         },
         Err(e) => {
             eprintln!("ERROR: Failed to launch editor: {}", e);
-            print_line(responses::MommyShellError::FileNotFound);
         }
     }
-}
-
-
-pub fn shell_get_directory_return() -> String {
-    let dir = env::current_dir()
-        .expect(&responses::MommyShellError::DirectoryNotFound.to_string());
-    dir.display().to_string()  // Convert PathBuf to String
 }
 

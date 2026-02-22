@@ -52,6 +52,7 @@ pub enum MommyLangError {
     RunFile,
     ExecutableFile,
     CannotCreateCFile,
+    
 
     // Math (ALU)
     MathOnString,
@@ -123,6 +124,8 @@ pub enum MommyShellError {
     ExternalCommandFailed,
     ExternalConsoleBroken,
     ConfigSaveError,
+    CannotFindTextEditor,
+    GeneralTextEditorError,
 }
 
 // =========================================================
@@ -200,6 +203,7 @@ impl fmt::Display for MommyLangError {
             Self::RunFile => write!(f, "Mommy is disappointed. Program exited with code."),
             Self::ExecutableFile => write!(f, "Could not start the executable."),
             Self::CannotCreateCFile => write!(f, "We cannot convert this file"),
+          
 
             Self::ErrorBegins => write!(f, "--- MOMMY IS DISAPPOINTED ---"),
             Self::ErrorEnds => write!(f, "--- END OF FAILURE ---"),
@@ -272,6 +276,8 @@ impl fmt::Display for MommyShellError {
             Self::SystemCrash => write!(f, "Look what you did. You broke it. Now I have to clean up your mess."),
             Self::ProcessNotFound => write!(f, "That doesn't exist. Focus, sweetie."),
             Self::LaunchFailed => write!(f, "It refused to start. Probably because you asked nicely instead of demanding it."),
+            Self::CannotFindTextEditor => write!(f, "I can't find the text editor. Did you hide it from me?"),
+            Self::GeneralTextEditorError => write!(f, "The text editor is not cooperating. Should I destroy it?"),
 
             // Windows / Network
             Self::ExternalIPConfigCallFail => write!(f, "Your little friend isn't answering. Just you and me now."),

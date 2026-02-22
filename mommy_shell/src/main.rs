@@ -5,6 +5,7 @@ mod editor_ops;
 mod exec_ops;
 mod help_ops;
 mod windows_ops;
+mod file_validation;
 
 use std::{env, io};
 use std::io::Write;

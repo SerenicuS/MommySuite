@@ -18,7 +18,7 @@ pub const CMD_RUN_NOTEPAD: &str = "notepad.exe";
 pub const ARGS_MIN_MATH: usize = 4;
 pub const ARGS_MIN_FILE: usize = 2;
 pub const ARGS_MIN_LEN: usize  = 2;
-pub const NAME_MIN_LEN: usize  = 3; // Was MIN_INDEX_NAME_LEN
+pub const NAME_MIN_LEN: usize  = 3;
 pub const ARGS_MIN_COND: usize = 3;
 
 pub const MAX_ARRAY_SIZE: usize = 100;
@@ -32,9 +32,9 @@ pub const SIZE_UNKNOWN: usize = 0;
 // 2. MOMMY LANGUAGE (Input Syntax)
 // ================================================================
 // Keywords the user types
-pub const KW_VAR_DEC: &str    = "mayihave"; // Was INDEX_KEYWORD_CREATE_VARIABLE (sort of)
+pub const KW_VAR_DEC: &str    = "mayihave";
 pub const KW_ARRAY_DEC: &str  = "group";
-pub const KW_ASSIGN: &str     = "replace";  // Was INDEX_KEYWORD_REPLACE (sort of)
+pub const KW_ASSIGN: &str     = "replace";
 pub const KW_MALLOC: &str     = "ibegyou";     // For dynamic memory allocation
 pub const KW_FREE: &str       = "takeitback";     // For freeing dynamic memory
 
@@ -60,7 +60,7 @@ pub const KW_ELSE_BLOCK: &str = "}else {";
 pub const KW_ASK: &str        = "ask";
 
 // Types
-pub const TYPE_STRING: &str     = "String";  // Used by io.rs
+pub const TYPE_STRING: &str     = "String";
 pub const TYPE_INT: &str        = "int";
 pub const TYPE_FLOAT: &str      = "float";
 pub const TYPE_ASCII: &str      = "ascii";
@@ -232,3 +232,9 @@ pub const SHELL_DF_USER: &str = "Harold"; // DF means default
 pub const SHELL_DF_PASS: &str = "Valeria";
 pub const SHELL_DF_ANGER_MAX: usize = 2;
 
+// ================================================================
+// 5. TEXT EDITOR
+// ================================================================
+
+pub const TXT_EDITOR_EXE: &str = "mommy_editor.exe";
+pub const TXT_EDITOR_DIR: &str = "mommy_editor";

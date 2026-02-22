@@ -1,4 +1,11 @@
-// Shared shell formatting utilities.
+//!
+//! This is the shell format crate of mommyshell.
+//!
+//!
+//!
+//!
+//!
+//!
 
 use std::io::{self, Write};
 use crate::constants;

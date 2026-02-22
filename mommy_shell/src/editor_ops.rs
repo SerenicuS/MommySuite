@@ -5,6 +5,8 @@ use mommy_lib::responses;
 use mommy_lib::shell_format::{print_line, print_wrapper, read_prompted_line};
 use mommy_lib::constants;
 
+use crate::file_validation;
+
 pub fn shell_prepare_coding(root_dir: &PathBuf, mommy_settings: &mut config::MommySettings) {
     print_wrapper([
         responses::MommyUI::PrepareCoding.to_string(),
@@ -24,10 +26,8 @@ pub fn shell_prepare_coding(root_dir: &PathBuf, mommy_settings: &mut config::Mom
 pub fn shell_start_coding(root_dir: &PathBuf, mommy_settings: &mut config::MommySettings) {
     let editor_path = root_dir.join("mommy_editor").join("mommy_editor.exe");
 
-    // Verify editor exists before attempting to launch
-    if !editor_path.exists() {
-        eprintln!("ERROR: Editor not found at: {}", editor_path.display());
-        print_line(responses::MommyShellError::FileNotFound);
+    if !file_validation::does_file_exist(&editor_path) {
+        print_line(responses::MommyShellError::CannotFindTextEditor);
         return;
     }
 
@@ -39,13 +39,11 @@ pub fn shell_start_coding(root_dir: &PathBuf, mommy_settings: &mut config::Mommy
             if status.success() {
                 print_line(responses::MommyShellOk::FileOpened);
             } else {
-                eprintln!("WARNING: Editor exited with error code: {:?}", status.code());
-                print_line(responses::MommyShellError::FileNotFound);
+                print_line(responses::MommyShellError::GeneralTextEditorError);
             }
         },
         Err(e) => {
             eprintln!("ERROR: Failed to launch editor: {}", e);
-            print_line(responses::MommyShellError::FileNotFound);
         }
     }
 }
