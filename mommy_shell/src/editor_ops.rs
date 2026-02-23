@@ -24,7 +24,7 @@ pub fn shell_prepare_coding(root_dir: &PathBuf, mommy_settings: &mut config::Mom
 }
 
 pub fn shell_start_coding(root_dir: &PathBuf, mommy_settings: &mut config::MommySettings) {
-    let editor_path = root_dir.join("mommy_editor").join("mommy_editor.exe");
+    let editor_path = root_dir.join(constants::TXT_EDITOR_DIR).join(constants::TXT_EDITOR_EXE);
 
     if !file_validation::does_file_exist(&editor_path) {
         print_line(responses::MommyShellError::CannotFindTextEditor);
