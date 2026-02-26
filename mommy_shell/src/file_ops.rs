@@ -16,6 +16,12 @@ pub fn shell_create_file(file_name: &str) {
 }
 
 pub fn shell_delete_file(file_name: &str) {
+
+    if file_name.starts_with(constants::MOMMY_DIR_PREFIX){
+        print_line(responses::MommyShellError::CannotDeleteFile);
+        return
+    }
+
     match std::fs::remove_file(file_name) {
         Ok(_) => print_line(responses::MommyShellOk::FileDeleted),
         Err(_) => print_line(responses::MommyShellError::CannotDeleteFile),
@@ -55,7 +61,16 @@ pub fn shell_open_file(file_name: &str, root_dir: &PathBuf) {
         return
     }
 
-    let editor_path = root_dir.join(constants::TXT_EDITOR_DIR).join(constants::TXT_EDITOR_EXE);
+    let editor_path = if cfg!(debug_assertions) {
+    // DEBUG PATH: Points to your actual source/project folder
+    root_dir
+        .join("mommy_editor")
+        .join(constants::TXT_EDITOR_EXE)
+    } else {
+    // RELEASE PATH: Points to the final bundled location
+         root_dir
+        .join(constants::TXT_EDITOR_EXE)
+    };
 
     if !file_validation::does_file_exist(&editor_path){
         print_line(responses::MommyShellError::CannotFindTextEditor);

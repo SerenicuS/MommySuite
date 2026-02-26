@@ -1,8 +1,15 @@
+[package]
+name = "mommy_suite"
+version = "0.1.0"
+edition = "2021"
+
 [workspace]
 members = [
-    "mommy_lang",     #  Compiler
-    "mommy_shell",    #  Terminal
-    "mommy_lib",      #  Shared Library
+    "mommy_lib",
+    "mommy_lang",
+    "mommy_shell",
 ]
 resolver = "2"
 
+[dependencies]
+mommy_lib = { path = "mommy_lib" }

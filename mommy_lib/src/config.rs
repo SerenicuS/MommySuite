@@ -11,7 +11,7 @@ pub struct MommySettings {
 
 impl MommySettings {
      pub fn load(root: &Path) -> Self {
-        let config_path = root.join("shell_properties").join("mommy_conf.memory");
+        let config_path = root.join("mommy_properties").join("mommy_conf.memory");
         let content = fs::read_to_string(&config_path).unwrap_or_default();
 
         let mut settings = Self {

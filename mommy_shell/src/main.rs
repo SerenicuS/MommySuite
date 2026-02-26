@@ -9,6 +9,7 @@ mod file_validation;
 
 use std::{env, io};
 use std::io::Write;
+use std::path::PathBuf;
 use mommy_lib::responses;
 use mommy_lib::constants;
 use mommy_lib::shell_commands;
@@ -26,29 +27,19 @@ use crate::dir_ops::{
 };
 use crate::config_ops::{shell_change_code_dir, shell_override_user};
 use crate::editor_ops::shell_prepare_coding;
-use crate::exec_ops::{run_mommy_lang, shell_run_file};
+use crate::exec_ops::{shell_run_file};
 use crate::help_ops::{shell_print_advance_help, shell_print_basic_help};
 use crate::windows_ops::shell_windows_call;
 
 fn main() {
-    let root_dir = env::current_dir().expect(&responses::MommyShellError::RootDirError.to_string());
+    let root_dir_str = env::var("MOMMY_ROOT_DIR").expect("SECURITY VIOLATION: Shell launched outside of MommySuite OS.");
+    let root_dir = PathBuf::from(root_dir_str);
+
+    // 2. Load the config (we know it's safe because the OS already built it!)
     let mut mommy_settings = MommySettings::load(&root_dir);
 
-    print_wrapper([
-        responses::MommyUI::WelcomeTitle.to_string(),
-        responses::MommyUI::WelcomeSubtitle.to_string(),
-        responses::MommyUI::WelcomePrompt.to_string(),
-    ]);
-
-    loop{
-        let input = read_prompted_line_with_error(constants::SPACE_PROMPT, &responses::MommyUI::ExitMessage.to_string());
-
-        match input.trim(){
-            constants::LETTER_SHELL_YES => shell_ask_user(&root_dir, &mut mommy_settings),
-            constants::LETTER_SHELL_T => shell_skip_default(&root_dir),
-            _ => std::process::exit(0),
-        }
-    }
+    // 3. Begin the Interrogation
+    shell_ask_user(&root_dir, &mut mommy_settings);
 }
 
 // ============================================================================
@@ -56,7 +47,7 @@ fn main() {
 // ============================================================================
 
 
-fn shell_ask_user(root_dir: &std::path::PathBuf, mommy_settings: &mut MommySettings) {
+fn shell_ask_user(root_dir: &PathBuf, mommy_settings: &mut MommySettings) {
     print_wrapper([
         responses::MommyUI::AskName.to_string(),
         responses::MommyUI::ConfirmName.to_string(),
@@ -127,13 +118,7 @@ fn validate_user_input(anger_level: &usize, pass: &str) -> bool{
 }
 
 
-
-fn shell_skip_default(root_dir: &std::path::PathBuf){
-    shell_move_directory(constants::DEF_DIR_OUPUT, root_dir);
-    run_mommy_lang(constants::SHELL_DBG_FILE);
-}
-
-fn shell_start_default(root_dir: &std::path::PathBuf, mommy_settings: &mut MommySettings) {
+fn shell_start_default(root_dir: &PathBuf, mommy_settings: &mut MommySettings) {
     print_wrapper([
         responses::MommyUI::GenericObedience.to_string(),
         format!("{}, {}.", responses::MommyUI::MommyAcknowledge, mommy_settings.user_name),
@@ -154,8 +139,7 @@ fn shell_start_default(root_dir: &std::path::PathBuf, mommy_settings: &mut Mommy
     }
 }
 
-
-fn shell_attempt_command(input: &str, root_dir: &std::path::PathBuf, mommy_settings: &mut MommySettings) {
+fn shell_attempt_command(input: &str, root_dir: &PathBuf, mommy_settings: &mut MommySettings) {
     let clean_input = input.trim();
     let args: Vec<&str> = clean_input.split_whitespace().collect();
 

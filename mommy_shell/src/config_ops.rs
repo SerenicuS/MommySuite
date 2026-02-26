@@ -4,6 +4,7 @@ use mommy_lib::config;
 use mommy_lib::responses;
 use mommy_lib::shell_format::print_line;
 
+
 pub fn shell_change_code_dir(new_dir: &str, mommy_settings: &mut config::MommySettings) {
     let current_working_dir = env::current_dir().unwrap();
     let absolute_target = current_working_dir.join(new_dir);
@@ -23,7 +24,9 @@ pub fn shell_override_user(user_name: &str, mommy_settings: &mut config::MommySe
             mommy_settings.user_name = user_name.trim().to_string();
             print_line(format!("{} {}", responses::MommyUI::AcceptNewName, user_name));
         }
-        Err(_) => print_line(responses::MommyUI::BrainError),
+        Err(_) =>  {
+            print_line(responses::MommyUI::BrainError)
+        },
 
     }
 }

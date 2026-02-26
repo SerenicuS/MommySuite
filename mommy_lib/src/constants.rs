@@ -232,6 +232,8 @@ pub const SHELL_DF_USER: &str = "Harold"; // DF means default
 pub const SHELL_DF_PASS: &str = "Valeria";
 pub const SHELL_DF_ANGER_MAX: usize = 2;
 
+pub const MOMMY_DIR_PREFIX: &str = "mommy";
+
 // ================================================================
 // 5. TEXT EDITOR
 // ================================================================

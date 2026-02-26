@@ -45,6 +45,12 @@ pub fn shell_create_dir(dir_name: &str) {
 }
 
 pub fn shell_delete_dir(dir_name: &str) {
+
+     if dir_name.starts_with(constants::MOMMY_DIR_PREFIX){
+        print_line(responses::MommyShellError::CannotDeleteFile);
+        return
+    }
+
     match std::fs::remove_dir(dir_name) {
         Ok(_) => print_line(responses::MommyShellOk::DirectoryDeleted),
         Err(_) => print_line(responses::MommyShellError::DirectoryNotFound),

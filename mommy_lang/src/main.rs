@@ -6,12 +6,12 @@
 //! ---
 //!
 //!  Started: Jan 26, 2026
-//!  Amount of Time Spent(Too late to track): 16(H), 2(M).
+//!  Amount of Time Spent(Too late to track): 16(H), 24(M).
 //!  Current: February 22, 2026
 //!
 //! ## 🛠️ Development Roadmap
 //!
-//! ### Phase 2: The Discipline Update (Current)
+//! ### Phase 2: The Discipline Update (Postponed)
 //! Focused on memory safety, data structures, and stricter control.
 //! - [x] Modular architecture refactor
 //! - [x] Unified shell formatting system (`shell_format.rs`)
@@ -27,13 +27,14 @@
 //! - [ ] Enhanced error messages
 //! - [ ] Security & sandboxing
 //!
-//! ### Phase 3: The Stockholm Update
+//! ### Phase 3: The Stockholm Update (current)
 //! Focused on OS-level features and system dependency.
-//! - [ ] Custom IDE editor (syntax highlighting, real-time editing)
+//! - [ ] System Pseudo Startup (custom init process)
+//! - [ ] Custom IDE editor (syntax highlighting, real-time editing) < only basic
 //! - [ ] Multi-file project support
 //! - [ ] Advanced debugging features
 //! - [ ] Performance optimizations
-//! - [ ] Terminal UI improvements
+//! - [x] Terminal UI improvements
 //! - [ ] Cleanup (refactoring & optimization)
 //!
 //! ### Phase 4: OS Features
