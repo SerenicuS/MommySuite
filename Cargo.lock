@@ -3,6 +3,10 @@
 version = 4
 
 [[package]]
+name = "mommy_installer"
+version = "0.1.0"
+
+[[package]]
 name = "mommy_lang"
 version = "0.1.0"
 dependencies = [

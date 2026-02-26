@@ -8,6 +8,7 @@ members = [
     "mommy_lib",
     "mommy_lang",
     "mommy_shell",
+    "mommy_installer",
 ]
 resolver = "2"
 
