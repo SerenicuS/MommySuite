@@ -13,23 +13,40 @@
 - 📚 **Standard Library** - Shared utilities for all components
 - ~2650 lines of Rust, modular architecture, production-quality error handling
 
-**The Three Components:**
+**The Five Components:**
 ```
 MommySuite
-├── mommy_lib (1500 lines)      → Shared language logic
-├── mommy_shell (800 lines)     → Interactive terminal UI
-└── mommy_lang (350 lines)      → Compiler/transpiler
+├── mommy_lib                   → Shared language logic
+├── mommy_shell                 → Interactive terminal UI
+├── mommy_lang                  → Compiler/transpiler
+├── mommy_editor                → Integrated code editor
+└── mommy_installer             → Distribution & setup (release)
 ```
 
 ---
 
 ## 🚀 Quick Start
 
+### **Option 1: Using the Installer (Recommended)**
+```bash
+# Build the project
+cargo build --release
+
+# Run the installer
+./target/release/mommy_installer.exe
+
+# Then run the suite
+./mommy_suite.exe
+```
+
+The installer will extract all binaries, then launch the MommySuite OS environment.
+
+### **Option 2: Build & Run Manually**
 ```bash
 # Clone and build
 cargo build --release
 
-# Run the shell
+# Run the shell directly
 ./target/release/mommy_shell.exe
 
 # Or compile a .mommy file directly
@@ -87,6 +104,13 @@ Building just a shell was boring. So I went all-in: created a **complete languag
 │  ├─ 20+ commands (file, dir, exec)      │
 │  └─ Interactive prompt with personality │
 │                                         │
+│  mommy_editor (IDE Editor)              │
+│  └─ Real-time code editing              │
+│                                         │
+│  mommy_installer (Distribution)         │
+│  ├─ Bundles all executables             │
+│  └─ Main entry point for releases       │
+│                                         │
 │  mommy_lib (Shared Library)             │
 │  ├─ Language core (lexer, parser, etc)  │
 │  ├─ Error handling (25+ error types)    │
@@ -100,9 +124,11 @@ Building just a shell was boring. So I went all-in: created a **complete languag
 
 | Component       | Purpose                    | Key Files                                                                                                                           |
 |-----------------|----------------------------|-------------------------------------------------------------------------------------------------------------------------------------|
-| **mommy_lib**   | Language logic + utilities | `syntax_lexer.rs`, `declaration.rs`, `alu.rs`, `loops.rs`, `conditions.rs`, `io.rs`, `responses.rs`, `shell_format.rs`, `config.rs` |
+| **mommy_lib**   | Language logic + utilities | `syntax_lexer.rs`, `declaration.rs`, `alu.rs`, `loops.rs`, `conditions.rs`, `io.rs`, `responses.rs`, `shell_format.rs`, `config.rs`, `shell_commands.rs`, `package.rs`, `validate_syntax.rs` |
 | **mommy_shell** | User-facing terminal       | `main.rs`, `file_ops.rs`, `dir_ops.rs`, `exec_ops.rs`, `config_ops.rs`, `editor_ops.rs`, `help_ops.rs`, `windows_ops.rs`            |
-| **mommy_lang**  | Compiler/transpiler        | Single `main.rs` with compilation pipeline                                                                                          |
+| **mommy_lang**  | Compiler/transpiler        | `main.rs`, `compiler.rs`, `pipeline.rs`, `config.rs`                                                                                |
+| **mommy_editor** | Code editor (IDE)          | `mommy_editor.exe` - Syntax highlighting & real-time editing                                                                         |
+| **mommy_installer** | Distribution utility    | Single `main.rs` that extracts and distributes binaries for releases                                                                |
 
 ### **Key Design Principles**
 
@@ -113,7 +139,7 @@ Building just a shell was boring. So I went all-in: created a **complete languag
 - ✅ **Persistent**: Settings saved to `mommy_conf.memory` across sessions
 - ✅ **Well-Organized**: ~2650 lines across 22 focused files
 
-![Hello World!](./readme_assets/hello-world.gif)
+![Hello World!](./readme_assets/loop.gif)
 
 ---
 
@@ -328,7 +354,8 @@ Always double-check commands before running!
 - [x] Program control (leave/return)
 - [x] Basic shell with file/directory operations
 
-### **Phase 2: Discipline Update (🔧 IN PROGRESS)**
+### **Phase 2: Discipline Update (⏸️ Postponed)**
+Focused on memory safety, data structures, and stricter control.
 - [x] Modular architecture refactor
 - [x] Unified shell formatting system (`shell_format.rs`)
 - [x] Data persistence (`mommy_conf.memory`)
@@ -336,19 +363,21 @@ Always double-check commands before running!
 - [x] Pointer support (`address`, `inside` keywords)
 - [x] Heap allocation (`ibegyou` keyword)
 - [x] Standard input (`listen` keyword)
-- [ ] Package system (`please use` keyword)
+- [x] Package system (`makeme` keyword)
 - [ ] Bitwise operations
 - [ ] Functions
-- [ ] System Calls
+- [ ] System calls
 - [ ] Enhanced error messages
 - [ ] Security & sandboxing
 
-### **Phase 3: Stockholm Update (📋 PLANNED)**
-- [ ] Custom IDE editor (syntax highlighting, real-time editing)
+### **Phase 3: Stockholm Update (🔄 CURRENT)**
+Focused on OS-level features and system dependency.
+- [ ] System Pseudo Startup (custom init process)
+- [x] Custom IDE editor (syntax highlighting, real-time editing) *basic only*
 - [ ] Multi-file project support
 - [ ] Advanced debugging features
 - [ ] Performance optimizations
-- [ ] Terminal UI improvements
+- [x] Terminal UI improvements
 - [ ] Cleanup (refactoring & optimization)
 
 ### **Phase 4: OS Features (🚀 FUTURE)**
@@ -357,15 +386,34 @@ Always double-check commands before running!
 - [ ] Memory allocation tracking
 - [ ] Custom standard library expansion
 
+### **Bonus Objectives**
+- [ ] **Mommy's Fingers:** Registry-like assembly manipulation
+
 ---
+
+## 🧠 Psychological Phases (The Lore)
+
+The compiler's personality evolves with the user's proficiency:
+
+1. **Phase 1 (Abusive):** Rejection. *"You are stupid."* (Syntax Errors = Insults)
+2. **Phase 2 (Discipline):** Correction. *"Do it my way."* (Strict Typing/Borrow Checking)
+3. **Phase 3 (Stockholm):** Acceptance. *"This is my home."* (Vendor Lock-in)
+
+### Future Personality Expansions
+- **Phase 3.5 (Gaslighting):** Confusion. *"Did I do that?"* (Randomized warnings)
+- **Phase 4 (Domestic):** Responsibility. *"I must feed the system."* (Manual memory management)
+- **Phase 5 (Freedom):** False Hope. *"I can leave... but do I want to?"* (The final test)
 
 ## 📊 Project Statistics
 
 | Metric                          | Value      |
 |---------------------------------|------------|
-| **Total Lines (Rust)**          | ~2650      |
-| **Core Library (mommy_lib)**    | 14 modules |
+| **Total Lines (Rust)**          | ~3000+     |
+| **Core Library (mommy_lib)**    | 16 modules |
 | **Shell Modules (mommy_shell)** | 8 modules  |
+| **Compiler Modules (mommy_lang)** | 4 modules |
+| **Editor (mommy_editor)**       | Binary     |
+| **Installer Module**            | 1 module   |
 | **Language Keywords**           | 25+        |
 | **Shell Commands**              | 20+        |
 | **Error Types**                 | 25+        |
@@ -396,6 +444,8 @@ MommySuite/
 │       ├── responses.rs         # Error & UI messages
 │       ├── shell_format.rs      # Unified formatting (NEW)
 │       ├── config.rs            # Settings persistence
+│       ├── shell_commands.rs    # Command registry
+│       ├── package.rs           # Package system
 │       └── [other modules...]
 ├── mommy_shell/        # User interface (Terminal)
 │   └── src/
@@ -404,9 +454,15 @@ MommySuite/
 │       ├── dir_ops.rs           # Directory navigation
 │       ├── exec_ops.rs          # Program execution
 │       └── [other modules...]
-└── mommy_lang/         # Compiler/Transpiler
-    └── src/
-        └── main.rs              # Compilation pipeline
+├── mommy_lang/         # Compiler/Transpiler
+│   └── src/
+│       ├── main.rs              # Compilation entry point
+│       ├── compiler.rs          # Core compiler logic
+│       ├── pipeline.rs          # Compilation pipeline
+│       └── config.rs            # Compiler configuration
+├── mommy_installer/    # Distribution utility
+│   └── src/
+│       └── main.rs              # Binary extraction & setup
 ```
 
 ---

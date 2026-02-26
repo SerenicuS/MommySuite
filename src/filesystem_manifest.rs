@@ -29,7 +29,6 @@ pub enum RequiredDirectory {
     MommyBrain,
     MommyTrash,
     MommyProperties,
-    MommyMemory,
     Sandbox,
 }
 
@@ -39,7 +38,6 @@ impl RequiredDirectory {
         RequiredDirectory::MommyBrain,
         RequiredDirectory::MommyTrash,
         RequiredDirectory::MommyProperties,
-        RequiredDirectory::MommyMemory,
         RequiredDirectory::Sandbox,
     ];
     
@@ -48,7 +46,7 @@ impl RequiredDirectory {
             Self::MommyBrain => "[0x09B0]",
             Self::MommyTrash => "[0x09B4]",
             Self::MommyProperties => "[0x09C2]",
-            Self::MommyMemory => "[0x09C8]",
+
             Self::Sandbox => "[0x09CC]",
         }
     }
@@ -58,7 +56,6 @@ impl RequiredDirectory {
             Self::MommyBrain => "mommy_brain",
             Self::MommyTrash => "mommy_trash",
             Self::MommyProperties => "mommy_properties",
-            Self::MommyMemory => "mommy_memory",
             Self::Sandbox => "sandbox",
         }
     }
