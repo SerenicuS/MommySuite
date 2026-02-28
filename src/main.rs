@@ -167,7 +167,9 @@ fn phase_6_shell_handoff(root_dir: &Path) {
         .spawn()
         .expect(&os_responses::MommySuiteCoreResponse::ShellMissing.to_string());
 
-    let status = shell_process.wait().expect_err(&os_responses::MommySuiteCoreResponse::ShellMissing.to_string());
+    let status = shell_process.wait().expect(&os_responses::MommySuiteCoreResponse::ShellMissing.to_string());
+
+
     println!("\n[SYS] Shell terminated with status: {}", status);
 }
 

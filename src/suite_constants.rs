@@ -26,8 +26,7 @@ pub const TERMINAL_CLEAR: &str = "\x1B[2J\x1B[1;1H";
 
 pub const MILLI_SLEEP_3000: u64 = 3000;
 
-pub const REQ_CORE_FILES_NUM: usize = 4;
-
+pub const REQ_CORE_FILES_NUM: usize = 4; // Should be the exact number of core files required for the suite to run. If this number is incorrect, the boot sequence will panic.
 
 pub const SHELL_EXE_PATH: &str = if cfg!(debug_assertions) {
     "target/debug/mommy_shell.exe"
