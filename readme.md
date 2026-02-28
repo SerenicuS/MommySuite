@@ -1,6 +1,6 @@
 # 🦀 MommySuite: Rust-Based Systems Ecosystem
 
-> A **complete language ecosystem** built in Rust: custom shell + transpiler + compiler + standard library.
+> A **complete language ecosystem** built in Rust: custom shell + transpiler + compiler + standard library + editor.
 
 ---
 
