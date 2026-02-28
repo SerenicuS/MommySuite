@@ -235,6 +235,8 @@ pub const SHELL_DF_ANGER_MAX: usize = 2;
 
 pub const MOMMY_DIR_PREFIX: &str = "mommy";
 
+pub const MOMMY_TRASH_PATH: &str = "mommy_trash";
+
 // ================================================================
 // 5. TEXT EDITOR
 // ================================================================

@@ -1,7 +1,7 @@
 use std::{env, fs};
 use std::fs::File;
 use std::io::{BufRead, BufReader};
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use std::process::Command;
 use mommy_lib::responses;
 use mommy_lib::constants;
@@ -16,14 +16,20 @@ pub fn shell_create_file(file_name: &str) {
     }
 }
 
-pub fn shell_delete_file(file_name: &str) {
-
-    if file_name.starts_with(constants::MOMMY_DIR_PREFIX){
+pub fn shell_delete_file(file_name: &str, root_dir: &PathBuf) {
+    if file_name.starts_with(constants::MOMMY_DIR_PREFIX) {
         print_line(responses::MommyShellError::CannotDeleteFile);
-        return
+        return;
     }
 
-    match fs::remove_file(file_name) {
+    let trash_dir = root_dir.join(constants::MOMMY_TRASH_PATH);
+    fs::create_dir_all(&trash_dir).unwrap();
+
+    let no_path_file = Path::new(file_name).file_name().unwrap();
+    let dest = trash_dir.join(no_path_file);
+
+
+    match fs::rename(file_name, dest) {
         Ok(_) => print_line(responses::MommyShellOk::FileDeleted),
         Err(_) => print_line(responses::MommyShellError::CannotDeleteFile),
     }

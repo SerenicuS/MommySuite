@@ -179,7 +179,7 @@ fn shell_attempt_command(input: &str, root_dir: &PathBuf, mommy_settings: &mut M
         // ==========================================
         (shell_commands::MommyShellCommands::ShellChangeDirectory, [arg]) => shell_move_directory(arg, root_dir),
         (shell_commands::MommyShellCommands::ShellCreateFile, [arg]) => shell_create_file(arg),
-        (shell_commands::MommyShellCommands::ShellDeleteFile, [arg]) => shell_delete_file(arg),
+        (shell_commands::MommyShellCommands::ShellDeleteFile, [file_name]) => shell_delete_file(file_name, root_dir),
         (shell_commands::MommyShellCommands::ShellOpenFile, [arg]) => shell_open_file(arg, root_dir),
         (shell_commands::MommyShellCommands::ShellRunFile, [arg]) => shell_run_file(arg, &mommy_settings.output_directory),
         (shell_commands::MommyShellCommands::ShellReadFile, [arg]) => shell_read_file(arg),
