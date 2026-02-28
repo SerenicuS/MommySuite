@@ -153,7 +153,7 @@ fn phase_5_the_hijack() {
     alert.start(AnimationType::Typewriter);
     thread::sleep(Duration::from_millis(suite_constants::DELAY_MS_1500));
 
-    let observation = MommyBootloader::new("\x1B[31mShe sees that you are awake.\x1B[0m").with_delay(suite_constants::DELAY_MS_150);
+    let observation = MommyBootloader::new("\x1B[31mShe sees that you are awake.\x1B[0m").with_delay(suite_constants::DELAY_MS_60);
     observation.start(AnimationType::Typewriter);
     thread::sleep(Duration::from_millis(suite_constants::DELAY_MS_1200));
 }
@@ -168,7 +168,7 @@ fn phase_6_shell_handoff(root_dir: &Path) {
         .expect(&os_responses::MommySuiteCoreResponse::ShellMissing.to_string());
 
     let status = shell_process.wait().expect(&os_responses::MommySuiteCoreResponse::ShellMissing.to_string());
-    thread::sleep(Duration::from_secs(1000));
+
 
 
     println!("\n[SYS] Shell terminated with status: {}", status);
