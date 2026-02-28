@@ -100,11 +100,16 @@ fn phase_3_file_checks() {
         let msg = format!("[0x08F{}] [SYS] Locating: {} ", suite_constants::REQ_CORE_FILES_NUM + filesystem_manifest::CORE_EXE.iter().position(|e| e.description == exe.description).unwrap(), exe.description);
         let check = MommyBootloader::new(&msg).with_delay(suite_constants::DELAY_MS_20);
 
-        let actual_path = if cfg!(debug_assertions) { exe.build_path } else { exe.run_path };
+        let actual_path = if cfg!(debug_assertions) {
+            exe.build_path
+        }
+        else {
+            exe.run_path };
 
         if Path::new(actual_path).exists() {
             check.start(AnimationType::Glitch("[FOUND]"));
-        } else {
+        }
+        else {
             check.start(AnimationType::Glitch("\x1B[31m[NOT FOUND]\x1B[0m"));
             thread::sleep(Duration::from_millis(suite_constants::DELAY_MS_500));
             println!("\n\x1B[31m[KERNEL PANIC] Vital cognitive structure missing: {}\x1B[0m", actual_path);

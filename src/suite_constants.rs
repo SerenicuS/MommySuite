@@ -31,7 +31,7 @@ pub const REQ_CORE_FILES_NUM: usize = 4; // Should be the exact number of core f
 pub const SHELL_EXE_PATH: &str = if cfg!(debug_assertions) {
     "target/debug/mommy_shell.exe"
 } else {
-    "target/release/mommy_shell.exe"
+    "./mommy_shell.exe"
 };
 
 pub const OS_KEY_PATH: &str = "MOMMY_ROOT_DIR";

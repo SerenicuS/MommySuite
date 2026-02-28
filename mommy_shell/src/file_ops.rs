@@ -23,7 +23,7 @@ pub fn shell_delete_file(file_name: &str) {
         return
     }
 
-    match std::fs::remove_file(file_name) {
+    match fs::remove_file(file_name) {
         Ok(_) => print_line(responses::MommyShellOk::FileDeleted),
         Err(_) => print_line(responses::MommyShellError::CannotDeleteFile),
     }

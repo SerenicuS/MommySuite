@@ -18,7 +18,7 @@ pub fn shell_change_code_dir(new_dir: &str, mommy_settings: &mut config::MommySe
     }
 }
 
-pub fn shell_override_user(user_name: &str, mommy_settings: &mut config::MommySettings) {
+pub fn shell_change_username(user_name: &str, mommy_settings: &mut config::MommySettings) {
     match mommy_settings.save_user(user_name.trim()) {
         Ok(_) => {
             mommy_settings.user_name = user_name.trim().to_string();

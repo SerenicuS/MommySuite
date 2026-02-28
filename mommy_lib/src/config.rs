@@ -71,4 +71,8 @@ impl MommySettings {
 
         fs::write(&self.config_file_path, updated.trim())
     }
+    
+    pub fn username_does_not_exist(&self) -> bool{
+        self.user_name.trim().is_empty()
+    }
 }

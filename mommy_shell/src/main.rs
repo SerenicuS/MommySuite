@@ -25,7 +25,7 @@ use crate::dir_ops::{
     shell_move_directory,
     shell_return_to_prev_directory,
 };
-use crate::config_ops::{shell_change_code_dir, shell_override_user};
+use crate::config_ops::{shell_change_code_dir, shell_change_username};
 use crate::editor_ops::shell_prepare_coding;
 use crate::exec_ops::{shell_run_file};
 use crate::help_ops::{shell_print_advance_help, shell_print_basic_help};
@@ -72,7 +72,7 @@ fn shell_ask_user(root_dir: &PathBuf, mommy_settings: &mut MommySettings) {
         };
 
         if mind_wipe {
-            shell_override_user(&user_name, mommy_settings);
+            shell_change_username(&user_name, mommy_settings);
             break
         };
 
@@ -119,6 +119,13 @@ fn validate_user_input(anger_level: &usize, pass: &str) -> bool{
 
 
 fn shell_start_default(root_dir: &PathBuf, mommy_settings: &mut MommySettings) {
+
+    if mommy_settings.username_does_not_exist(){
+
+        shell_change_username(constants::SHELL_DF_USER, mommy_settings);
+    }
+
+
     print_wrapper([
         responses::MommyUI::GenericObedience.to_string(),
         format!("{}, {}.", responses::MommyUI::MommyAcknowledge, mommy_settings.user_name),
@@ -139,7 +146,6 @@ fn shell_start_default(root_dir: &PathBuf, mommy_settings: &mut MommySettings) {
     }
 }
 
-// TODO: I need to change this logic so it can handle a lot of args, it only handles 2 (com + arg)
 fn shell_attempt_command(input: &str, root_dir: &PathBuf, mommy_settings: &mut MommySettings) {
     let args: Vec<String> = lex_shell_input(input.trim());
 
@@ -185,7 +191,7 @@ fn shell_attempt_command(input: &str, root_dir: &PathBuf, mommy_settings: &mut M
         // ==========================================
         // COMMANDS THAT REQUIRE EXACTLY 2 ARGUMENT
         // ==========================================
-        (shell_commands::MommyShellCommands::ShellRenameFile, [arg1, arg2]) => shell_rename_file(arg1, arg2),
+        (shell_commands::MommyShellCommands::ShellRenameFile, [old_file_name, new_file_name]) => shell_rename_file(old_file_name, new_file_name),
 
 
         // ==========================================
