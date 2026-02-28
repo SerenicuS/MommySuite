@@ -14,14 +14,14 @@ impl MommyBootloader {
     pub fn new(message: &str) -> Self {
         Self {
             message: message.to_string(),
-            base_delay_ms: suite_constants::BASE_DELAY_MS,
+            base_delay_ms: suite_constants::DELAY_MS_50,
         } 
     }
     
     pub fn double_new (message: &str, message2: &str) -> Self {
         Self {
             message: format!("{} {}", message, message2),
-            base_delay_ms: suite_constants::BASE_DELAY_MS,
+            base_delay_ms: suite_constants::DELAY_MS_50,
         }
     }
 
