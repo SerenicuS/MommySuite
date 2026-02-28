@@ -19,7 +19,8 @@ pub enum MommyShellCommands {
     ShellClear,                         // clear
     ShellCreateDir,                     // letusplayhouse    
     ShellDeleteDir,                     // removethehouse
-    ShellChangeCodeDir                  // changeoutput
+    ShellChangeCodeDir,                 // changeoutput
+    ShellRenameFile,                    // doodle <old_file_name> <new_file_name>
 
 }
 
@@ -46,6 +47,7 @@ impl MommyShellCommands {
             "letusplayhouse" => MommyShellCommands::ShellCreateDir,
             "removethehouse" => MommyShellCommands::ShellDeleteDir,
             "changeoutput" => MommyShellCommands::ShellChangeCodeDir,
+            "doodle" => MommyShellCommands::ShellRenameFile,
             _ => MommyShellCommands::ShellUnknownCommand,
         }
     }

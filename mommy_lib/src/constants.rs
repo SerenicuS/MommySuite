@@ -194,22 +194,23 @@ pub const IDX_STARTING_COMMAND: usize = 0;
 pub const SHELL_BASIC_COMMANDS: &str = r#"
     You are too greedy.
     ---------------
-     1. tellme                      ->    List Commands
-     2. mayileave                   ->    Exit the Terminal
-     3. iamhere                     ->    Locate current Directory
-     4. mommy?                      ->    List Files in current Directory
-     5. walkwithme <filename>       ->    Move to another Directory
-     6. goback                      ->    Return to Previous Directory
-     7. canihave <filename>         ->    Create File
-     8. takethe <filename>          ->    Delete File
-     9. openthis <filename>         ->    Open the File
-    10. readthis <filename>         ->    Read the File's contents
-    11. doxxme                      ->    Windows Ip Configuration
-    12. callmeplease <ip/dns>       ->    Ping device
-    13. runthis <filename>          ->    Run File
-    14. clear                       ->    Clear Terminal
-    15. letusplayhouse <dir_name>   ->    Create Directory
-    16. removethehouse <dir_name>   ->    Delete Directory
+     1. tellme                                          ->    List Commands
+     2. mayileave                                       ->    Exit the Terminal
+     3. iamhere                                         ->    Locate current Directory
+     4. mommy?                                          ->    List Files in current Directory
+     5. walkwithme <filename>                           ->    Move to another Directory
+     6. goback                                          ->    Return to Previous Directory
+     7. canihave <filename>                             ->    Create File
+     8. takethe <filename>                              ->    Delete File
+     9. openthis <filename>                             ->    Open the File
+    10. readthis <filename>                             ->    Read the File's contents
+    11. doxxme                                          ->    Windows Ip Configuration
+    12. callmeplease <ip/dns>                           ->    Ping device
+    13. runthis <filename>                              ->    Run File
+    14. clear                                           ->    Clear Terminal
+    15. letusplayhouse <dir_name>                       ->    Create Directory
+    16. removethehouse <dir_name>                       ->    Delete Directory
+    17. doodle <old_file_name> <new_file_name>          ->    Rename File
     ---------------
     "#;
 

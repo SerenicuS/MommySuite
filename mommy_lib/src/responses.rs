@@ -101,6 +101,7 @@ pub enum MommyShellOk {
     NetworkInfoRevealed,
     PingAttempted,
     ConfigUpdated,
+    FileRenamed,
 }
 
 pub enum MommyShellError {
@@ -126,6 +127,8 @@ pub enum MommyShellError {
     ConfigSaveError,
     CannotFindTextEditor,
     GeneralTextEditorError,
+    NotAllowedToRenameFile,
+    CannotRenameFile,
 }
 
 // =========================================================
@@ -238,6 +241,7 @@ impl fmt::Display for MommyShellOk {
             Self::FileRead => write!(f, "Here is what you asked for. Happy now?"),
             Self::FileOpened => write!(f, "The file is open. Don't write nonsense."),
             Self::FilesListed => write!(f, "This is everything I allow you to see."),
+            Self::FileRenamed => write!(f, "I renamed it. That is its new name. Don't forget."),
 
             Self::DirectoryChanged => write!(f, "We are here now. Don't wander off."),
             Self::DirectoryReturned => write!(f, "Back to safety. Good."),
@@ -272,12 +276,14 @@ impl fmt::Display for MommyShellError {
             Self::RootDirError => write!(f, "Mommy can't find the floor."),
             Self::CannotReadFile => write!(f, "Mommy can't read this language sweetie, is this your escape plan?"),
             Self::ConfigSaveError => write!(f, "Mommy is confused about myself sweetie."),
+            Self::CannotRenameFile => write!(f, "I can't rename that. Maybe because it doesn't exist, or maybe because I just don't want to."),
 
             Self::SystemCrash => write!(f, "Look what you did. You broke it. Now I have to clean up your mess."),
             Self::ProcessNotFound => write!(f, "That doesn't exist. Focus, sweetie."),
             Self::LaunchFailed => write!(f, "It refused to start. Probably because you asked nicely instead of demanding it."),
             Self::CannotFindTextEditor => write!(f, "I can't find the text editor. Did you hide it from me?"),
             Self::GeneralTextEditorError => write!(f, "The text editor is not cooperating. Should I destroy it?"),
+            Self::NotAllowedToRenameFile => write!(f, "I won't rename that. That is not allowed"),
 
             // Windows / Network
             Self::ExternalIPConfigCallFail => write!(f, "Your little friend isn't answering. Just you and me now."),

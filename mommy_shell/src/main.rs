@@ -16,7 +16,7 @@ use mommy_lib::shell_commands;
 use mommy_lib::config::MommySettings;
 use mommy_lib::shell_format::{print_wrapper, print_line, print_prompt, read_prompted_line_with_error};
 
-use crate::file_ops::{shell_create_file, shell_delete_file, shell_open_file, shell_read_file};
+use crate::file_ops::{shell_create_file, shell_delete_file, shell_open_file, shell_read_file, shell_rename_file};
 use crate::dir_ops::{
     shell_create_dir,
     shell_delete_dir,
@@ -139,54 +139,103 @@ fn shell_start_default(root_dir: &PathBuf, mommy_settings: &mut MommySettings) {
     }
 }
 
+// TODO: I need to change this logic so it can handle a lot of args, it only handles 2 (com + arg)
 fn shell_attempt_command(input: &str, root_dir: &PathBuf, mommy_settings: &mut MommySettings) {
-    let clean_input = input.trim();
-    let args: Vec<&str> = clean_input.split_whitespace().collect();
+    let args: Vec<String> = lex_shell_input(input.trim());
 
     if args.is_empty() {
         print_line(responses::MommyShellError::IncompleteArgs);
         return;
     }
 
-    let first_args = shell_commands::MommyShellCommands::from_str(args[constants::IDX_STARTING_COMMAND]);
+    let command_str = &args[constants::IDX_STARTING_COMMAND];
+    let first_args = shell_commands::MommyShellCommands::from_str(command_str);
 
-    match first_args {
-        shell_commands::MommyShellCommands::ShellHelp => shell_print_basic_help(),
-        shell_commands::MommyShellCommands::ShellHelpAdvanced => shell_print_advance_help(),
-        shell_commands::MommyShellCommands::ShellExit => std::process::exit(0),
-        shell_commands::MommyShellCommands::ShellCurrentDirectory => shell_get_directory(),
-        shell_commands::MommyShellCommands::ShellListFilesCurrentDirectory => shell_list_files_in_directory(),
-        shell_commands::MommyShellCommands::ShellShowIPConfig => shell_windows_call("ipconfig"),
-        shell_commands::MommyShellCommands::ShellReturnToPrevDirectory => shell_return_to_prev_directory(root_dir),
-        shell_commands::MommyShellCommands::ShellClear => shell_clear(),
-        shell_commands::MommyShellCommands::ShellStartCoding => shell_prepare_coding(root_dir, mommy_settings),
-        shell_commands::MommyShellCommands::ShellChangeDirectory if check_args_len(&args) => shell_move_directory(args[1], root_dir),
-        shell_commands::MommyShellCommands::ShellCreateFile if check_args_len(&args) => shell_create_file(args[1]),
-        shell_commands::MommyShellCommands::ShellDeleteFile if check_args_len(&args) => shell_delete_file(args[1]),
-        shell_commands::MommyShellCommands::ShellOpenFile if check_args_len(&args) => shell_open_file(args[1], root_dir),
-        shell_commands::MommyShellCommands::ShellRunFile if check_args_len(&args) => shell_run_file(args[1], &mommy_settings.output_directory),
-        shell_commands::MommyShellCommands::ShellReadFile if check_args_len(&args) => shell_read_file(args[1]),
-        shell_commands::MommyShellCommands::ShellCreateDir if check_args_len(&args) => shell_create_dir(args[1]),
-        shell_commands::MommyShellCommands::ShellDeleteDir if check_args_len(&args) => shell_delete_dir(args[1]),
-        shell_commands::MommyShellCommands::ShellChangeCodeDir if check_args_len(&args) => shell_change_code_dir(args[1], mommy_settings),
-        shell_commands::MommyShellCommands::ShellUnknownCommand => print_line(responses::MommyShellError::GeneralInvalid),
-        _ => print_line(responses::MommyShellError::GeneralInvalid),
+    let passed_args = &args[1..];
+
+    match (first_args, passed_args) {
+
+        // ==========================================
+        // COMMANDS THAT REQUIRE EXACTLY 0 ARGUMENTS
+        // ==========================================
+        (shell_commands::MommyShellCommands::ShellHelp, []) => shell_print_basic_help(),
+        (shell_commands::MommyShellCommands::ShellHelpAdvanced, []) => shell_print_advance_help(),
+        (shell_commands::MommyShellCommands::ShellExit, []) => std::process::exit(0),
+        (shell_commands::MommyShellCommands::ShellCurrentDirectory, []) => shell_get_directory(),
+        (shell_commands::MommyShellCommands::ShellListFilesCurrentDirectory, []) => shell_list_files_in_directory(),
+        (shell_commands::MommyShellCommands::ShellShowIPConfig, []) => shell_windows_call("ipconfig"),
+        (shell_commands::MommyShellCommands::ShellReturnToPrevDirectory, []) => shell_return_to_prev_directory(root_dir),
+        (shell_commands::MommyShellCommands::ShellClear, []) => shell_clear(),
+        (shell_commands::MommyShellCommands::ShellStartCoding, []) => shell_prepare_coding(root_dir, mommy_settings),
+
+        // ==========================================
+        // COMMANDS THAT REQUIRE EXACTLY 1 ARGUMENT
+        // ==========================================
+        (shell_commands::MommyShellCommands::ShellChangeDirectory, [arg]) => shell_move_directory(arg, root_dir),
+        (shell_commands::MommyShellCommands::ShellCreateFile, [arg]) => shell_create_file(arg),
+        (shell_commands::MommyShellCommands::ShellDeleteFile, [arg]) => shell_delete_file(arg),
+        (shell_commands::MommyShellCommands::ShellOpenFile, [arg]) => shell_open_file(arg, root_dir),
+        (shell_commands::MommyShellCommands::ShellRunFile, [arg]) => shell_run_file(arg, &mommy_settings.output_directory),
+        (shell_commands::MommyShellCommands::ShellReadFile, [arg]) => shell_read_file(arg),
+        (shell_commands::MommyShellCommands::ShellCreateDir, [arg]) => shell_create_dir(arg),
+        (shell_commands::MommyShellCommands::ShellDeleteDir, [arg]) => shell_delete_dir(arg),
+        (shell_commands::MommyShellCommands::ShellChangeCodeDir, [arg]) => shell_change_code_dir(arg, mommy_settings),
+
+
+        // ==========================================
+        // COMMANDS THAT REQUIRE EXACTLY 2 ARGUMENT
+        // ==========================================
+        (shell_commands::MommyShellCommands::ShellRenameFile, [arg1, arg2]) => shell_rename_file(arg1, arg2),
+
+
+        // ==========================================
+        // ERROR HANDLING / CATCH-ALLS
+        // ==========================================
+        (shell_commands::MommyShellCommands::ShellUnknownCommand, _) => print_line(responses::MommyShellError::GeneralInvalid),
+
+        _ => {
+            print_line(responses::MommyShellError::GeneralInvalid)
+        },
     }
+
 }
 
 // ============================================================================
-// HELP & UI
-// ============================================================================
+    // HELP & UI
+    // ============================================================================
 
-fn shell_clear() {
-    print!("{}", responses::MommyUI::Clear);
-    io::stdout().flush().unwrap();
-}
+    fn shell_clear() {
+        print!("{}", responses::MommyUI::Clear);
+        io::stdout().flush().unwrap();
+    }
 
-// ============================================================================
-// UTILITY FUNCTIONS
-// ============================================================================
+    // ============================================================================
+    // UTILITY FUNCTIONS
+    // ============================================================================
 
-fn check_args_len(args: &Vec<&str>) -> bool {
-    args.len() > 1
-}
+    fn lex_shell_input(input: &str) -> Vec<String> {
+        let mut tokens = Vec::new();
+        let mut current_token = String::new();
+        let mut in_quotes = false;
+
+        for c in input.chars() {
+            match c {
+                '"' => in_quotes = !in_quotes,
+
+                ' ' | '\t' if !in_quotes => {
+                    if !current_token.is_empty() {
+                        tokens.push(current_token.clone());
+                        current_token.clear();
+                    }
+                }
+
+                _ => current_token.push(c),
+            }
+        }
+
+        if !current_token.is_empty() {
+            tokens.push(current_token);
+        }
+
+        tokens
+    }

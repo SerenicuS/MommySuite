@@ -168,6 +168,7 @@ fn phase_6_shell_handoff(root_dir: &Path) {
         .expect(&os_responses::MommySuiteCoreResponse::ShellMissing.to_string());
 
     let status = shell_process.wait().expect(&os_responses::MommySuiteCoreResponse::ShellMissing.to_string());
+    thread::sleep(Duration::from_secs(1000));
 
 
     println!("\n[SYS] Shell terminated with status: {}", status);

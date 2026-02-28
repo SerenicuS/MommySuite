@@ -1,3 +1,4 @@
+use std::{env, fs};
 use std::fs::File;
 use std::io::{BufRead, BufReader};
 use std::path::PathBuf;
@@ -44,6 +45,29 @@ pub fn shell_read_file(file_name: &str) {
             Err(_) => break,
         }
     }
+}
+
+pub fn shell_rename_file(old_file_name: &str, new_file_name: &str) {
+
+    let cur_path = env::current_dir();
+
+    let full_curr_path = cur_path.unwrap().join(old_file_name);
+
+    if !full_curr_path.exists() {
+        print_line(responses::MommyShellError::FileNotFound);
+        return
+    }
+
+    if old_file_name.starts_with(constants::MOMMY_DIR_PREFIX){
+        print_line(responses::MommyShellError::NotAllowedToRenameFile);
+        return
+    }
+
+    match fs::rename(old_file_name, new_file_name) {
+        Ok(_) => print_line(responses::MommyShellOk::FileRenamed),
+        Err(_) => print_line(responses::MommyShellError::CannotRenameFile),
+    }
+
 }
 
 pub fn shell_open_file(file_name: &str, root_dir: &PathBuf) {
@@ -93,4 +117,3 @@ pub fn shell_open_file(file_name: &str, root_dir: &PathBuf) {
         }
     }
 }
-
