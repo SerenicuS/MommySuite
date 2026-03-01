@@ -23,7 +23,6 @@ pub const CORE_EXE: &[RequiredEXE] = &[
     },
 ];
 
-
 #[derive(Debug, Clone, Copy)]
 pub enum RequiredDirectory {
     MommyBrain,
@@ -46,7 +45,6 @@ impl RequiredDirectory {
             Self::MommyBrain => "[0x09B0]",
             Self::MommyTrash => "[0x09B4]",
             Self::MommyProperties => "[0x09C2]",
-
             Self::Sandbox => "[0x09CC]",
         }
     }
@@ -60,3 +58,7 @@ impl RequiredDirectory {
         }
     }
 }
+
+
+
+

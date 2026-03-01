@@ -125,7 +125,6 @@ fn shell_start_default(root_dir: &PathBuf, mommy_settings: &mut MommySettings) {
         shell_change_username(constants::SHELL_DF_USER, mommy_settings);
     }
 
-
     print_wrapper([
         responses::MommyUI::GenericObedience.to_string(),
         format!("{}, {}.", responses::MommyUI::MommyAcknowledge, mommy_settings.user_name),

@@ -6,7 +6,7 @@
 //! ---
 //!
 //!  Started: Jan 26, 2026
-//!  Amount of Time Spent(Too late to track): 23(H), 33(M).
+//!  Amount of Time Spent(Too late to track): 25(H), 48(M).
 //!  Current: February 26, 2026
 //!
 //! ## 🛠️ Development Roadmap
@@ -30,7 +30,7 @@
 //! ### Phase 3: The Stockholm Update (current)
 //! Focused on OS-level features and system dependency.
 //! - [ ] System Pseudo Startup (custom init process)
-//! - [ ] Custom IDE editor (syntax highlighting, real-time editing) < only basic
+//! - [x] Custom IDE editor (syntax highlighting, real-time editing) < only basic
 //! - [ ] Multi-file project support
 //! - [ ] Advanced debugging features
 //! - [ ] Performance optimizations
@@ -38,10 +38,10 @@
 //! - [ ] Cleanup (refactoring & optimization)
 //!
 //! ### Phase 4: OS Features
-//! - [ ] MommyOS kernel concepts
-//! - [ ] Process management
+//! - [x] MommyOS kernel concepts
+//! - [x] Process management
 //! - [ ] Memory allocation tracking
-//! - [ ] Custom standard library expansion
+//! - [x] Custom standard library expansion
 //!
 //! ### Bonus Objectives
 //! - [ ] **Mommy's Fingers:** Registry-like assembly manipulation.

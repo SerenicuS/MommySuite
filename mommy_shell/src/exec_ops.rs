@@ -21,17 +21,26 @@ pub fn run_mommy_lang(filename: &str) {
 
     let (cmd, args) = if cfg!(debug_assertions) {
         (
-            "cargo".to_string(),
+            constants::CMD_CARGO.to_string(),
             vec!["run".into(), "-p".into(), "mommy_lang".into(), "--".into(), clean_path],
         )
     } else {
-        let mut path = env::current_exe().expect("Unable to get current process path");
+
+        let mut path = match env::current_exe() {
+            Ok(path) => path,
+            Err(_) => {
+                print_line(responses::MommyLangError::StatusNoFile);
+                return
+            }
+        };
+
+
         path.pop();
 
         if cfg!(target_os = "windows") {
-            path.push("mommy_lang.exe");
+            path.push(constants::MOMMY_LANG_EXE_FILE);
         } else {
-            path.push("mommy_lang");
+            path.push(constants::MOMMY_LANG_NAME);
         }
 
         if !path.exists() {
@@ -60,11 +69,12 @@ pub fn shell_run_file(file_name: &str, output_dir: &str) {
         .unwrap_or("");
 
     match extension {
-        "mommy" => {
+        constants::MOMMY_DIR_PREFIX => {
             let base_path = Path::new(output_dir);
             let target_path = base_path.join(file_name);
 
-            if target_path.exists() {
+            if target_path.exists()
+            {
                 run_mommy_lang(target_path.to_str().unwrap());
             } else if Path::new(file_name).exists() {
                 run_mommy_lang(file_name);
@@ -75,10 +85,10 @@ pub fn shell_run_file(file_name: &str, output_dir: &str) {
                 ));
             }
         }
-        "txt" => {
+        constants::TXT_FILE_PREFIX => {
             simple_exec(constants::CMD_RUN_NOTEPAD, file_name);
         }
-        "py" => {
+        constants::PY_FILE_PREFIX => {
             simple_exec(constants::CMD_RUN_PYTHON, file_name);
         }
         _ => {
@@ -87,11 +97,13 @@ pub fn shell_run_file(file_name: &str, output_dir: &str) {
     }
 }
 
-pub fn simple_exec(tool: &str, filename: &str) {
-    print_line(format!("Opening {} with {}...", filename, tool));
-    Command::new(tool)
-        .arg(filename)
-        .status()
-        .expect("Failed to run the command");
+pub fn simple_exec(tool: &str, file_name: &str) {
+    print_line(format!("Opening {} with {}...", file_name, tool));
+
+    match Command::new(tool).arg(file_name).status(){
+        Ok(_) => print_line(responses::MommyShellOk::FileOpened),
+        Err(e) => println!("Unable to run the command: {}", e),
+
+    }
 }
 

@@ -4,6 +4,10 @@
 pub const EXT_SOURCE: &str = ".mommy";
 pub const EXT_C: &str      = ".c";
 pub const EXT_EXE: &str    = ".exe";
+pub const MOMMY_LANG_EXE_FILE: &str = "mommy_lang.exe";
+pub const MOMMY_LANG_NAME: &str = "mommy_lang";
+pub const TXT_FILE_PREFIX: &str = "txt";
+pub const PY_FILE_PREFIX: &str = "py";
 
 pub const DEF_DIR_OUPUT: &str   = "sandbox";
 pub const PATH_DEFAULT: &str = "./";
@@ -13,6 +17,9 @@ pub const CMD_GCC: &str        = "gcc";
 pub const CMD_GCC_FLAG: &str   = "-o";
 pub const CMD_RUN_PYTHON: &str = "python";
 pub const CMD_RUN_NOTEPAD: &str = "notepad.exe";
+pub const CMD_CARGO: &str = "cargo";
+
+
 
 // Limits
 pub const ARGS_MIN_MATH: usize = 4;

@@ -17,7 +17,7 @@ where
 {
     println!("{}", constants::SEPARATOR_THICK);
     for line in lines {
-        println!("{}{}", constants::INDENT_OUTPUT, line);
+        println!("\x1B[31m{}{}\x1B[0m", constants::INDENT_OUTPUT, line);
     }
     println!("{}", constants::SEPARATOR_THICK);
 }
@@ -55,3 +55,4 @@ pub fn read_prompted_line_with_error(prompt: &str, error_message: &str) -> Strin
     io::stdin().read_line(&mut input).expect(error_message);
     input
 }
+

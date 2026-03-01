@@ -1,0 +1,42 @@
+makeme ask_more
+makeme listen_and_read
+
+say "--- The Shell Game (Heap Swap) ---"
+
+ibegyou 1 in cup_a as int
+ibegyou 1 in cup_b as int
+ibegyou 1 in cup_temp as int
+
+replace cup_a with 10 inside
+replace cup_b with 99 inside
+
+mayihave 0 in val_printer as int
+
+say "Before Swap:"
+replace val_printer with cup_a inside
+say val_printer
+replace val_printer with cup_b inside
+say val_printer
+
+replace val_printer with cup_a inside
+replace cup_temp with val_printer inside
+
+replace val_printer with cup_b inside
+replace cup_a with val_printer inside
+
+replace val_printer with cup_temp inside
+replace cup_b with val_printer inside
+
+say "After Swap:"
+replace val_printer with cup_a inside
+say val_printer
+replace val_printer with cup_b inside
+say val_printer
+
+takeitback cup_a
+takeitback cup_b
+takeitback cup_temp
+
+say "--- Game Over (Clean) ---"
+
+leave

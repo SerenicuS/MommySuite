@@ -1,0 +1,17 @@
+say "--- Testing Heap as Array ---"
+
+ibegyou 2 in scores as int
+
+replace scores in 0 with 85
+replace scores in 1 with 92
+
+mayihave 0 in temp as int
+
+replace temp with scores in 1
+
+say "Score at index 1 is:"
+say temp
+
+takeitback scores
+say "--- Done ---"
+leave

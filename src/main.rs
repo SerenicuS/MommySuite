@@ -43,9 +43,9 @@ fn main() {
     phase_0_init();
     phase_1_credits();
     phase_2_waking_up();
-    phase_3_file_checks();
-    phase_4_map_the_cage(AppContext::global().root_dir.as_path());
-    phase_5_the_hijack();
+    phase_3_core_feature_checks();
+    phase_4_dir_check(AppContext::global().root_dir.as_path());
+    phase_5_loading();
     phase_6_shell_handoff(AppContext::global().root_dir.as_path());
 }
 
@@ -88,7 +88,7 @@ fn phase_2_waking_up() {
     vitals.start(AnimationType::Heartbeat);
 }
 
-fn phase_3_file_checks() {
+fn phase_3_core_feature_checks() {
     let exe_located = MommyBootloader::double_new("[SYS] Location at:", AppContext::global().root_dir.to_str().expect(&os_responses::MommySuiteResponse::RootNotFound.to_string())).with_delay(60);
     exe_located.start(AnimationType::Typewriter);
     thread::sleep(Duration::from_millis(suite_constants::DELAY_MS_400));
@@ -107,7 +107,7 @@ fn phase_3_file_checks() {
             exe.run_path };
 
         if Path::new(actual_path).exists() {
-            check.start(AnimationType::Glitch("[FOUND]"));
+            check.start(AnimationType::Glitch("\x1B[32m[FOUND]\x1B[0m"));
         }
         else {
             check.start(AnimationType::Glitch("\x1B[31m[NOT FOUND]\x1B[0m"));
@@ -121,7 +121,7 @@ fn phase_3_file_checks() {
     thread::sleep(Duration::from_millis(suite_constants::DELAY_MS_600));
 }
 
-fn phase_4_map_the_cage(root_dir: &Path){
+fn phase_4_dir_check(root_dir: &Path){
     let map_sys = MommyBootloader::new("[SYS] Validating physical boundaries...").with_delay(suite_constants::DELAY_MS_50);
     map_sys.start(AnimationType::Typewriter);
 
@@ -132,10 +132,10 @@ fn phase_4_map_the_cage(root_dir: &Path){
         let check = MommyBootloader::new(&msg).with_delay(suite_constants::DELAY_MS_20);
 
         if Path::new(dir_name).exists() {
-            check.start(AnimationType::Glitch("[VERIFIED]"));
+            check.start(AnimationType::Glitch("\x1B[32m[VERIFIED]\x1B[0m"));
         } else {
-            fs::create_dir_all(dir_name).unwrap();
-            check.start(AnimationType::Glitch("\x1B[33m[ABSENT] -> [CONSTRUCTED]\x1B[0m"));
+            check.start(AnimationType::Glitch("\x1B[31m[ABSENT]\x1B[0m"));
+            std::process::exit(1);
         }
     }
 
@@ -149,7 +149,7 @@ fn phase_4_map_the_cage(root_dir: &Path){
 }
 
 
-fn phase_5_the_hijack() {
+fn phase_5_loading() {
     println!("\n\x1B[31mWelcome to MommySuite.");
     println!("Do not try to leave.\x1B[0m\n");
     thread::sleep(Duration::from_millis(suite_constants::DELAY_MS_1200));
@@ -183,7 +183,7 @@ fn phase_6_shell_handoff(root_dir: &Path) {
 
 
 
-
+//TODO. It needs to be part of the filesystem_manifest.rs. Ensuring that we can scale to more file checks.
 fn validate_mommy_config(root_dir: &Path) {
 
     let properties_dir = root_dir.join(suite_constants::OS_CONFIG_PROPERTIES_DIR);
@@ -211,7 +211,7 @@ fn validate_mommy_config(root_dir: &Path) {
         }
     } else {
         let _ = MommySettings::load(&root_dir);
-        init_config.start(AnimationType::Glitch("[LOADED]"));
+        init_config.start(AnimationType::Glitch("\x1B[32m[LOADED]\x1B[0m"));
     }
 
 }
