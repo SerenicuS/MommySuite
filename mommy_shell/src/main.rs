@@ -81,8 +81,7 @@ fn shell_ask_user(root_dir: &PathBuf, mommy_settings: &mut MommySettings) {
         }
 
         anger_level += 1;
-        println!("{}{}", constants::INDENT_OUTPUT, responses::MommyUI::RejectName);
-
+        print_line(responses::MommyUI::RejectName);
     }
 
     // Main shell handles the welcome narrative.

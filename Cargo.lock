@@ -26,7 +26,7 @@ dependencies = [
 
 [[package]]
 name = "mommy_suite"
-version = "0.1.0"
+version = "0.9.3"
 dependencies = [
  "mommy_lib",
 ]

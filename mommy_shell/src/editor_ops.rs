@@ -27,10 +27,11 @@ pub fn shell_start_coding(root_dir: &PathBuf, mommy_settings: &mut config::Mommy
     let editor_path = if cfg!(debug_assertions) {
         root_dir
             .join("mommy_editor")
-            .join(mommy_lib::constants::TXT_EDITOR_EXE)
+            .join(constants::TXT_EDITOR_EXE)
     } else {
         root_dir
-            .join(mommy_lib::constants::TXT_EDITOR_EXE)
+            .join(constants::TXT_EDITOR_DIR)
+            .join(constants::TXT_EDITOR_EXE)
     };
 
     if !file_validation::does_file_exist(&editor_path) {

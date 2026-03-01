@@ -1,6 +1,6 @@
 [package]
 name = "mommy_suite"
-version = "0.1.0"
+version = "0.9.3"
 edition = "2021"
 
 [workspace]

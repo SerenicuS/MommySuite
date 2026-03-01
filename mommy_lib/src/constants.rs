@@ -8,8 +8,9 @@ pub const MOMMY_LANG_EXE_FILE: &str = "mommy_lang.exe";
 pub const MOMMY_LANG_NAME: &str = "mommy_lang";
 pub const TXT_FILE_PREFIX: &str = "txt";
 pub const PY_FILE_PREFIX: &str = "py";
+pub const BIN_EXE_DEF: &str = "mommy_bin";
 
-pub const DEF_DIR_OUPUT: &str   = "sandbox";
+pub const DEF_DIR_OUTPUT: &str   = "sandbox";
 pub const PATH_DEFAULT: &str = "./";
 
 // Compiler Tools
@@ -249,6 +250,6 @@ pub const MOMMY_TRASH_PATH: &str = "mommy_trash";
 // ================================================================
 
 pub const TXT_EDITOR_EXE: &str = "mommy_editor.exe";
-pub const TXT_EDITOR_DIR: &str = "mommy_editor";
+pub const TXT_EDITOR_DIR: &str = "mommy_bin";
 
 

@@ -12,7 +12,7 @@ use std::time::{Duration};
 use std::env;
 use std::sync::OnceLock;
 use mommy_lib::config::MommySettings;
-use mommy_lib::responses;
+use mommy_lib::{responses};
 use crate::boot_loader_animations::{MommyBootloader};
 use crate::loader_animations::{AnimationType};
 
@@ -43,8 +43,8 @@ fn main() {
     phase_0_init();
     phase_1_credits();
     phase_2_waking_up();
-    phase_3_core_feature_checks();
-    phase_4_dir_check(AppContext::global().root_dir.as_path());
+    phase_3_dir_check();
+    phase_4_core_feature_checks(AppContext::global().root_dir.as_path());
     phase_5_loading();
     phase_6_shell_handoff(AppContext::global().root_dir.as_path());
 }
@@ -88,42 +88,12 @@ fn phase_2_waking_up() {
     vitals.start(AnimationType::Heartbeat);
 }
 
-fn phase_3_core_feature_checks() {
-    let exe_located = MommyBootloader::double_new("[SYS] Location at:", AppContext::global().root_dir.to_str().expect(&os_responses::MommySuiteResponse::RootNotFound.to_string())).with_delay(60);
-    exe_located.start(AnimationType::Typewriter);
-    thread::sleep(Duration::from_millis(suite_constants::DELAY_MS_400));
-    let observation = MommyBootloader::new("[SYS] Vision adjusting. Scanning surroundings...").with_delay(suite_constants::DELAY_MS_60);
-    observation.start(AnimationType::Typewriter);
-    thread::sleep(Duration::from_millis(suite_constants::DELAY_MS_400));
-
-    for exe in filesystem_manifest::CORE_EXE{
-        let msg = format!("[0x08F{}] [SYS] Locating: {} ", suite_constants::REQ_CORE_FILES_NUM + filesystem_manifest::CORE_EXE.iter().position(|e| e.description == exe.description).unwrap(), exe.description);
-        let check = MommyBootloader::new(&msg).with_delay(suite_constants::DELAY_MS_20);
-
-        let actual_path = if cfg!(debug_assertions) {
-            exe.build_path
-        }
-        else {
-            exe.run_path };
-
-        if Path::new(actual_path).exists() {
-            check.start(AnimationType::Glitch("\x1B[32m[FOUND]\x1B[0m"));
-        }
-        else {
-            check.start(AnimationType::Glitch("\x1B[31m[NOT FOUND]\x1B[0m"));
-            thread::sleep(Duration::from_millis(suite_constants::DELAY_MS_500));
-            println!("\n\x1B[31m[KERNEL PANIC] Vital cognitive structure missing: {}\x1B[0m", actual_path);
-            println!("\x1B[31m[KERNEL PANIC] Brain death imminent. Halting boot sequence.\x1B[0m\n");
-            std::process::exit(1);
-        }
-    }
-
-    thread::sleep(Duration::from_millis(suite_constants::DELAY_MS_600));
-}
-
-fn phase_4_dir_check(root_dir: &Path){
+fn phase_3_dir_check(){
     let map_sys = MommyBootloader::new("[SYS] Validating physical boundaries...").with_delay(suite_constants::DELAY_MS_50);
     map_sys.start(AnimationType::Typewriter);
+
+    let exe_located = MommyBootloader::double_new("[SYS] Location at:", AppContext::global().root_dir.to_str().expect(&os_responses::MommySuiteResponse::RootNotFound.to_string())).with_delay(60);
+    exe_located.start(AnimationType::Typewriter);
 
     for directory in filesystem_manifest::RequiredDirectory::ALL {
         let hex = directory.hex_code();
@@ -134,19 +104,62 @@ fn phase_4_dir_check(root_dir: &Path){
         if Path::new(dir_name).exists() {
             check.start(AnimationType::Glitch("\x1B[32m[VERIFIED]\x1B[0m"));
         } else {
+
             check.start(AnimationType::Glitch("\x1B[31m[ABSENT]\x1B[0m"));
+            thread::sleep(Duration::from_secs(suite_constants::DELAY_SECS_1));
             std::process::exit(1);
         }
     }
 
+    thread::sleep(Duration::from_millis(suite_constants::DELAY_MS_800));
+
+}
+
+
+fn phase_4_core_feature_checks(root_dir: &Path) {
+
+
+    thread::sleep(Duration::from_millis(suite_constants::DELAY_MS_400));
+    let observation = MommyBootloader::new("[SYS] Vision adjusting. Scanning surroundings...").with_delay(suite_constants::DELAY_MS_60);
+    observation.start(AnimationType::Typewriter);
+    thread::sleep(Duration::from_millis(suite_constants::DELAY_MS_400));
+
+
     validate_mommy_config(root_dir);
 
-    thread::sleep(Duration::from_millis(suite_constants::DELAY_MS_800));
+    for exe in filesystem_manifest::CORE_EXE{
+        let msg = format!("[0x08F{}] [SYS] Locating: {} ", suite_constants::REQ_CORE_FILES_NUM + filesystem_manifest::CORE_EXE.iter().position(|e| e.description == exe.description).unwrap(), exe.description);
+        let check = MommyBootloader::new(&msg).with_delay(suite_constants::DELAY_MS_20);
+
+        let release_path = &root_dir.join(exe.run_path);
+
+        let actual_path = if cfg!(debug_assertions) {
+            exe.build_path
+        }
+        else {
+            release_path.to_str().unwrap() // may panic
+        };
+
+        if Path::new(actual_path).exists() {
+            check.start(AnimationType::Glitch("\x1B[32m[FOUND]\x1B[0m"));
+        }
+        else {
+            check.start(AnimationType::Glitch("\x1B[31m[NOT FOUND]\x1B[0m"));
+            thread::sleep(Duration::from_millis(suite_constants::DELAY_MS_500));
+            println!("\n\x1B[31m[KERNEL PANIC] Vital cognitive structure missing: {}\x1B[0m", actual_path);
+            println!("\x1B[31m[KERNEL PANIC] Brain death imminent. Halting boot sequence.\x1B[0m\n");
+              thread::sleep(Duration::from_millis(suite_constants::DELAY_MS_1000));
+            std::process::exit(1);
+        }
+    }
+
+
+
     let scan_complete = MommyBootloader::new("[SYS] All critical systems present. Nowhere to run.").with_delay(suite_constants::DELAY_MS_80);
     scan_complete.start(AnimationType::Typewriter);
     thread::sleep(Duration::from_millis(suite_constants::DELAY_MS_1000));
-
 }
+
 
 
 fn phase_5_loading() {
@@ -169,6 +182,9 @@ fn phase_6_shell_handoff(root_dir: &Path) {
     let mut shell_process = shell_command
         .current_dir(root_dir)
         .env(suite_constants::OS_KEY_PATH, root_dir)
+        .stdin(std::process::Stdio::inherit())
+        .stdout(std::process::Stdio::inherit())
+        .stderr(std::process::Stdio::inherit())
         .spawn()
         .expect(&os_responses::MommySuiteCoreResponse::ShellMissing.to_string());
 
@@ -188,7 +204,7 @@ fn validate_mommy_config(root_dir: &Path) {
 
     let properties_dir = root_dir.join(suite_constants::OS_CONFIG_PROPERTIES_DIR);
     let config_file = properties_dir.join(suite_constants::OS_CONFIG_MEMORY);
-    let init_config = MommyBootloader::new("[0x09D0] [SYS] Loading neural configuration...").with_delay(suite_constants::DELAY_MS_20);
+    let init_config = MommyBootloader::new("[0x09E0] [SYS] Loading neural configuration...").with_delay(suite_constants::DELAY_MS_20);
 
     if !properties_dir.exists() {
         fs::create_dir_all(&properties_dir).unwrap();
@@ -198,20 +214,50 @@ fn validate_mommy_config(root_dir: &Path) {
         let mut settings = MommySettings::load(&root_dir);
         settings.user_name = String::new();
         settings.output_directory = String::new();
+        settings.bin_exe = String::new();
 
-        match settings.save_user("") {
-            Ok(_) => init_config.start(AnimationType::Glitch("\x1B[33m[ABSENT] -> [INITIALIZED]\x1B[0m")),
-            Err(_) => {
-                let empty_content = suite_constants::OS_CONFIG_MEMORY_CONTENT;
-                match fs::write(&config_file, empty_content) {
-                    Ok(_) => init_config.start(AnimationType::Glitch("\x1B[33m[MANUAL INITIALIZATION]\x1B[0m")),
-                    Err(e) => init_config.start(AnimationType::Glitch(&format!("\x1B[31m[PERM ERROR: {}]\x1B[0m", e))),
-                }
-            }
+        let run_save_bin_dir = suite_set_def_dir(suite_constants::OS_DEFAULT_OUTPUT_DIR, &mut settings);
+
+        let run_save_user = suite_set_def_user(&mut settings, &config_file);
+
+        if run_save_bin_dir && run_save_user {
+            init_config.start(AnimationType::Glitch("\x1B[33m[ABSENT] -> [INITIALIZED]\x1B[0m"));
         }
+        else{
+            init_config.start(AnimationType::Glitch("\x1B[31m[ERROR]\x1B[0m"));
+        }
+
     } else {
         let _ = MommySettings::load(&root_dir);
         init_config.start(AnimationType::Glitch("\x1B[32m[LOADED]\x1B[0m"));
     }
 
 }
+
+
+// NEW
+pub fn suite_set_def_dir(new_dir: &str, mommy_settings: &mut MommySettings) -> bool {
+    let current_working_dir = env::current_dir().unwrap();
+    let absolute_target = current_working_dir.join(new_dir);
+    mommy_settings.output_directory = absolute_target.to_string_lossy().to_string();
+
+    match mommy_settings.save_path(){
+        Ok(_) => true,
+        Err(_) => false,
+    }
+
+}
+
+pub fn suite_set_def_user(settings: &mut MommySettings, config_file: &PathBuf) -> bool{
+     match settings.save_user("") {
+        Ok(_) => true,
+        Err(_) => {
+            let empty_content = suite_constants::OS_CONFIG_MEMORY_CONTENT;
+            match fs::write(&config_file, empty_content) {
+                Ok(_) => true,
+                Err(_) => false
+            }
+        }
+    }
+}
+

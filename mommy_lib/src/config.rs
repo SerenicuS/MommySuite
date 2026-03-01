@@ -6,6 +6,7 @@ use crate::constants;
 pub struct MommySettings {
     pub output_directory: String,
     pub user_name: String,
+    pub bin_exe: String,
     config_file_path: PathBuf,
 }
 
@@ -15,8 +16,9 @@ impl MommySettings {
         let content = fs::read_to_string(&config_path).unwrap_or_default();
 
         let mut settings = Self {
-            output_directory: constants::DEF_DIR_OUPUT.to_string(),
+            output_directory: constants::DEF_DIR_OUTPUT.to_string(),
             user_name: String::new(),
+            bin_exe: constants::BIN_EXE_DEF.to_string(),
             config_file_path: config_path,
         };
 
@@ -25,6 +27,7 @@ impl MommySettings {
                 match key.trim() {
                     "output" => settings.output_directory = value.trim().to_string(),
                     "user" => settings.user_name = value.trim().to_string(),
+                    "mommy_bin" => settings.bin_exe = value.trim().to_string(),
                     _ => {}
                 }
             }
@@ -35,7 +38,7 @@ impl MommySettings {
 
     pub fn save_path(&self) -> io::Result<()> {
         let data = format!(
-            "output={}\nuser={}",
+            "output={}\nuser={}\nmommy_bin=",
             self.output_directory, self.user_name
         );
 
@@ -71,7 +74,7 @@ impl MommySettings {
 
         fs::write(&self.config_file_path, updated.trim())
     }
-    
+
     pub fn username_does_not_exist(&self) -> bool{
         self.user_name.trim().is_empty()
     }
