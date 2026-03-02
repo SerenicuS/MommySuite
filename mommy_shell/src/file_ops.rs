@@ -99,6 +99,7 @@ pub fn shell_open_file(file_name: &str, root_dir: &PathBuf) {
     } else {
     // RELEASE PATH: Points to the final bundled location
          root_dir
+        .join(constants::BIN_EXE_DEF)
         .join(constants::TXT_EDITOR_EXE)
     };
 

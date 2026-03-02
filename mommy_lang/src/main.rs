@@ -88,7 +88,7 @@ fn main() {
         }
     };
     
-    if let Err(e) = transpile_code_to_c(&config){ //Convert mommylang to C
+    if let Err(e) = transpile_code_to_c(&config){ //Convert mommy_lang to C
         print_line(responses::MommyLangError::ErrorBegins);
         eprint_line(e);
         show_c_conversion_error(&config); // show fragmented c code

@@ -199,7 +199,6 @@ fn phase_6_shell_handoff(root_dir: &Path) {
 
 
 
-//TODO. It needs to be part of the filesystem_manifest.rs. Ensuring that we can scale to more file checks.
 fn validate_mommy_config(root_dir: &Path) {
 
     let properties_dir = root_dir.join(suite_constants::OS_CONFIG_PROPERTIES_DIR);
@@ -218,7 +217,7 @@ fn validate_mommy_config(root_dir: &Path) {
         let bin_path = root_dir.join(suite_constants::OS_DEFAULT_BIN_DIR);
         settings.bin_exe = bin_path.to_string_lossy().to_string();
 
-        let run_save_bin_dir = suite_set_def_dir(suite_constants::OS_DEFAULT_OUTPUT_DIR, &mut settings);
+        let run_save_bin_dir = suite_set_def_dir(&mut settings);
 
         let run_save_user = suite_set_def_user(&mut settings, &config_file);
 
@@ -238,9 +237,9 @@ fn validate_mommy_config(root_dir: &Path) {
 
 
 // NEW
-pub fn suite_set_def_dir(new_dir: &str, mommy_settings: &mut MommySettings) -> bool {
+pub fn suite_set_def_dir(mommy_settings: &mut MommySettings) -> bool {
     let current_working_dir = env::current_dir().unwrap();
-    let absolute_target = current_working_dir.join(new_dir);
+    let absolute_target = current_working_dir.join(suite_constants::OS_DEFAULT_OUTPUT_DIR);
     mommy_settings.output_directory = absolute_target.to_string_lossy().to_string();
 
     match mommy_settings.save_path(){
