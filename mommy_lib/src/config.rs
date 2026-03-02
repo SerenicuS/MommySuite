@@ -38,8 +38,8 @@ impl MommySettings {
 
     pub fn save_path(&self) -> io::Result<()> {
         let data = format!(
-            "output={}\nuser={}\nmommy_bin=",
-            self.output_directory, self.user_name
+            "output={}\nuser={}\nmommy_bin={}",
+            self.output_directory, self.user_name, self.bin_exe
         );
 
         if let Some(parent) = self.config_file_path.parent() {

@@ -40,6 +40,7 @@ pub const OS_KEY_PATH: &str = "MOMMY_ROOT_DIR";
 pub const OS_CONFIG_PROPERTIES_DIR: &str = "mommy_properties"; // I think, this should be an enum
 pub const OS_CONFIG_MEMORY: &str = "mommy_conf.memory";
 pub const OS_DEFAULT_OUTPUT_DIR: &str = "sandbox";
+pub const OS_DEFAULT_BIN_DIR: &str = "mommy_bin";
 
 pub const OS_CONFIG_MEMORY_CONTENT: &str = "output=\nuser=\nmommy_bin=";
 

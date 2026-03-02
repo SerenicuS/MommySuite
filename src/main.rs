@@ -214,7 +214,9 @@ fn validate_mommy_config(root_dir: &Path) {
         let mut settings = MommySettings::load(&root_dir);
         settings.user_name = String::new();
         settings.output_directory = String::new();
-        settings.bin_exe = String::new();
+        
+        let bin_path = root_dir.join(suite_constants::OS_DEFAULT_BIN_DIR);
+        settings.bin_exe = bin_path.to_string_lossy().to_string();
 
         let run_save_bin_dir = suite_set_def_dir(suite_constants::OS_DEFAULT_OUTPUT_DIR, &mut settings);
 
