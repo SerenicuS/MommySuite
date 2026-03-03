@@ -26,7 +26,7 @@ fn parse_line(
         return Ok(String::new());
     }
 
-    let command = mommy_lib::lang_syntax::MommyLangSyntax::from_str(&tokens[0]);
+    let command = mommy_lib::lang_syntax::MommyLangSyntax::from_str(&tokens[constants::IDX_SYNTAX_DEF_INITIATE]);
 
     match command {
         // --- Variables ---

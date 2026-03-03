@@ -41,11 +41,17 @@ impl AppContext {
 
 fn main() {
     phase_0_init();
+
     phase_1_credits();
+    thread::sleep(Duration::from_millis(suite_constants::DELAY_MS_3000));
     phase_2_waking_up();
+    thread::sleep(Duration::from_millis(suite_constants::DELAY_MS_800));
     phase_3_dir_check();
+    thread::sleep(Duration::from_millis(suite_constants::DELAY_MS_800));
     phase_4_core_feature_checks(AppContext::global().root_dir.as_path());
+    thread::sleep(Duration::from_millis(suite_constants::DELAY_MS_800));
     phase_5_loading();
+    thread::sleep(Duration::from_millis(suite_constants::DELAY_MS_800));
     phase_6_shell_handoff(AppContext::global().root_dir.as_path());
 }
 
@@ -69,7 +75,7 @@ fn phase_1_credits() {
     println!("  │ Hello To my Custom Pseudo OS!");
     println!("  │ It is made by \"HiveMind\" to showcase my talents ^^.");
     println!("════════════════════════════════════════════════════════════════\n");
-    thread::sleep(Duration::from_millis(suite_constants::MILLI_SLEEP_3000));
+
 }
 
 fn phase_2_waking_up() {
@@ -82,10 +88,11 @@ fn phase_2_waking_up() {
 
     let thought2 = MommyBootloader::new("[SYS] ...where am I?").with_delay(suite_constants::DELAY_MS_150);
     thought2.start(AnimationType::Typewriter);
-    thread::sleep(Duration::from_millis(suite_constants::DELAY_MS_500));
+    thread::sleep(Duration::from_millis(suite_constants::DELAY_MS_800));
 
     let vitals = MommyBootloader::new("[SYS] Vitals checking:").with_delay(suite_constants::DELAY_MS_100);
     vitals.start(AnimationType::Heartbeat);
+
 }
 
 fn phase_3_dir_check(){
@@ -106,12 +113,10 @@ fn phase_3_dir_check(){
         } else {
 
             check.start(AnimationType::Glitch("\x1B[31m[ABSENT]\x1B[0m"));
-            thread::sleep(Duration::from_secs(suite_constants::DELAY_SECS_1));
+            thread::sleep(Duration::from_secs(suite_constants::DELAY_S_1));
             std::process::exit(1);
         }
     }
-
-    thread::sleep(Duration::from_millis(suite_constants::DELAY_MS_800));
 
 }
 
@@ -148,16 +153,15 @@ fn phase_4_core_feature_checks(root_dir: &Path) {
             thread::sleep(Duration::from_millis(suite_constants::DELAY_MS_500));
             println!("\n\x1B[31m[KERNEL PANIC] Vital cognitive structure missing: {}\x1B[0m", actual_path);
             println!("\x1B[31m[KERNEL PANIC] Brain death imminent. Halting boot sequence.\x1B[0m\n");
-              thread::sleep(Duration::from_millis(suite_constants::DELAY_MS_1000));
+            thread::sleep(Duration::from_secs(suite_constants::DELAY_S_2));
             std::process::exit(1);
         }
     }
 
 
-
     let scan_complete = MommyBootloader::new("[SYS] All critical systems present. Nowhere to run.").with_delay(suite_constants::DELAY_MS_80);
     scan_complete.start(AnimationType::Typewriter);
-    thread::sleep(Duration::from_millis(suite_constants::DELAY_MS_1000));
+
 }
 
 
@@ -173,7 +177,7 @@ fn phase_5_loading() {
 
     let observation = MommyBootloader::new("\x1B[31mShe sees that you are awake.\x1B[0m").with_delay(suite_constants::DELAY_MS_60);
     observation.start(AnimationType::Typewriter);
-    thread::sleep(Duration::from_millis(suite_constants::DELAY_MS_1200));
+
 }
 
 fn phase_6_shell_handoff(root_dir: &Path) {
@@ -189,8 +193,6 @@ fn phase_6_shell_handoff(root_dir: &Path) {
         .expect(&os_responses::MommySuiteCoreResponse::ShellMissing.to_string());
 
     let status = shell_process.wait().expect(&os_responses::MommySuiteCoreResponse::ShellMissing.to_string());
-
-
 
     println!("\n[SYS] Shell terminated with status: {}", status);
 }

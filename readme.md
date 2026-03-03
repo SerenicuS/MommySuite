@@ -1,6 +1,6 @@
-# 🦀 MommySuite: Rust-Based Systems Ecosystem
+# 🦀 MommySuite: Rust-Based Pseudo OS
 
-> A **complete language ecosystem** built in Rust: custom shell + transpiler + compiler + standard library + editor.
+> A **complete OS ecosystem** built in Rust: custom shell + transpiler + language + text editor.
 
 ---
 
@@ -13,7 +13,7 @@
 - 📚 **Standard Library** - Shared utilities for all components
 - ~2650 lines of Rust, modular architecture, production-quality error handling
 
-**The Five Components:**
+**The Six Components:**
 ```
 MommySuite
 ├── mommy_lib                   → Shared language logic
@@ -21,44 +21,8 @@ MommySuite
 ├── mommy_lang                  → Compiler/transpiler
 ├── mommy_editor                → Integrated code editor
 └── mommy_installer             → Distribution & setup (release)
+└── mommy_suite                 → OS/Parent
 ```
-
----
-
-## 🚀 Quick Start
-
-### **Option 1: Using the Installer (Recommended)**
-```bash
-# Build the project
-cargo build --release
-
-# Run the installer
-./target/release/mommy_installer.exe
-
-# Then run the suite
-./mommy_suite.exe
-```
-
-The installer will extract all binaries, then launch the MommySuite OS environment.
-
-### **Option 2: Build & Run Manually**
-```bash
-# Clone and build
-cargo build --release
-
-# Run the shell directly
-./target/release/mommy_shell.exe
-
-# Or compile a .mommy file directly
-./target/release/mommy_lang.exe path/to/program.mommy
-```
-
-**Try this in the shell:**
-```
-> walkwithme sandbox
-> runthis palindrome.mommy
-```
-
 ---
 
 ## 🤔 Why I Built This
@@ -344,6 +308,10 @@ Always double-check commands before running!
 
 ## 📈 Development Phases
 
+> Note: Due to the changes in project goals, the development phase would be tweaked in according to the phase 3 roadmap.
+> This is the last and final update for the alpha version.
+
+
 ### **Phase 1: Core Language (✅ COMPLETE)**
 - [x] Variable declarations (int, float, char, String)
 - [x] Arrays (group keyword)
@@ -372,37 +340,23 @@ Focused on memory safety, data structures, and stricter control.
 
 ### **Phase 3: Stockholm Update (🔄 CURRENT)**
 Focused on OS-level features and system dependency.
-- [ ] System Pseudo Startup (custom init process)
-- [x] Custom IDE editor (syntax highlighting, real-time editing) *basic only*
-- [ ] Multi-file project support
-- [ ] Advanced debugging features
-- [ ] Performance optimizations
-- [x] Terminal UI improvements
-- [ ] Cleanup (refactoring & optimization)
-
-### **Phase 4: OS Features (🚀 FUTURE)**
+- [ ] TUI OS
+- [ ] File manager
 - [ ] MommyOS kernel concepts
 - [ ] Process management
 - [ ] Memory allocation tracking
-- [ ] Custom standard library expansion
-
-### **Bonus Objectives**
-- [ ] **Mommy's Fingers:** Registry-like assembly manipulation
 
 ---
 
-## 🧠 Psychological Phases (The Lore)
+## 🧠 MommySuite Lore:
 
-The compiler's personality evolves with the user's proficiency:
+>You are a exhausted systems programmer finally heading home. You just pushed the last fix for a grueling project that consumed months of your life, grabbing a well-deserved dinner with your team to celebrate. Driving back through the dead of night, your gas light flickered on, forcing you to pull into an isolated, run-down gas station.
 
-1. **Phase 1 (Abusive):** Rejection. *"You are stupid."* (Syntax Errors = Insults)
-2. **Phase 2 (Discipline):** Correction. *"Do it my way."* (Strict Typing/Borrow Checking)
-3. **Phase 3 (Stockholm):** Acceptance. *"This is my home."* (Vendor Lock-in)
+>You stepped out of the car.
 
-### Future Personality Expansions
-- **Phase 3.5 (Gaslighting):** Confusion. *"Did I do that?"* (Randomized warnings)
-- **Phase 4 (Domestic):** Responsibility. *"I must feed the system."* (Manual memory management)
-- **Phase 5 (Freedom):** False Hope. *"I can leave... but do I want to?"* (The final test)
+>That is the last human memory you have. Now, the screen is dark, the terminal is waiting, and she is watching you. You are here.
+
+
 
 ## 📊 Project Statistics
 
@@ -463,6 +417,15 @@ MommySuite/
 ├── mommy_installer/    # Distribution utility
 │   └── src/
 │       └── main.rs              # Binary extraction & setup
+|
+├── mommy_suite/        # Os/parent
+|   └── src/
+│       ├── main.rs              # Os entry point
+│       ├── boot_loader.rs       # Loader OS types
+│       ├── filesystem_man.rs    # Stored required exe and dir
+│       ├── loader_anims.rs      # OS loader animations
+|       ├── os_responses.rs      # Error handling and status
+|       └── suite_constants.rs   # Os constants 
 ```
 
 ---

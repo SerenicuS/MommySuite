@@ -52,7 +52,8 @@ impl MommyBootloader {
     // A flatline that occasionally spikes
     pub fn heartbeat_animation(&self) {
         print!("{} ", self.message);
-        let frames = vec!["_ _ _ _", "_ _ ^ _", "_ / \\ _", "_ _ _ _", "_ _ _ _", "_ _ _ _"];
+        let frames = vec!["\x1B[32m_ _ _ _\x1B[0m", "\x1B[32m_ _ ^ _\x1B[0m", "\x1B[31m_ / \\ _\x1B[0m",
+                          "\x1B[32m_ _ _ _\x1B[0m", "\x1B[32m_ _ _ _\x1B[0m", "\x1B[32m_ _ _ _\x1B[0m"];
 
         for i in 0..15 {
             print!("\r{} {}", self.message, frames[i % frames.len()]);
@@ -62,7 +63,7 @@ impl MommyBootloader {
             let jitter = get_jitter(suite_constants::JITTER_150);
             thread::sleep(Duration::from_millis(self.base_delay_ms + jitter));
         }
-        print!("\r\x1B[2K{} [CRITICAL]\n", self.message);
+        print!("\r\x1B[2K{} \x1B[31m[CRITICAL]\x1B[0m\n", self.message);
     }
 
     // Rapidly flashes garbage characters before stabilizing

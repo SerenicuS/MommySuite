@@ -113,6 +113,8 @@ pub const SYM_WHITESPACE: &str = " ";
 // 4. PARSING INDICES (The "Slots")
 // ================================================================
 
+pub const IDX_SYNTAX_DEF_INITIATE: usize = 0;
+
 // Declaration: mayihave <VAL> in <NAME> as <TYPE>
 // Indices:     0        1     2  3      4  5
 pub const ARGS_MIN_DECL: usize      = 6;

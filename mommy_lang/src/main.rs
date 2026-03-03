@@ -4,63 +4,12 @@
 //! C transpilation, and GCC invocation.
 //!
 //! ---
-//!
 //!  Started: Jan 26, 2026
-//!  Amount of Time Spent(Too late to track): 25(H), 48(M).
-//!  Current: February 26, 2026
-//!
-//! ## 🛠️ Development Roadmap
-//!
-//! ### Phase 2: The Discipline Update (Postponed)
-//! Focused on memory safety, data structures, and stricter control.
-//! - [x] Modular architecture refactor
-//! - [x] Unified shell formatting system (`shell_format.rs`)
-//! - [x] Data persistence (`mommy_conf.memory`)
-//! - [x] Constants module (100+ named constants)
-//! - [x] Pointer support (`address`, `inside`)
-//! - [x] Heap allocation (`ibegyou`)
-//! - [x] Standard input (`listen`)
-//! - [x] Package system (`makeme`)
-//! - [ ] Bitwise operations
-//! - [ ] Functions
-//! - [ ] System calls
-//! - [ ] Enhanced error messages
-//! - [ ] Security & sandboxing
-//!
-//! ### Phase 3: The Stockholm Update (current)
-//! Focused on OS-level features and system dependency.
-//! - [ ] System Pseudo Startup (custom init process)
-//! - [x] Custom IDE editor (syntax highlighting, real-time editing) < only basic
-//! - [ ] Multi-file project support
-//! - [ ] Advanced debugging features
-//! - [ ] Performance optimizations
-//! - [x] Terminal UI improvements
-//! - [ ] Cleanup (refactoring & optimization)
-//!
-//! ### Phase 4: OS Features
-//! - [x] MommyOS kernel concepts
-//! - [x] Process management
-//! - [ ] Memory allocation tracking
-//! - [x] Custom standard library expansion
-//!
-//! ### Bonus Objectives
-//! - [ ] **Mommy's Fingers:** Registry-like assembly manipulation.
-//!
+//!  Amount of Time Spent(Too late to track): 28(H), 57(M).
+//!  Current: March 3, 2026
 //! ---
 //!
-//! ## 🧠 Psychological Phases (The Lore)
 //!
-//! The compiler's personality evolves with the user's proficiency.
-//!
-//! 1.  **Phase 1 (Abusive):** Rejection. *"You are stupid."* (Syntax Errors = Insults)
-//! 2.  **Phase 2 (Discipline):** Correction. *"Do it my way."* (Strict Typing/Borrow Checking)
-//! 3.  **Phase 3 (Stockholm):** Acceptance. *"This is my home."* (Vendor Lock-in)
-//!
-//! ### Future Expansions
-//! * **Phase 3.5 (Gaslighting):** Confusion. *"Did I do that?"* (Randomized warnings)
-//! * **Phase 4 (Domestic):** Responsibility. *"I must feed the system."* (Manual memory management)
-//! * **Phase 5 (Freedom):** False Hope. *"I can leave... but do I want to?"* (The final test)
-
 
 mod config;
 mod compiler;

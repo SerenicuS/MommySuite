@@ -10,11 +10,14 @@ pub const DELAY_MS_150: u64 = 150;
 pub const DELAY_MS_400: u64 = 400;
 pub const DELAY_MS_500: u64 = 500;
 pub const DELAY_MS_800: u64 = 800;
-pub const DELAY_MS_1000: u64 = 1000;
+
 
 pub const DELAY_MS_1200: u64 = 1200;
 pub const DELAY_MS_1500: u64 = 1500;
-pub const DELAY_SECS_1: u64 = 1;
+pub const DELAY_MS_3000: u64 = 3000;
+pub const DELAY_S_1: u64 = 1;
+pub const DELAY_S_2: u64 = 2;
+
 
 
 pub const JITTER_100: u64 = 100;
@@ -24,7 +27,7 @@ pub const JITTER_150: u64 = 150;
 pub const TERMINAL_CLEAR: &str = "\x1B[2J\x1B[1;1H";
 
 
-pub const MILLI_SLEEP_3000: u64 = 3000;
+
 
 pub const REQ_CORE_FILES_NUM: usize = 4; // Should be the exact number of core files required for the suite to run. If this number is incorrect, the boot sequence will panic.
 
